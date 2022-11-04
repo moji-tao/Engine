@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\dxgi-format.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-commandlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-compute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-queries.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-resource-bindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\d3d11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\dxgi-format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\src\d3d11\d3d11-backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\dev\Engine\engine\3rd\nvrhi\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0C6E346F-17A2-3DC9-9210-43F3BB057AB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3BDC7A07-CE8C-348E-94A3-6334189B87BF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A54494D6-55B5-3794-9A76-A395A4D2227C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>glfw</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin-int\GLFW\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glfw3</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin-int\GLFW\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glfw3</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\GLFW\include;$(SolutionDir)engine\3rd\GLFW\src;$(SolutionDir)engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";_GLFW_BUILD_DLL</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";_GLFW_BUILD_DLL</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(SolutionDir)lib\$(TargetName).lib</ImportLibrary>
+      <ProgramDataBaseFile>$(SolutionDir)bin\glfw3.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\GLFW\include;$(SolutionDir)engine\3rd\GLFW\src;$(SolutionDir)engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";_GLFW_BUILD_DLL</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";_GLFW_BUILD_DLL</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(SolutionDir)lib\$(TargetName).lib</ImportLibrary>
+      <ProgramDataBaseFile>$(SolutionDir)bin\glfw3.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\dev\Engine\engine\3rd\GLFW\src\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/dev/Engine/engine/3rd/GLFW/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" -SD:/dev/Engine/engine/3rd/GLFW -BD:/dev/Engine/engine/3rd/GLFW/build --check-stamp-file D:/dev/Engine/engine/3rd/GLFW/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\dev\Engine\engine\3rd\GLFW\CMake\glfw3.pc.in;D:\dev\Engine\engine\3rd\GLFW\src\glfw.rc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\dev\Engine\engine\3rd\GLFW\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/dev/Engine/engine/3rd/GLFW/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" -SD:/dev/Engine/engine/3rd/GLFW -BD:/dev/Engine/engine/3rd/GLFW/build --check-stamp-file D:/dev/Engine/engine/3rd/GLFW/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\dev\Engine\engine\3rd\GLFW\CMake\glfw3.pc.in;D:\dev\Engine\engine\3rd\GLFW\src\glfw.rc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\dev\Engine\engine\3rd\GLFW\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\include\GLFW\glfw3.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\include\GLFW\glfw3native.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\internal.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\platform.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\mappings.h" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\context.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\init.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\input.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\monitor.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\platform.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\vulkan.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\window.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\egl_context.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\osmesa_context.c" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\null_platform.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\null_joystick.h" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_init.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_monitor.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_window.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_joystick.c" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_time.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_thread.h" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_module.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_time.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_thread.c" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_platform.h" />
+    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_joystick.h" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_init.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_joystick.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_monitor.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_window.c" />
+    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\wgl_context.c" />
+    <ResourceCompile Include="D:\dev\Engine\engine\3rd\GLFW\build\src\glfw.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\dev\Engine\engine\3rd\GLFW\build\ZERO_CHECK.vcxproj">
+      <Project>{1D96FE24-8812-3F29-A7B6-7009E1970E8D}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

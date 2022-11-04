@@ -1,0 +1,4 @@
+# CMake generation dependency list for this directory.
+D:/Program Files/CMake/share/cmake-3.25/Modules/GNUInstallDirs.cmake
+D:/dev/Engine/engine/3rd/nvrhi/thirdparty/Vulkan-Headers/CMakeLists.txt
+D:/dev/Engine/engine/3rd/nvrhi/thirdparty/Vulkan-Headers/cmake/cmake_uninstall.cmake.in

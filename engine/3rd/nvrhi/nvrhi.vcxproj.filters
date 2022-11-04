@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\format-info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\shader-blob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\state-tracking.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\validation\validation-commandlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\dev\Engine\engine\3rd\nvrhi\src\validation\validation-device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\nvrhi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\common\containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\common\misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\common\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\src\common\state-tracking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\include\nvrhi\validation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\dev\Engine\engine\3rd\nvrhi\src\validation\validation-backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\dev\Engine\engine\3rd\nvrhi\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="D:\dev\Engine\engine\3rd\nvrhi\tools\nvrhi.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0C6E346F-17A2-3DC9-9210-43F3BB057AB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3BDC7A07-CE8C-348E-94A3-6334189B87BF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

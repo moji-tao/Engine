@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{16068c63-d6de-4b7f-b8f9-b88a4ad8bcbf}</ProjectGuid>
+    <RootNamespace>EngineRuntime</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\EngineRuntime\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\EngineRuntime\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\core\Alloter\MemoryPool.h" />
+    <ClInclude Include="include\core\Base\macro.h" />
+    <ClInclude Include="include\core\Log\LogSystem.h" />
+    <ClInclude Include="include\core\Math\Angle.h" />
+    <ClInclude Include="include\Core\Math\Color.h" />
+    <ClInclude Include="include\core\Math\Math.h" />
+    <ClInclude Include="include\core\Math\Matrix3x3.h" />
+    <ClInclude Include="include\core\Math\Matrix4x4.h" />
+    <ClInclude Include="include\core\Math\Quaternion.h" />
+    <ClInclude Include="include\core\Math\Vector2.h" />
+    <ClInclude Include="include\core\Math\Vector3.h" />
+    <ClInclude Include="include\core\Math\Vector4.h" />
+    <ClInclude Include="include\core\STL\Array.h" />
+    <ClInclude Include="include\core\STL\Map.h" />
+    <ClInclude Include="include\core\STL\Set.h" />
+    <ClInclude Include="include\EngineRuntime.h" />
+    <ClInclude Include="include\Framework\Interface\IRuntimeModule.h" />
+    <ClInclude Include="include\Framework\Interface\ISingleton.h" />
+    <ClInclude Include="include\Function\Render\DirectX\D3D12DeviceManager.h" />
+    <ClInclude Include="include\Function\Render\RenderCamera.h" />
+    <ClInclude Include="include\Function\Render\RenderPass.h" />
+    <ClInclude Include="include\Function\Render\DeviceManager.h" />
+    <ClInclude Include="include\Function\Render\RenderResource.h" />
+    <ClInclude Include="include\Function\Render\RenderResourceBase.h" />
+    <ClInclude Include="include\Function\Render\RHI.h" />
+    <ClInclude Include="include\Function\Render\RenderSystem.h" />
+    <ClInclude Include="include\Function\Window\WindowSystem.h" />
+    <ClInclude Include="include\Function\Window\WindowUI.h" />
+    <ClInclude Include="include\Platform\CharSet.h" />
+    <ClInclude Include="include\core\Math\Transform.h" />
+    <ClInclude Include="include\Platform\FileSystem\FileSystem.h" />
+    <ClInclude Include="include\Resource\ConfigManager\ConfigManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Math\Math.cpp" />
+    <ClCompile Include="src\core\Alloter\MemoryPool.cpp" />
+    <ClCompile Include="src\core\Math\Angle.cpp" />
+    <ClCompile Include="src\core\Math\Matrix3x3.cpp" />
+    <ClCompile Include="src\core\Math\Matrix4x4.cpp" />
+    <ClCompile Include="src\core\Math\Quaternion.cpp" />
+    <ClCompile Include="src\core\Math\Transform.cpp" />
+    <ClCompile Include="src\core\Math\Vector3.cpp" />
+    <ClCompile Include="src\core\Math\Vector4.cpp" />
+    <ClCompile Include="src\Function\Render\DirectX\D3D12DeviceManager.cpp" />
+    <ClCompile Include="src\Function\Render\RenderCamera.cpp" />
+    <ClCompile Include="src\Function\Render\DeviceManager.cpp" />
+    <ClCompile Include="src\Function\Render\RenderResource.cpp" />
+    <ClCompile Include="src\Function\Render\RenderSystem.cpp" />
+    <ClCompile Include="src\Function\Window\WindowSystem.cpp" />
+    <ClCompile Include="src\core\Log\LogSystem.cpp" />
+    <ClCompile Include="src\core\Math\Vector2.cpp" />
+    <ClCompile Include="src\EngineRuntime.cpp" />
+    <ClCompile Include="src\Platform\CharSet.cpp" />
+    <ClCompile Include="src\Platform\FileSystem\FileSystem.cpp" />
+    <ClCompile Include="src\Resource\ConfigManager\ConfigManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\3rd\Assimp\code\assimp.vcxproj">
+      <Project>{7ca55b07-712e-3db7-a539-443ea0fe3395}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\GLFW\build\src\glfw.vcxproj">
+      <Project>{a54494d6-55b5-3794-9a76-a395a4d2227c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\ImGUI\ImGUI\ImGUI.vcxproj">
+      <Project>{b07649fb-0f85-4c52-9990-7d3648ce84d3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\nvrhi\nvrhi.vcxproj">
+      <Project>{97b6622b-5700-3c8a-8733-b25bbe24a5bb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\nvrhi\nvrhi_d3d11.vcxproj">
+      <Project>{929088d3-926b-34c7-a674-fb2abc3056f5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\nvrhi\nvrhi_d3d12.vcxproj">
+      <Project>{9c0b129c-8bfc-3282-9ebe-4529751f00a9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\nvrhi\nvrhi_vk.vcxproj">
+      <Project>{a904fb8b-82d5-38a8-bba9-d69c72287878}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\spdlog\spdlog.vcxproj">
+      <Project>{62034bdf-ac53-372e-9976-51cf8670b66e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
