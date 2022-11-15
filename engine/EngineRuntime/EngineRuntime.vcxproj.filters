@@ -111,6 +111,27 @@
     <ClInclude Include="include\Function\Render\DirectX\D3D12DeviceManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Resource\AssetManager\AssetManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource\ResourceType\Data\MeshData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Random\Random.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\UI\ImGuiRHI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\ShaderUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\UI\ImGuiRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\VertexBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Math\Vector2.cpp">
@@ -174,6 +195,24 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Function\Render\DirectX\D3D12DeviceManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource\AssetManager\AssetManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Random\Random.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\UI\ImGuiRHI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\ShaderUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\UI\ImGuiRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

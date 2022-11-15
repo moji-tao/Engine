@@ -26,6 +26,7 @@ namespace Engine
 
 	void DeviceManager::Finalize()
 	{
+		mAllRenderAsset.clear();
 		mSwapChainFramebuffers.clear();
 
 		DestroyDeviceAndSwapChain();
@@ -60,46 +61,35 @@ namespace Engine
 		mRenderPasses.remove(pRenderPass);
 	}
 
-	void DeviceManager::Render()
+	void DeviceManager::Render(float deltaTile)
 	{
+		UpdateWindowSize();
+
 		BeginFrame();
 
 		nvrhi::IFramebuffer* framebuffer = mSwapChainFramebuffers[GetCurrentBackBufferIndex()];
 
 		for (auto it : mRenderPasses)
 		{
-			it->Render(framebuffer);
+			it->Render(framebuffer, deltaTile);
 		}
+
+		if (mAllRenderAsset.size() > 0)
+		{
+			GetDevice()->executeCommandLists(&mAllRenderAsset[0], mAllRenderAsset.size());
+		}
+		mAllRenderAsset.clear();
 
 		Present();
 
 		GetDevice()->runGarbageCollection();
-
+		
 		++mFrameIndex;
 	}
 
 	uint64_t DeviceManager::GetFrameIndex() const
 	{
 		return mFrameIndex;
-	}
-
-	void DefaultMessageCallback::message(nvrhi::MessageSeverity severity, const char* messageText)
-	{
-		switch (severity)
-		{
-		case nvrhi::MessageSeverity::Info:
-			LOG_INFO("{0}", messageText);
-			break;
-		case nvrhi::MessageSeverity::Warning:
-			LOG_WARN("{0}", messageText);
-			break;
-		case nvrhi::MessageSeverity::Error:
-			LOG_ERROR("{0}", messageText);
-			break;
-		case nvrhi::MessageSeverity::Fatal:
-			LOG_FATAL("{0}", messageText);
-			break;
-		}
 	}
 
 	void DeviceManager::UpdateWindowSize()
@@ -133,7 +123,7 @@ namespace Engine
 			ResizeSwapChain();
 			BackBufferResized();
 		}
-
+		
 		m_DeviceParams.vsyncEnabled = m_RequestedVSync;
 	}
 
@@ -178,4 +168,27 @@ namespace Engine
 		return nullptr;
 	}
 
+	void DeviceManager::AddCommandList(nvrhi::CommandListHandle handle)
+	{
+		mAllRenderAsset.push_back(handle);
+	}
+
+	void DefaultMessageCallback::message(nvrhi::MessageSeverity severity, const char* messageText)
+	{
+		switch (severity)
+		{
+		case nvrhi::MessageSeverity::Info:
+			LOG_INFO("{0}", messageText);
+			break;
+		case nvrhi::MessageSeverity::Warning:
+			LOG_WARN("{0}", messageText);
+			break;
+		case nvrhi::MessageSeverity::Error:
+			LOG_ERROR("{0}", messageText);
+			break;
+		case nvrhi::MessageSeverity::Fatal:
+			LOG_FATAL("{0}", messageText);
+			break;
+		}
+	}
 }

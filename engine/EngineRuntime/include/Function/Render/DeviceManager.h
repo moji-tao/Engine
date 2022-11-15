@@ -48,7 +48,7 @@ namespace Engine
 
 		void RemoveRenderPass(IRenderPass* pRenderPass);
 
-		void Render();
+		void Render(float deltaTile);
 
 		uint64_t GetFrameIndex() const;
 
@@ -82,6 +82,8 @@ namespace Engine
 
 		uint64_t mFrameIndex = 0;
 
+		bool m_IsNvidia = false;
+
 	public:
 		virtual nvrhi::IDevice* GetDevice() const = 0;
 
@@ -100,6 +102,13 @@ namespace Engine
 		nvrhi::IFramebuffer* GetCurrentFramebuffer();
 
 		nvrhi::IFramebuffer* GetFramebuffer(uint32_t index);
+
+	public:
+		void AddCommandList(nvrhi::CommandListHandle handle);
+
+	private:
+		std::vector<nvrhi::CommandListHandle> mAllRenderAsset;
+
 	};
 
 	struct DefaultMessageCallback : public nvrhi::IMessageCallback, public ISingleton<DefaultMessageCallback>

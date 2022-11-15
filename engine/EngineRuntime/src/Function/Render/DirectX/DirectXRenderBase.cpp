@@ -162,7 +162,7 @@ namespace Engine
 
 		ThrowIfFailed(mDXGIFactory->CreateSwapChainForHwnd(
 			mCommandQueue.Get(),		// 交换链需要命令队列，Present命令要执行
-			(HWND)window.GetWindowHandle(),
+			(HWND)window.GetWindowHandle(true),
 			&stSwapChainDesc,
 			nullptr,
 			nullptr,

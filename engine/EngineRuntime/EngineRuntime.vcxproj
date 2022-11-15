@@ -57,10 +57,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\include;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\Boost;$(SolutionDir)engine\3rd\stb\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -74,10 +74,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\3rd\spdlog\include;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\ImGUI\include;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\Boost;$(SolutionDir)engine\3rd\stb\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -100,6 +100,7 @@
     <ClInclude Include="include\core\Math\Vector2.h" />
     <ClInclude Include="include\core\Math\Vector3.h" />
     <ClInclude Include="include\core\Math\Vector4.h" />
+    <ClInclude Include="include\Core\Random\Random.h" />
     <ClInclude Include="include\core\STL\Array.h" />
     <ClInclude Include="include\core\STL\Map.h" />
     <ClInclude Include="include\core\STL\Set.h" />
@@ -114,12 +115,18 @@
     <ClInclude Include="include\Function\Render\RenderResourceBase.h" />
     <ClInclude Include="include\Function\Render\RHI.h" />
     <ClInclude Include="include\Function\Render\RenderSystem.h" />
+    <ClInclude Include="include\Function\Render\ShaderUtil.h" />
+    <ClInclude Include="include\Function\Render\VertexBuffer.h" />
+    <ClInclude Include="include\Function\UI\ImGuiRenderer.h" />
+    <ClInclude Include="include\Function\UI\ImGuiRHI.h" />
     <ClInclude Include="include\Function\Window\WindowSystem.h" />
     <ClInclude Include="include\Function\Window\WindowUI.h" />
     <ClInclude Include="include\Platform\CharSet.h" />
     <ClInclude Include="include\core\Math\Transform.h" />
     <ClInclude Include="include\Platform\FileSystem\FileSystem.h" />
+    <ClInclude Include="include\Resource\AssetManager\AssetManager.h" />
     <ClInclude Include="include\Resource\ConfigManager\ConfigManager.h" />
+    <ClInclude Include="include\Resource\ResourceType\Data\MeshData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Math\Math.cpp" />
@@ -131,44 +138,24 @@
     <ClCompile Include="src\core\Math\Transform.cpp" />
     <ClCompile Include="src\core\Math\Vector3.cpp" />
     <ClCompile Include="src\core\Math\Vector4.cpp" />
+    <ClCompile Include="src\Core\Random\Random.cpp" />
     <ClCompile Include="src\Function\Render\DirectX\D3D12DeviceManager.cpp" />
     <ClCompile Include="src\Function\Render\RenderCamera.cpp" />
     <ClCompile Include="src\Function\Render\DeviceManager.cpp" />
     <ClCompile Include="src\Function\Render\RenderResource.cpp" />
     <ClCompile Include="src\Function\Render\RenderSystem.cpp" />
+    <ClCompile Include="src\Function\Render\ShaderUtil.cpp" />
+    <ClCompile Include="src\Function\Render\VertexBuffer.cpp" />
+    <ClCompile Include="src\Function\UI\ImGuiRenderer.cpp" />
+    <ClCompile Include="src\Function\UI\ImGuiRHI.cpp" />
     <ClCompile Include="src\Function\Window\WindowSystem.cpp" />
     <ClCompile Include="src\core\Log\LogSystem.cpp" />
     <ClCompile Include="src\core\Math\Vector2.cpp" />
     <ClCompile Include="src\EngineRuntime.cpp" />
     <ClCompile Include="src\Platform\CharSet.cpp" />
     <ClCompile Include="src\Platform\FileSystem\FileSystem.cpp" />
+    <ClCompile Include="src\Resource\AssetManager\AssetManager.cpp" />
     <ClCompile Include="src\Resource\ConfigManager\ConfigManager.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\3rd\Assimp\code\assimp.vcxproj">
-      <Project>{7ca55b07-712e-3db7-a539-443ea0fe3395}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\GLFW\build\src\glfw.vcxproj">
-      <Project>{a54494d6-55b5-3794-9a76-a395a4d2227c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\ImGUI\ImGUI\ImGUI.vcxproj">
-      <Project>{b07649fb-0f85-4c52-9990-7d3648ce84d3}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\nvrhi\nvrhi.vcxproj">
-      <Project>{97b6622b-5700-3c8a-8733-b25bbe24a5bb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\nvrhi\nvrhi_d3d11.vcxproj">
-      <Project>{929088d3-926b-34c7-a674-fb2abc3056f5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\nvrhi\nvrhi_d3d12.vcxproj">
-      <Project>{9c0b129c-8bfc-3282-9ebe-4529751f00a9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\nvrhi\nvrhi_vk.vcxproj">
-      <Project>{a904fb8b-82d5-38a8-bba9-d69c72287878}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\spdlog\spdlog.vcxproj">
-      <Project>{62034bdf-ac53-372e-9976-51cf8670b66e}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

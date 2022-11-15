@@ -50,13 +50,11 @@ namespace nvrhi::d3d12
 
             case ResourceType::TypedBuffer_SRV:
             case ResourceType::StructuredBuffer_SRV:
-            case ResourceType::RawBuffer_SRV:
                 requireBufferState(checked_cast<IBuffer*>(binding.resourceHandle), ResourceStates::ShaderResource);
                 break;
 
             case ResourceType::TypedBuffer_UAV:
             case ResourceType::StructuredBuffer_UAV:
-            case ResourceType::RawBuffer_UAV:
                 requireBufferState(checked_cast<IBuffer*>(binding.resourceHandle), ResourceStates::UnorderedAccess);
                 break;
 

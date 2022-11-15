@@ -5,6 +5,9 @@
 #include "EngineRuntime/include/Function/Render/DeviceManager.h"
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
+#include "EngineRuntime/include/Function/Window/WindowUI.h"
+
+#include "EngineRuntime/include/Function/Render/VertexBuffer.h"
 
 namespace Engine
 {
@@ -22,17 +25,15 @@ namespace Engine
 
 		virtual void Finalize() override;
 
-		void InitializeUIRenderBackend();
+		void InitializeUIRenderBackend(WindowUI* windowUI, IRenderPass* editorPass);
 
 		void ResizeEngineContentViewport(float offsetX, float offsetY, float width, float height);
+
+		DeviceManager* GetRenderDeviceManager();
 
 	private:
 		std::shared_ptr<DeviceManager> mDeviceManager;
 
-		//std::shared_ptr<RenderCamera> mCamera;
-
-		//std::shared_ptr<RenderPipelineBase> mRenderPipeline;
-
-		//std::shared_ptr<RenderResourceBase> mRenderResource;
+		std::shared_ptr<VertexBuffer> mDDDD;
 	};
 }

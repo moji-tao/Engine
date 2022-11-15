@@ -112,8 +112,10 @@ namespace Engine
 
 		Vector2& operator/=(const Vector2& rhs);
 
-	private:
-		float m_Value[2];
+	public:
+		//float m_Value[2];
+		float x;
+		float y;
 
 	public:
 		static const Vector2 ZERO;

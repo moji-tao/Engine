@@ -74,7 +74,7 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;SPDLOG_SHARED_LIB;FMT_EXPORT;FMT_SHARED;SPDLOG_COMPILED_LIB;CMAKE_INTDIR=\"Debug\";spdlog_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +118,7 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;SPDLOG_SHARED_LIB;FMT_EXPORT;FMT_SHARED;SPDLOG_COMPILED_LIB;CMAKE_INTDIR=\"Release\";spdlog_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -277,14 +277,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\dev\Engine\engine\3rd\spdlog\include\spdlog\fmt\bundled\printf.h" />
     <ClInclude Include="D:\dev\Engine\engine\3rd\spdlog\include\spdlog\fmt\bundled\ranges.h" />
     <ClInclude Include="D:\dev\Engine\engine\3rd\spdlog\include\spdlog\fmt\bundled\xchar.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="D:\dev\Engine\engine\3rd\spdlog\ZERO_CHECK.vcxproj">
-      <Project>{F21E3D03-246C-3D6F-B0F4-34B1CF69426B}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

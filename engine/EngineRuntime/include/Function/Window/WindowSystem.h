@@ -35,6 +35,8 @@ namespace Engine
 
 		void SetTitle(const wchar_t* title);
 
+		void SetTitle(const std::string title);
+
 		int GetWindowWidth() const;
 
 		int GetWindowHeight() const;
@@ -45,18 +47,23 @@ namespace Engine
 
 		void SetFocusMode(bool mode);
 
-		HANDLE GetWindowHandle() const;
+		HANDLE GetWindowHandle(bool isNative) const;
 
 		void SetFullScreenDisplay();
 
 		void SetWindowScreenDisplay(int width, int height);
+
+		void CloseWindow();
 
 	private:
 		GLFWwindow* m_pWindow = nullptr;
 		int m_nWidth;
 		int m_nHeight;
 		bool m_bFocusMode = false;
-		char* m_pTitle = nullptr;
+		//char* m_pTitle = nullptr;
+		std::string m_pTitle;
+
+		std::string m_defuleTitle;
 
 	public:
 		typedef std::function<void(unsigned)> CharInputFunc;

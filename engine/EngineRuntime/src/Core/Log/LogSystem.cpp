@@ -20,7 +20,7 @@ namespace Engine
 		sinks.push_back(std::make_shared<sinks::stdout_color_sink_mt>());
 		sinks.push_back(std::make_shared<sinks::rotating_file_sink_mt>(
 			workspacePath.string(), MAX_FILE_SIZE, MAX_FILE_COUNT));
-
+		
 		sinks[0]->set_pattern("[%Y-%m-%d %T][%^%-l%$][%s:%#] %v");
 		sinks[1]->set_pattern("[%Y-%m-%d %T][%-l][%s:%#] %v");
 

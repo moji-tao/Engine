@@ -3,6 +3,7 @@
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
+#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Resource/ConfigManager/ConfigManager.h"
 
 namespace Engine
@@ -19,7 +20,7 @@ namespace Engine
 
 		LOG_INFO("日志系统初始化完成");
 
-		if (!FileSystem::GetInstance()->Initialize(info))
+		if (!NativeFileSystem::GetInstance()->Initialize(info))
 		{
 			LOG_ERROR("文件系统初始化失败");
 			return false;
@@ -34,6 +35,14 @@ namespace Engine
 		}
 
 		LOG_INFO("配置系统初始化完成");
+
+		if(!AssetManager::GetInstance()->Initialize())
+		{
+			LOG_ERROR("资源系统初始化失败");
+		}
+
+		LOG_INFO("资源系统初始化完成");
+
 
 		if (!WindowSystem::GetInstance()->Initialize(info))
 		{
@@ -63,7 +72,7 @@ namespace Engine
 		RenderSystem::GetInstance()->Finalize();
 		WindowSystem::GetInstance()->Finalize();
 		ConfigManager::GetInstance()->Finalize();
-		FileSystem::GetInstance()->Finalize();
+		NativeFileSystem::GetInstance()->Finalize();
 		LogSystem::GetInstance()->Finalize();
 	}
 

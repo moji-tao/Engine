@@ -22,6 +22,9 @@ namespace Editor
 	private:
 		void AnalysisConfig(const ApplicationDesc* config, Engine::InitConfig& initConfig);
 
+	private:
+		static void FilesDrop(int fileCount, const char** filePath);
+
 	protected:
 		bool mIsQuit = false;
 

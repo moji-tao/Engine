@@ -4,14 +4,18 @@ namespace Engine
 	class Radian;
 	class Quaternion;
 
+	class Vector2;
+
 	class Vector3
 	{
 	public:
 		Vector3();
 
-		Vector3(float x, float y, float z);
+		Vector3(float _x, float _y, float _z);
 
 		explicit Vector3(const float coords[3]);
+
+		explicit Vector3(const Vector2& vec);
 
 		float* ptr();
 
@@ -125,8 +129,11 @@ namespace Engine
 
 		Vector3& operator/=(const Vector3& rhs);
 
-	private:
-		float m_Value[3];
+	public:
+		//float m_Value[3];
+		float x;
+		float y;
+		float z;
 
 	public:
 		static const Vector3 ZERO;

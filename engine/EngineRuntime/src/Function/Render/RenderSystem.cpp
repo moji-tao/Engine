@@ -2,6 +2,7 @@
 
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12DeviceManager.h"
+#include "EngineRuntime/include/Function/UI/ImGuiRenderer.h"
 
 namespace Engine
 {
@@ -32,42 +33,49 @@ namespace Engine
 		DeviceCreationParameters param;
 		param.backBufferWidth = info->WindowWidth;
 		param.backBufferHeight = info->WindowHeight;
+		param.swapChainBufferCount = 3;
+		param.swapChainSampleCount = 1;
+		param.startFullscreen = false;
+		param.vsyncEnabled = true;
+		param.enableComputeQueue = true;
+		param.enableCopyQueue = true;
+
+#ifdef _DEBUG
+		//param.enableNvrhiValidationLayer = true;
+		param.enableDebugRuntime = true;
+#endif
 		mDeviceManager = std::make_shared<D3D12DeviceManager>();
 		if(!mDeviceManager->Initialize(param))
 		{
 			return false;
 		}
 
+		//mBasicTriangle = std::make_shared<BasicTriangle>(mDeviceManager.get());
+		//mDeviceManager->AddRenderPassToFront(mBasicTriangle.get());
+		mDDDD = std::make_shared<VertexBuffer>(mDeviceManager.get());
+		mDeviceManager->AddRenderPassToFront(mDDDD.get());
+
 		return true;
 	}
 
 	bool RenderSystem::Tick(float deltaTile)
 	{
-		/*
-		mRHI->PrepareContext();
-
-		// 上传数据 MVP
-		mRenderResource->UploadPerFrameBuffer(mRHI, mCamera);
-
-
-		// 渲染
-		mRenderPipeline->ForwardRender(mRHI, mRenderResource);
-		*/
-		mDeviceManager->Render();
+		mDeviceManager->Render(deltaTile);
 
 		return true;
 	}
 
 	void RenderSystem::Finalize()
 	{
+		mDDDD = nullptr;
 		mDeviceManager->Finalize();
+		mDeviceManager = nullptr;
 	}
 
-	void RenderSystem::InitializeUIRenderBackend()
+	void RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI, IRenderPass* editorPass)
 	{
-		/*
-		mRenderPipeline->InitializeUIRenderBackend();
-		*/
+		//mEditorUI = std::make_shared<ImGuiRenderer>(mDeviceManager.get(), windowUI);
+		mDeviceManager->AddRenderPassToBack(editorPass);
 	}
 
 	void RenderSystem::ResizeEngineContentViewport(float offsetX, float offsetY, float width, float height)
@@ -75,6 +83,11 @@ namespace Engine
 		/*
 		mRHI->ResizeEngineContentViewport(offsetX, offsetY, width, height);
 		*/
+	}
+
+	DeviceManager* RenderSystem::GetRenderDeviceManager()
+	{
+		return mDeviceManager.get();
 	}
 
 }

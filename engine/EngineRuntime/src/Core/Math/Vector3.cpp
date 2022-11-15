@@ -1,4 +1,5 @@
 #include "EngineRuntime/include/Core/Math/Vector3.h"
+#include "EngineRuntime/include/Core/Math/Vector2.h"
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
@@ -17,60 +18,62 @@ namespace Engine
 	const Vector3 Vector3::NEGATIVE_UNIT_Z(0, 0, -1);
 	const Vector3 Vector3::UNIT_SCALE(1, 1, 1);
 
-	Vector3::Vector3() : m_Value{ 0.0f, 0.0f, 0.0f } { }
+	Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f) { }
 
-	Vector3::Vector3(float x, float y, float z) : m_Value{ x, y, z } { }
+	Vector3::Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) { }
 
-	Vector3::Vector3(const float coords[3]) : m_Value{ coords[0], coords[1], coords[2] } { }
+	Vector3::Vector3(const float coords[3]) : x(coords[0]), y(coords[1]), z(coords[2]) { }
+
+	Vector3::Vector3(const Vector2& vec) : x(vec.x), y(vec.y), z(0.0f) { }
 
 	float* Vector3::ptr()
 	{
-		return m_Value;
+		return &x;
 	}
 
 	const float* Vector3::ptr() const
 	{
-		return m_Value;
+		return &x;
 	}
 
 	float Vector3::GetX() const
 	{
-		return m_Value[0];
+		return x;
 	}
 
 	float Vector3::GetY() const
 	{
-		return m_Value[1];
+		return y;
 	}
 
 	float Vector3::GetZ() const
 	{
-		return m_Value[2];
+		return z;
 	}
 
 	void Vector3::SetX(float scaler)
 	{
-		m_Value[0] = scaler;
+		x = scaler;
 	}
 
 	void Vector3::SetY(float scaler)
 	{
-		m_Value[1] = scaler;
+		y = scaler;
 	}
 
 	void Vector3::SetZ(float scaler)
 	{
-		m_Value[2] = scaler;
+		z = scaler;
 	}
 
 	float Vector3::Length() const
 	{
-		return std::hypot(m_Value[0], m_Value[1], m_Value[2]);
+		return std::hypot(x, y, z);
 	}
 
 	float Vector3::SquaredLength() const
 	{
-		return m_Value[0] * m_Value[0] + m_Value[1] * m_Value[1] + m_Value[2] * m_Value[2];
+		return x * x + y * y + z * z;
 	}
 
 	float Vector3::Distance(const Vector3& rhs) const
@@ -85,47 +88,47 @@ namespace Engine
 
 	float Vector3::DotProduct(const Vector3& vec) const
 	{
-		return m_Value[0] * vec.m_Value[0] + m_Value[1] * vec.m_Value[1] + m_Value[2] * vec.m_Value[2];
+		return x * vec.x + y * vec.y + z * vec.z;
 	}
 
 	void Vector3::Normalise()
 	{
-		float length = std::hypot(m_Value[0], m_Value[1], m_Value[2]);
+		float length = std::hypot(x, y, z);
 		if (length > 0.0f)
 		{
 			float inv_length = 1.0f / length;
-			m_Value[0] *= inv_length;
-			m_Value[1] *= inv_length;
-			m_Value[2] *= inv_length;
+			x *= inv_length;
+			y *= inv_length;
+			z *= inv_length;
 		}
 	}
 
 	Vector3 Vector3::CrossProduct(const Vector3& rhs) const
 	{
 		return Vector3(
-			m_Value[1] * rhs.m_Value[2] - m_Value[2] * rhs.m_Value[1],
-			m_Value[2] * rhs.m_Value[0] - m_Value[0] * rhs.m_Value[2],
-			m_Value[0] * rhs.m_Value[1] - m_Value[1] * rhs.m_Value[0]);
+			y * rhs.z - z * rhs.y,
+			z * rhs.x - x * rhs.z,
+			x * rhs.y - y * rhs.x);
 	}
 
 	void Vector3::MakeFloor(const Vector3& cmp)
 	{
-		if (cmp.m_Value[0] < m_Value[0])
-			m_Value[0] = cmp.m_Value[0];
-		if (cmp.m_Value[1] < m_Value[1])
-			m_Value[1] = cmp.m_Value[1];
-		if (cmp.m_Value[2] < m_Value[2])
-			m_Value[2] = cmp.m_Value[2];
+		if (cmp.x < x)
+			x = cmp.x;
+		if (cmp.y < y)
+			y = cmp.y;
+		if (cmp.z < z)
+			z = cmp.z;
 	}
 
 	void Vector3::MakeCeil(const Vector3& cmp)
 	{
-		if (cmp.m_Value[0] > m_Value[0])
-			m_Value[0] = cmp.m_Value[0];
-		if (cmp.m_Value[1] > m_Value[1])
-			m_Value[1] = cmp.m_Value[1];
-		if (cmp.m_Value[2] > m_Value[2])
-			m_Value[2] = cmp.m_Value[2];
+		if (cmp.x > x)
+			x = cmp.x;
+		if (cmp.y > y)
+			y = cmp.y;
+		if (cmp.z > z)
+			z = cmp.z;
 	}
 
 	Radian Vector3::GetAngle(const Vector3& dest) const
@@ -195,13 +198,13 @@ namespace Engine
 
 	bool Vector3::IsZeroLength() const
 	{
-		float sqlen = (m_Value[0] * m_Value[0]) + (m_Value[1] * m_Value[1]) + (m_Value[2] * m_Value[2]);
+		float sqlen = (x * x) + (y * y) + (z * z);
 		return (sqlen < (1e-06 * 1e-06));
 	}
 
 	bool Vector3::IsZero() const
 	{
-		return m_Value[0] == 0.0f && m_Value[1] == 0.0f && m_Value[2] == 0.0f;
+		return x == 0.0f && y == 0.0f && z == 0.0f;
 	}
 
 	Vector3 Vector3::GetNormalised() const
@@ -223,7 +226,7 @@ namespace Engine
 
 	Vector3 Vector3::GetAbsolute() const
 	{
-		return Vector3(fabsf(m_Value[0]), fabsf(m_Value[1]), fabsf(m_Value[2]));
+		return Vector3(fabsf(x), fabsf(y), fabsf(z));
 	}
 
 	Vector3 Vector3::Lerp(const Vector3& lhs, const Vector3& rhs, float alpha)
@@ -233,73 +236,73 @@ namespace Engine
 
 	Vector3 Vector3::Clamp(const Vector3& v, const Vector3& min, const Vector3& max)
 	{
-		return Vector3(std::clamp(v.m_Value[0], min.m_Value[0], max.m_Value[0]),
-			std::clamp(v.m_Value[1], min.m_Value[1], max.m_Value[1]),
-			std::clamp(v.m_Value[2], min.m_Value[2], max.m_Value[2]));
+		return Vector3(std::clamp(v.x, min.x, max.x),
+			std::clamp(v.y, min.y, max.y),
+			std::clamp(v.z, min.z, max.z));
 	}
 
 	float Vector3::GetMaxElement(const Vector3& v)
 	{
-		return *std::max_element(v.m_Value, v.m_Value + 3);
+		return *std::max_element(&v.x, &v.x + 3);
 	}
 
 	bool Vector3::IsNaN() const
 	{
-		return std::isnan(m_Value[0]) || std::isnan(m_Value[1]) || std::isnan(m_Value[2]);
+		return std::isnan(x) || std::isnan(y) || std::isnan(z);
 	}
 
 	float Vector3::operator[](size_t i) const
 	{
 		assert(i < 3);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	float& Vector3::operator[](size_t i)
 	{
 		assert(i < 3);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	bool Vector3::operator==(const Vector3& rhs) const
 	{
-		return m_Value[0] == rhs.m_Value[0] && m_Value[1] == rhs.m_Value[1] && m_Value[2] == rhs.m_Value[2];
+		return x == rhs.x && y == rhs.y && z == rhs.z;
 	}
 
 	bool Vector3::operator!=(const Vector3& rhs) const
 	{
-		return m_Value[0] != rhs.m_Value[0] || m_Value[1] != rhs.m_Value[1] || m_Value[2] != rhs.m_Value[2];
+		return x != rhs.x || y != rhs.y || z != rhs.z;
 	}
 
 	Vector3 Vector3::operator+(const Vector3& rhs) const
 	{
-		return Vector3(m_Value[0] + rhs.m_Value[0], m_Value[1] + rhs.m_Value[1], m_Value[2] + rhs.m_Value[2]);
+		return Vector3(x + rhs.x, y + rhs.y, z + rhs.z);
 	}
 
 	Vector3 Vector3::operator-(const Vector3& rhs) const
 	{
-		return Vector3(m_Value[0] - rhs.m_Value[0], m_Value[1] - rhs.m_Value[1], m_Value[2] - rhs.m_Value[2]);
+		return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 	}
 
 	Vector3 Vector3::operator*(float scalar) const
 	{
-		return Vector3(m_Value[0] * scalar, m_Value[1] * scalar, m_Value[2] * scalar);
+		return Vector3(x * scalar, y * scalar, z * scalar);
 	}
 
 	Vector3 Vector3::operator*(const Vector3& rhs) const
 	{
-		return Vector3(m_Value[0] * rhs.m_Value[0], m_Value[1] * rhs.m_Value[1], m_Value[2] * rhs.m_Value[2]);
+		return Vector3(x * rhs.x, y * rhs.y, z * rhs.z);
 	}
 
 	Vector3 Vector3::operator/(float scalar) const
 	{
 		assert(scalar != 0.0f);
-		return Vector3(m_Value[0] / scalar, m_Value[1] / scalar, m_Value[2] / scalar);
+		return Vector3(x / scalar, y / scalar, z / scalar);
 	}
 
 	Vector3 Vector3::operator/(const Vector3& rhs) const
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f);
-		return Vector3(m_Value[0] / rhs.m_Value[0], m_Value[1] / rhs.m_Value[1], m_Value[2] / rhs.m_Value[2]);
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		return Vector3(x / rhs.x, y / rhs.y, z / rhs.z);
 	}
 
 	const Vector3& Vector3::operator+() const
@@ -309,103 +312,103 @@ namespace Engine
 
 	Vector3 Vector3::operator-() const
 	{
-		return Vector3(-m_Value[0], -m_Value[1], -m_Value[2]);
+		return Vector3(-x, -y, -z);
 	}
 
 	Vector3 operator*(float scalar, const Vector3& rhs)
 	{
-		return Vector3(scalar * rhs.m_Value[0], scalar * rhs.m_Value[1], scalar * rhs.m_Value[2]);
+		return Vector3(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z);
 	}
 
 	Vector3 operator/(float scalar, const Vector3& rhs)
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f);
-		return Vector3(scalar / rhs.m_Value[0], scalar / rhs.m_Value[1], scalar / rhs.m_Value[2]);
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		return Vector3(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z);
 	}
 
 	Vector3 operator+(const Vector3& lhs, float rhs)
 	{
-		return Vector3(lhs.m_Value[0] + rhs, lhs.m_Value[1] + rhs, lhs.m_Value[2] + rhs);
+		return Vector3(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
 	}
 
 	Vector3 operator+(float lhs, const Vector3& rhs)
 	{
-		return Vector3(lhs + rhs.m_Value[0], lhs + rhs.m_Value[1], lhs + rhs.m_Value[2]);
+		return Vector3(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z);
 	}
 
 	Vector3 operator-(const Vector3& lhs, float rhs)
 	{
-		return Vector3(lhs.m_Value[0] - rhs, lhs.m_Value[1] - rhs, lhs.m_Value[2] - rhs);
+		return Vector3(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
 	}
 
 	Vector3 operator-(float lhs, const Vector3& rhs)
 	{
-		return Vector3(lhs - rhs.m_Value[0], lhs - rhs.m_Value[1], lhs - rhs.m_Value[2]);
+		return Vector3(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z);
 	}
 
 	Vector3& Vector3::operator+=(const Vector3& rhs)
 	{
-		m_Value[0] += rhs.m_Value[0];
-		m_Value[1] += rhs.m_Value[1];
-		m_Value[2] += rhs.m_Value[2];
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
 		return *this;
 	}
 
 	Vector3& Vector3::operator+=(float scalar)
 	{
-		m_Value[0] += scalar;
-		m_Value[1] += scalar;
-		m_Value[2] += scalar;
+		x += scalar;
+		y += scalar;
+		z += scalar;
 		return *this;
 	}
 
 	Vector3& Vector3::operator-=(const Vector3& rhs)
 	{
-		m_Value[0] -= rhs.m_Value[0];
-		m_Value[1] -= rhs.m_Value[1];
-		m_Value[2] -= rhs.m_Value[2];
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
 		return *this;
 	}
 
 	Vector3& Vector3::operator-=(float scalar)
 	{
-		m_Value[0] -= scalar;
-		m_Value[1] -= scalar;
-		m_Value[2] -= scalar;
+		x -= scalar;
+		y -= scalar;
+		z -= scalar;
 		return *this;
 	}
 
 	Vector3& Vector3::operator*=(const Vector3& rhs)
 	{
-		m_Value[0] *= rhs.m_Value[0];
-		m_Value[1] *= rhs.m_Value[1];
-		m_Value[2] *= rhs.m_Value[2];
+		x *= rhs.x;
+		y *= rhs.y;
+		z *= rhs.z;
 		return *this;
 	}
 
 	Vector3& Vector3::operator*=(float scalar)
 	{
-		m_Value[0] *= scalar;
-		m_Value[1] *= scalar;
-		m_Value[2] *= scalar;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
 		return *this;
 	}
 
 	Vector3& Vector3::operator/=(const Vector3& rhs)
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f);
-		m_Value[0] /= rhs.m_Value[0];
-		m_Value[1] /= rhs.m_Value[1];
-		m_Value[2] /= rhs.m_Value[2];
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		x /= rhs.x;
+		y /= rhs.y;
+		z /= rhs.z;
 		return *this;
 	}
 
 	Vector3& Vector3::operator/=(float scalar)
 	{
 		assert(scalar != 0.0f);
-		m_Value[0] /= scalar;
-		m_Value[1] /= scalar;
-		m_Value[2] /= scalar;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
 		return *this;
 	}
 }

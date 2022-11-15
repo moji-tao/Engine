@@ -12,52 +12,52 @@ namespace Engine
 	const Vector2 Vector2::NEGATIVE_UNIT_Y(0, -1);
 	const Vector2 Vector2::UNIT_SCALE(1, 1);
 
-	Vector2::Vector2() : m_Value{ 0.0f, 0.0f } { };
+	Vector2::Vector2() : x(0.0f), y(0.0f) { };
 
-	Vector2::Vector2(float _x, float _y) : m_Value{ _x,_y } { }
+	Vector2::Vector2(float _x, float _y) : x(_x), y(_y) { }
 
-	Vector2::Vector2(float scaler) : m_Value{ scaler, scaler } { }
+	Vector2::Vector2(float scaler) : x(scaler), y(scaler) { }
 
-	Vector2::Vector2(const float v[2]) : m_Value{ v[0], v[1] } { }
+	Vector2::Vector2(const float v[2]) : x(v[0]), y(v[1]) { }
 
 	float* Vector2::ptr()
 	{
-		return m_Value;
+		return &x;
 	}
 
 	const float* Vector2::ptr() const
 	{
-		return m_Value;
+		return &x;
 	}
 
 	float Vector2::GetX() const
 	{
-		return m_Value[0];
+		return x;
 	}
 
 	float Vector2::GetY() const
 	{
-		return m_Value[1];
+		return y;
 	}
 
 	void Vector2::SetX(float scaler)
 	{
-		m_Value[0] = scaler;
+		x = scaler;
 	}
 
 	void Vector2::SetY(float scaler)
 	{
-		m_Value[1] = scaler;
+		y = scaler;
 	}
 
 	float Vector2::Length() const
 	{
-		return std::hypot(m_Value[0], m_Value[1]);
+		return std::hypot(x, y);
 	}
 
 	float Vector2::SquaredLength() const
 	{
-		return m_Value[0] * m_Value[0] + m_Value[1] * m_Value[1];
+		return x * x + y * y;
 	}
 
 	float Vector2::Distance(const Vector2& rhs) const
@@ -72,18 +72,18 @@ namespace Engine
 
 	float Vector2::DotProduct(const Vector2& rhs) const
 	{
-		return m_Value[0] * rhs.m_Value[0] + m_Value[1] * rhs.m_Value[1];
+		return x * rhs.x + y * rhs.y;
 	}
 
 	float Vector2::Normalise()
 	{
-		float length = std::hypot(m_Value[0], m_Value[1]);
+		float length = std::hypot(x, y);
 
 		if (length > 0.0f)
 		{
 			float inv_length = 1.0f / length;
-			m_Value[0] *= inv_length;
-			m_Value[1] *= inv_length;
+			x *= inv_length;
+			y *= inv_length;
 		}
 
 		return length;
@@ -91,35 +91,35 @@ namespace Engine
 
 	Vector2 Vector2::MidPoint(const Vector2& vec) const
 	{
-		return Vector2((m_Value[0] + vec.m_Value[0]) * 0.5f, (m_Value[1] + vec.m_Value[1]) * 0.5f);
+		return Vector2((x + vec.x) * 0.5f, (y + vec.y) * 0.5f);
 	}
 
 	void Vector2::MakeFloor(const Vector2& cmp)
 	{
-		if (cmp.m_Value[0] < m_Value[0])
-			m_Value[0] = cmp.m_Value[0];
+		if (cmp.x < x)
+			x = cmp.x;
 
-		if (cmp.m_Value[1] < m_Value[1])
-			m_Value[1] = cmp.m_Value[1];
+		if (cmp.y < y)
+			y = cmp.y;
 	}
 
 	void Vector2::MakeCeil(const Vector2& cmp)
 	{
-		if (cmp.m_Value[0] > m_Value[0])
-			m_Value[0] = cmp.m_Value[0];
+		if (cmp.x > x)
+			x = cmp.x;
 
-		if (cmp.m_Value[1] > m_Value[1])
-			m_Value[1] = cmp.m_Value[1];
+		if (cmp.y > y)
+			y = cmp.y;
 	}
 
 	float Vector2::crossProduct(const Vector2& rhs) const
 	{
-		return m_Value[0] * rhs.m_Value[1] - m_Value[1] * rhs.m_Value[0];
+		return x * rhs.y - y * rhs.x;
 	}
 
 	bool Vector2::IsZeroLength() const
 	{
-		float sqlen = m_Value[0] * m_Value[0] + m_Value[1] * m_Value[1];
+		float sqlen = x * x + y * y;
 		return (sqlen < (Float_EPSILON* Float_EPSILON));
 	}
 
@@ -137,7 +137,7 @@ namespace Engine
 
 	bool Vector2::IsNaN() const
 	{
-		return std::isnan(m_Value[0]) || std::isnan(m_Value[1]);
+		return std::isnan(x) || std::isnan(y);
 	}
 
 	Vector2 Vector2::Lerp(const Vector2& lhs, const Vector2& rhs, float alpha)
@@ -148,18 +148,18 @@ namespace Engine
 	float Vector2::operator[](size_t i) const
 	{
 		assert(i < 2);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	float& Vector2::operator[](size_t i)
 	{
 		assert(i < 2);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	bool Vector2::operator==(const Vector2& rhs) const
 	{
-		return m_Value[0] == rhs.m_Value[0] && m_Value[1] == rhs.m_Value[1];
+		return x == rhs.x && y == rhs.y;
 	}
 
 	bool Vector2::operator!=(const Vector2& rhs) const
@@ -169,46 +169,46 @@ namespace Engine
 
 	Vector2 Vector2::operator+(const Vector2& rhs) const
 	{
-		return Vector2(m_Value[0] + rhs.m_Value[0], m_Value[1] + rhs.m_Value[1]);
+		return Vector2(x + rhs.x, y + rhs.y);
 	}
 
 	Vector2 Vector2::operator-(const Vector2& rhs) const
 	{
-		return Vector2(m_Value[0] - rhs.m_Value[0], m_Value[1] - rhs.m_Value[1]);
+		return Vector2(x - rhs.x, y - rhs.y);
 	}
 
 	Vector2 Vector2::operator*(const Vector2& rhs) const
 	{
-		return Vector2(m_Value[0] * rhs.m_Value[0], m_Value[1] * rhs.m_Value[1]);
+		return Vector2(x * rhs.x, y * rhs.y);
 	}
 
 	Vector2 Vector2::operator*(float scaler) const
 	{
-		return Vector2(m_Value[0] * scaler, m_Value[1] * scaler);
+		return Vector2(x * scaler, y * scaler);
 	}
 
 	Vector2 Vector2::operator/(const Vector2& rhs) const
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f);
+		assert(rhs.x != 0.0f && rhs.y != 0.0f);
 
-		return Vector2(m_Value[0] / rhs.m_Value[0], m_Value[1] / rhs.m_Value[1]);
+		return Vector2(x / rhs.x, y / rhs.y);
 	}
 
 	Vector2 Vector2::operator/(float scaler) const
 	{
 		assert(scaler != 0.0f);
 
-		return Vector2(m_Value[0] / scaler, m_Value[1] / scaler);
+		return Vector2(x / scaler, y / scaler);
 	}
 
 	bool Vector2::operator<(const Vector2& rhs) const
 	{
-		return m_Value[0] < rhs.m_Value[0] && m_Value[1] < rhs.m_Value[1];
+		return x < rhs.x && y < rhs.y;
 	}
 
 	bool Vector2::operator>(const Vector2& rhs) const
 	{
-		return m_Value[0] > rhs.m_Value[0] && m_Value[1] > rhs.m_Value[1];
+		return x > rhs.x && y > rhs.y;
 	}
 
 	const Vector2& Vector2::operator+() const
@@ -218,92 +218,92 @@ namespace Engine
 
 	Vector2 Vector2::operator-() const
 	{
-		return Vector2(-m_Value[0], -m_Value[1]);
+		return Vector2(-x, -y);
 	}
 
 	Vector2 operator*(float scalar, const Vector2& rhs)
 	{
-		return Vector2(scalar * rhs.m_Value[0], scalar * rhs.m_Value[1]);
+		return Vector2(scalar * rhs.x, scalar * rhs.y);
 	}
 
 	Vector2 operator/(float scalar, const Vector2& rhs)
 	{
-		return Vector2(scalar / rhs.m_Value[0], scalar / rhs.m_Value[1]);
+		return Vector2(scalar / rhs.x, scalar / rhs.y);
 	}
 
 	Vector2 operator+(const Vector2& lhs, float rhs)
 	{
-		return Vector2(lhs.m_Value[0] + rhs, lhs.m_Value[1] + rhs);
+		return Vector2(lhs.x + rhs, lhs.y + rhs);
 	}
 
 	Vector2 operator+(float lhs, const Vector2& rhs)
 	{
-		return Vector2(rhs.m_Value[0] + lhs, rhs.m_Value[1] + lhs);
+		return Vector2(rhs.x + lhs, rhs.y + lhs);
 	}
 
 	Vector2 operator-(const Vector2& lhs, float rhs)
 	{
-		return Vector2(lhs.m_Value[0] - rhs, lhs.m_Value[1] - rhs);
+		return Vector2(lhs.x - rhs, lhs.y - rhs);
 	}
 
 	Vector2 operator-(float lhs, const Vector2& rhs)
 	{
-		return Vector2(lhs - rhs.m_Value[0], lhs - rhs.m_Value[1]);
+		return Vector2(lhs - rhs.x, lhs - rhs.y);
 	}
 
 	Vector2& Vector2::operator+=(const Vector2& rhs)
 	{
-		m_Value[0] += rhs.m_Value[0];
-		m_Value[1] += rhs.m_Value[1];
+		x += rhs.x;
+		y += rhs.y;
 		return *this;
 	}
 
 	Vector2& Vector2::operator+=(float scalar)
 	{
-		m_Value[0] += scalar;
-		m_Value[1] += scalar;
+		x += scalar;
+		y += scalar;
 		return *this;
 	}
 
 	Vector2& Vector2::operator-=(const Vector2& rhs)
 	{
-		m_Value[0] -= rhs.m_Value[0];
-		m_Value[1] -= rhs.m_Value[1];
+		x -= rhs.x;
+		y -= rhs.y;
 		return *this;
 	}
 
 	Vector2& Vector2::operator-=(float scalar)
 	{
-		m_Value[0] -= scalar;
-		m_Value[1] -= scalar;
+		x -= scalar;
+		y -= scalar;
 		return *this;
 	}
 
 	Vector2& Vector2::operator*=(float scalar)
 	{
-		m_Value[0] *= scalar;
-		m_Value[1] *= scalar;
+		x *= scalar;
+		y *= scalar;
 		return *this;
 	}
 
 	Vector2& Vector2::operator*=(const Vector2& rhs)
 	{
-		m_Value[0] *= rhs.m_Value[0];
-		m_Value[1] *= rhs.m_Value[1];
+		x *= rhs.x;
+		y *= rhs.y;
 		return *this;
 	}
 
 	Vector2& Vector2::operator/=(float scalar)
 	{
-		m_Value[0] /= scalar;
-		m_Value[1] /= scalar;
+		x /= scalar;
+		y /= scalar;
 		return *this;
 	}
 
 	Vector2& Vector2::operator/=(const Vector2& rhs)
 	{
-		m_Value[0] /= rhs.m_Value[0];
-		m_Value[1] /= rhs.m_Value[1];
+		x /= rhs.x;
+		y /= rhs.y;
 		return *this;
 	}
 }

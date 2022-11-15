@@ -19,15 +19,12 @@ namespace Engine
 		m_nWidth = info->WindowWidth;
 		m_nHeight = info->WindowHeight;
 		m_bFocusMode = false;
-
-		size_t titleLength = strlen(info->Title) + 1;
-		m_pTitle = (char*)GetBuffer(titleLength);
-		memset(m_pTitle, 0x00, titleLength);
-		memcpy(m_pTitle, info->Title, titleLength);
+		m_pTitle = info->Title;
+		m_defuleTitle = info->Title;
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-		m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, m_pTitle, nullptr, nullptr);
+		m_pWindow = glfwCreateWindow(m_nWidth, m_nHeight, m_pTitle.c_str(), nullptr, nullptr);
 		if (m_pWindow == nullptr)
 		{
 			LOG_FATAL("窗体创建失败!");
@@ -106,6 +103,7 @@ namespace Engine
 
 	bool WindowSystem::Tick(float deltaTile)
 	{
+		SetTitle(m_defuleTitle + "  FPS: " + std::to_string(1 / deltaTile));
 		glfwPollEvents();
 		return true;
 	}
@@ -118,12 +116,6 @@ namespace Engine
 			m_pWindow = nullptr;
 			glfwTerminate();
 		}
-
-		if (m_pTitle != nullptr)
-		{
-			PushBuffer(m_pTitle);
-			m_pTitle = nullptr;
-		}
 	}
 
 	bool WindowSystem::ShouldClose() const
@@ -133,35 +125,30 @@ namespace Engine
 
 	const char* WindowSystem::GetTitle() const
 	{
-		return m_pTitle;
+		return m_pTitle.c_str();
 	}
 
 	void WindowSystem::SetTitle(const char* title)
 	{
-		if (m_pTitle != nullptr)
-		{
-			PushBuffer(m_pTitle);
-			m_pTitle = nullptr;
-		}
-		size_t uTitleLength = strlen(title) + 1;
-		m_pTitle = (char*)GetBuffer(uTitleLength);
-		memcpy(m_pTitle, title, uTitleLength);
+		m_pTitle = std::string(title);
 
-		glfwSetWindowTitle(m_pWindow, m_pTitle);
+		glfwSetWindowTitle(m_pWindow, m_pTitle.c_str());
 	}
 
 	void WindowSystem::SetTitle(const wchar_t* title)
 	{
-		if (m_pTitle != nullptr)
-		{
-			PushBuffer(m_pTitle);
-			m_pTitle = nullptr;
-		}
 		size_t uTitleLength = UnicodeToAnsiLengthBuffer(title);
-		m_pTitle = (char*)GetBuffer(uTitleLength);
-		UnicodeToAnsi(title, m_pTitle);
+		m_pTitle.resize(uTitleLength);
+		UnicodeToAnsi(title, m_pTitle.data());
 
-		glfwSetWindowTitle(m_pWindow, m_pTitle);
+		glfwSetWindowTitle(m_pWindow, m_pTitle.c_str());
+	}
+
+	void WindowSystem::SetTitle(const std::string title)
+	{
+		m_pTitle = title;
+
+		glfwSetWindowTitle(m_pWindow, m_pTitle.c_str());
 	}
 
 
@@ -191,10 +178,13 @@ namespace Engine
 		glfwSetInputMode(m_pWindow, GLFW_CURSOR, m_bFocusMode ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 	}
 
-	HANDLE WindowSystem::GetWindowHandle() const
+	HANDLE WindowSystem::GetWindowHandle(bool isNative) const
 	{
 #ifdef _WIN64
-		return glfwGetWin32Window(m_pWindow);
+		if(isNative)
+		{
+			return glfwGetWin32Window(m_pWindow);
+		}
 #endif
 		return m_pWindow;
 	}
@@ -211,10 +201,15 @@ namespace Engine
 		GLFWmonitor* primary = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(primary);
 
-		width = min(width, mode->width);
-		height = min(height, mode->height);
+		width = std::min(width, mode->width);
+		height = std::min(height, mode->height);
 
 		glfwSetWindowMonitor(m_pWindow, nullptr, (mode->width - width) / 2, (mode->height - height) / 2, width, height, 0);
+	}
+
+	void WindowSystem::CloseWindow()
+	{
+		glfwSetWindowShouldClose(m_pWindow, true);
 	}
 
 	void WindowSystem::RegisterCharInputCallback(CharInputFunc func)
@@ -540,12 +535,6 @@ namespace Engine
 
 		if (app != nullptr)
 		{
-			if (app->m_pTitle != nullptr)
-			{
-				LOG_INFO("{0} 窗口已关闭", app->m_pTitle);
-				PushBuffer(app->m_pTitle);
-				app->m_pTitle = nullptr;
-			}
 			app->OnWindowClose();
 		}
 	}

@@ -1,56 +1,182 @@
+#include <fstream>
+
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 
 namespace Engine
 {
-	FileSystem::~FileSystem()
-	{ }
+	Blob::Blob(void* data, size_t size) : mData(data), mSize(size) { }
 
-	bool FileSystem::Initialize(InitConfig* info)
+	Blob::~Blob()
 	{
-		mRootPath[FileSystemType::EnginePath] = info->enginePath;
-
-		mRootPath[FileSystemType::AssectPath] = info->workspacePath;
-
-		return true;
-	}
-
-	bool FileSystem::Tick(float deltaTile)
-	{
-		return true;
-	}
-
-	void FileSystem::Finalize()
-	{ }
-
-	bool FileSystem::CreateDirectory(FileSystemType type, const path& filePath)
-	{
-		if (Exists(type, filePath))
-			return false;
-
-		return create_directories(mRootPath[type] / filePath);
-	}
-
-	path FileSystem::GetActualPath(FileSystemType type, const path& filePath)
-	{
-		if (Exists(type, filePath))
+		if(mData != nullptr)
 		{
-			return mRootPath[type] / filePath;
+			free(mData);
+		}
+		mData = nullptr;
+		mSize = 0;
+	}
+
+	const void* Blob::GetData() const
+	{
+		return mData;
+	}
+
+	size_t Blob::GetSize() const
+	{
+		return mSize;
+	}
+
+	bool NativeFileSystem::Initialize(InitConfig* info)
+	{
+		EngineFileSystem::GetInstance()->Initialize(info->enginePath);
+
+		ProjectFileSystem::GetInstance()->Initialize(info->workspacePath);
+
+		return true;
+	}
+
+	void NativeFileSystem::Finalize()
+	{
+
+	}
+
+	std::shared_ptr<Blob> NativeFileSystem::ReadFile(const path& filePath)
+	{
+		if (!FileExists(filePath))
+			return nullptr;
+
+		std::ifstream file(filePath, std::ios::binary);
+
+		file.seekg(0, std::ios::end);
+		uint64_t size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		char* buffer = new char[size];
+		file.read(buffer, size);
+
+		if (!file.good() && !file.eof())
+		{
+			delete[] buffer;
+			return nullptr;
 		}
 
-		return "";
+		return std::make_shared<Blob>(buffer, size);
 	}
 
-	bool FileSystem::Exists(FileSystemType type, const path& filePath)
+	bool NativeFileSystem::WriteFile(const path& filePath, const void* data, size_t size)
 	{
-		return exists(mRootPath[type] / filePath);
+		std::ofstream file(filePath, std::ios::binary);
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		if (size > 0)
+		{
+			file.write(static_cast<const char*>(data), size);
+		}
+
+		if (!file.good())
+		{
+			return false;
+		}
+
+		return true;
+
 	}
 
-	uintmax_t FileSystem::GetFileSize(FileSystemType type, const path& filePath)
+	bool NativeFileSystem::FolderExists(const path& folderPath)
 	{
-		if (Exists(type, filePath))
+		return std::filesystem::exists(folderPath) && std::filesystem::is_directory(folderPath);
+	}
+
+	bool NativeFileSystem::FileExists(const path& filePath)
+	{
+		return std::filesystem::exists(filePath) && std::filesystem::is_regular_file(filePath);
+	}
+
+	uintmax_t NativeFileSystem::GetFileSize(const path& filePath)
+	{
+		if (!std::filesystem::exists(filePath))
+		{
 			return 0;
-		return file_size(mRootPath[type] / filePath);
+		}
+		return file_size(filePath);
 	}
 
+	void EngineFileSystem::Initialize(const std::filesystem::path& ph)
+	{
+		mRootPath = ph;
+	}
 
+	std::shared_ptr<Blob> EngineFileSystem::ReadFile(const path& filePath)
+	{
+		if (!FileExists(filePath))
+			return nullptr;
+
+		return NativeFileSystem::GetInstance()->ReadFile(mRootPath / filePath);
+	}
+
+	bool EngineFileSystem::WriteFile(const path& filePath, const void* data, size_t size)
+	{
+		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data, size);
+	}
+
+	bool EngineFileSystem::FolderExists(const path& folderPath)
+	{
+		return NativeFileSystem::GetInstance()->FolderExists(mRootPath / folderPath);
+	}
+
+	bool EngineFileSystem::FileExists(const path& filePath)
+	{
+		return NativeFileSystem::GetInstance()->FileExists(mRootPath / filePath);
+	}
+
+	path EngineFileSystem::GetActualPath(const path& filePath)
+	{
+		return mRootPath / filePath;
+	}
+
+	uintmax_t EngineFileSystem::GetFileSize(const path& filePath)
+	{
+		return NativeFileSystem::GetInstance()->GetFileSize(mRootPath / filePath);
+	}
+
+	void ProjectFileSystem::Initialize(const std::filesystem::path& ph)
+	{
+		mRootPath = ph;
+	}
+
+	std::shared_ptr<Blob> ProjectFileSystem::ReadFile(const path& filePath)
+	{
+		if (!FileExists(filePath))
+			return nullptr;
+
+		return NativeFileSystem::GetInstance()->ReadFile(mRootPath / filePath);
+	}
+
+	bool ProjectFileSystem::WriteFile(const path& filePath, const void* data, size_t size)
+	{
+		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data, size);
+	}
+
+	bool ProjectFileSystem::FolderExists(const path& folderPath)
+	{
+		return NativeFileSystem::GetInstance()->FolderExists(mRootPath / folderPath);
+	}
+
+	bool ProjectFileSystem::FileExists(const path& filePath)
+	{
+		return NativeFileSystem::GetInstance()->FileExists(mRootPath / filePath);
+	}
+
+	path ProjectFileSystem::GetActualPath(const path& filePath)
+	{
+		return mRootPath / filePath;
+	}
+
+	uintmax_t ProjectFileSystem::GetFileSize(const path& filePath)
+	{
+		return NativeFileSystem::GetInstance()->GetFileSize(mRootPath / filePath);
+	}
 }

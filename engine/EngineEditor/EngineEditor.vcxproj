@@ -55,17 +55,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\EngineRuntime\include;$(SolutionDir)engine\3rd\spdlog\include\;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\EngineRuntime\include;$(SolutionDir)engine\3rd\spdlog\include\;$(SolutionDir)engine\3rd\ImGUI\include;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\Boost;$(SolutionDir)engine\3rd\stb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nvrhi_vk.lib;nvrhi_d3d12.lib;nvrhi_d3d11.lib;nvrhi.lib;ImGUI.lib;d3d12.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;glfw3.lib;assimp-mt.lib;spdlog.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nvrhi.lib;ImGUI.lib;d3d12.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;glfw3.lib;assimp-mt.lib;spdlog.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -76,10 +76,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\EngineRuntime\include;$(SolutionDir)engine\3rd\spdlog\include\;$(SolutionDir)engine\3rd\ImGUI\;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\;$(SolutionDir)engine\EngineRuntime\include;$(SolutionDir)engine\3rd\spdlog\include\;$(SolutionDir)engine\3rd\ImGUI\include;$(SolutionDir)engine\3rd\nvrhi\include;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\Assimp\include;$(SolutionDir)engine\3rd\Boost;$(SolutionDir)engine\3rd\stb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -88,7 +88,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>nvrhi_vk.lib;nvrhi_d3d12.lib;nvrhi_d3d11.lib;nvrhi.lib;ImGUI.lib;d3d12.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;glfw3.lib;assimp-mt.lib;spdlog.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nvrhi.lib;ImGUI.lib;d3d12.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;glfw3.lib;assimp-mt.lib;spdlog.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -97,13 +97,42 @@
     <ClInclude Include="include\Application\EngineEditor.h" />
     <ClInclude Include="include\Application\IApplication.h" />
     <ClInclude Include="include\UI\EditorUI.h" />
+    <ClInclude Include="include\UI\EditorUIConsolePass.h" />
+    <ClInclude Include="include\UI\EditorUIHierarchyPass.h" />
+    <ClInclude Include="include\UI\EditorUIInspectorPass.h" />
+    <ClInclude Include="include\UI\EditorUIPassBase.h" />
+    <ClInclude Include="include\UI\EditorUIProjectPass.h" />
+    <ClInclude Include="include\UI\EditorUIScenePass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application\EngineEditor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\UI\EditorUI.cpp" />
+    <ClCompile Include="src\UI\EditorUIConsolePass.cpp" />
+    <ClCompile Include="src\UI\EditorUIHierarchyPass.cpp" />
+    <ClCompile Include="src\UI\EditorUIInspectorPass.cpp" />
+    <ClCompile Include="src\UI\EditorUIProjectPass.cpp" />
+    <ClCompile Include="src\UI\EditorUIScenePass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\3rd\Assimp\code\assimp.vcxproj">
+      <Project>{7ca55b07-712e-3db7-a539-443ea0fe3395}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\Assimp\contrib\zlib\zlibstatic.vcxproj">
+      <Project>{c0707212-389d-3dee-a0d6-94e56e153fcb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\GLFW\build\src\glfw.vcxproj">
+      <Project>{a54494d6-55b5-3794-9a76-a395a4d2227c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\ImGUI\ImGUI.vcxproj">
+      <Project>{b07649fb-0f85-4c52-9990-7d3648ce84d3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\nvrhi\build\nvrhi.vcxproj">
+      <Project>{c1e69934-31d2-3710-af36-cc0d6bc5d6a6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\spdlog\spdlog.vcxproj">
+      <Project>{62034bdf-ac53-372e-9976-51cf8670b66e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\EngineRuntime\EngineRuntime.vcxproj">
       <Project>{16068c63-d6de-4b7f-b8f9-b88a4ad8bcbf}</Project>
     </ProjectReference>

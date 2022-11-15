@@ -1,8 +1,10 @@
 #ifdef _WIN64
+#include <algorithm>
+#include <sstream>
+
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12DeviceManager.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
-#include "EngineRuntime/include/Platform/CharSet.h"
 #include "nvrhi/validation.h"
 #include "nvrhi/d3d12.h"
 
@@ -10,38 +12,106 @@ namespace Engine
 {
 #define HR_RETURN(hr) if(FAILED(hr)) return false;
 
-	bool D3D12DeviceManager::CreateDeviceAndSwapChain()
-	{
-        // 创建DXGI工厂
-        RefCountPtr<IDXGIFactory5> pDxgiFactory5;
-        UINT dxgiFactoryFlags = m_DeviceParams.enableDebugRuntime ? DXGI_CREATE_FACTORY_DEBUG : 0;
-        HR_RETURN(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&pDxgiFactory5)));
+    static bool IsNvDeviceID(UINT id)
+    {
+        return id == 0x10DE;
+    }
 
-        // 获取显示设备
-        DXGI_ADAPTER_DESC1 stAdapterDesc = {};
-        D3D_FEATURE_LEVEL emFeatureLevel = D3D_FEATURE_LEVEL_12_1;
-        for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != pDxgiFactory5->EnumAdapters1(adapterIndex, &m_DxgiAdapter); ++adapterIndex)
+    static RefCountPtr<IDXGIAdapter> FindAdapter()
+    {
+        RefCountPtr<IDXGIAdapter> targetAdapter;
+        RefCountPtr<IDXGIFactory1> DXGIFactory;
+        HRESULT hres = CreateDXGIFactory1(IID_PPV_ARGS(&DXGIFactory));
+        if (hres != S_OK)
         {
-            m_DxgiAdapter->GetDesc1(&stAdapterDesc);
+            LOG_ERROR("ERROR in CreateDXGIFactory.\n"
+                "For more info, get log from debug D3D runtime: (1) Install DX SDK, and enable Debug D3D from DX Control Panel Utility. (2) Install and start DbgView. (3) Try running the program again.\n");
+        	return targetAdapter;
+        }
 
-            if (stAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        unsigned int adapterNo = 0;
+        while (SUCCEEDED(hres))
+        {
+            RefCountPtr<IDXGIAdapter> pAdapter;
+            hres = DXGIFactory->EnumAdapters(adapterNo, &pAdapter);
+
+            if (SUCCEEDED(hres))
             {
-                continue;
+                DXGI_ADAPTER_DESC aDesc;
+                pAdapter->GetDesc(&aDesc);
+
+                // If no name is specified, return the first adapater.  This is the same behaviour as the
+                // default specified for D3D11CreateDevice when no adapter is specified.
+            	targetAdapter = pAdapter;
+            	break;
             }
 
-            if (SUCCEEDED(D3D12CreateDevice(m_DxgiAdapter.Get(), emFeatureLevel, _uuidof(ID3D12Device), nullptr)))
+            adapterNo++;
+        }
+
+        return targetAdapter;
+    }
+
+    static bool MoveWindowOntoAdapter(IDXGIAdapter* targetAdapter, RECT& rect)
+    {
+        assert(targetAdapter != NULL);
+
+        HRESULT hres = S_OK;
+        unsigned int outputNo = 0;
+        while (SUCCEEDED(hres))
+        {
+            IDXGIOutput* pOutput = nullptr;
+            hres = targetAdapter->EnumOutputs(outputNo++, &pOutput);
+
+            if (SUCCEEDED(hres) && pOutput)
             {
-                char pszLog[MAX_PATH];
-                memset(pszLog, 0x00, MAX_PATH);
-                UnicodeToAnsi(stAdapterDesc.Description, pszLog);
-                LOG_INFO("检测到显卡 {0}", pszLog);
-                break;
+                DXGI_OUTPUT_DESC OutputDesc;
+                pOutput->GetDesc(&OutputDesc);
+                const RECT desktop = OutputDesc.DesktopCoordinates;
+                const int centreX = (int)desktop.left + (int)(desktop.right - desktop.left) / 2;
+                const int centreY = (int)desktop.top + (int)(desktop.bottom - desktop.top) / 2;
+                const int winW = rect.right - rect.left;
+                const int winH = rect.bottom - rect.top;
+                const int left = centreX - winW / 2;
+                const int right = left + winW;
+                const int top = centreY - winH / 2;
+                const int bottom = top + winH;
+                rect.left = std::max(left, (int)desktop.left);
+                rect.right = std::min(right, (int)desktop.right);
+                rect.bottom = std::min(bottom, (int)desktop.bottom);
+                rect.top = std::max(top, (int)desktop.top);
+
+                // If there is more than one output, go with the first found.  Multi-monitor support could go here.
+                return true;
             }
         }
 
+        return false;
+    }
+
+	bool D3D12DeviceManager::CreateDeviceAndSwapChain()
+	{
+		UINT windowStyle = m_DeviceParams.startFullscreen
+    		? (WS_POPUP | WS_SYSMENU | WS_VISIBLE) : m_DeviceParams.startMaximized
+				? (WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE)
+				: (WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+
+		RECT rect = { 0, 0, LONG(m_DeviceParams.backBufferWidth), LONG(m_DeviceParams.backBufferHeight) };
+        AdjustWindowRect(&rect, windowStyle, FALSE);
+
+		RefCountPtr<IDXGIAdapter> targetAdapter;
+
+		targetAdapter = FindAdapter();
+
+		if (!targetAdapter)
+		{
+			LOG_ERROR("Could not find an adapter matching\n");
+			return false;
+		}
+
         {
             DXGI_ADAPTER_DESC aDesc;
-            m_DxgiAdapter->GetDesc(&aDesc);
+            targetAdapter->GetDesc(&aDesc);
 
             std::wstring adapterName = aDesc.Description;
 
@@ -51,10 +121,73 @@ namespace Engine
             for (auto c : adapterName)
                 ss << wss.narrow(c, '?');
             m_RendererString = ss.str();
+
+            m_IsNvidia = IsNvDeviceID(aDesc.VendorId);
         }
 
-        // 创建d3d驱动
-        HR_RETURN(D3D12CreateDevice(m_DxgiAdapter, D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&m_Device12)));
+        if (MoveWindowOntoAdapter(targetAdapter, rect))
+        {
+            glfwSetWindowPos((GLFWwindow*)WindowSystem::GetInstance()->GetWindowHandle(false), rect.left, rect.top);
+        }
+
+        RECT clientRect;
+        GetClientRect((HWND)WindowSystem::GetInstance()->GetWindowHandle(true), &clientRect);
+        UINT width = clientRect.right - clientRect.left;
+        UINT height = clientRect.bottom - clientRect.top;
+
+        ZeroMemory(&m_SwapChainDesc, sizeof(m_SwapChainDesc));
+        m_SwapChainDesc.Width = width;
+        m_SwapChainDesc.Height = height;
+        m_SwapChainDesc.SampleDesc.Count = m_DeviceParams.swapChainSampleCount;
+        m_SwapChainDesc.SampleDesc.Quality = 0;
+        m_SwapChainDesc.BufferUsage = DXGI_USAGE_SHADER_INPUT | DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        //m_SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        m_SwapChainDesc.BufferCount = m_DeviceParams.swapChainBufferCount;
+        m_SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        m_SwapChainDesc.Flags = m_DeviceParams.allowModeSwitch ? DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH : 0;
+
+        // Special processing for sRGB swap chain formats.
+        // DXGI will not create a swap chain with an sRGB format, but its contents will be interpreted as sRGB.
+        // So we need to use a non-sRGB format here, but store the true sRGB format for later framebuffer creation.
+        switch (m_DeviceParams.swapChainFormat)  // NOLINT(clang-diagnostic-switch-enum)
+        {
+        case nvrhi::Format::SRGBA8_UNORM:
+            m_SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            break;
+        case nvrhi::Format::SBGRA8_UNORM:
+            m_SwapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+            break;
+        default:
+            m_SwapChainDesc.Format = nvrhi::d3d12::convertFormat(m_DeviceParams.swapChainFormat);
+            break;
+        }
+
+        if (m_DeviceParams.enableDebugRuntime)
+        {
+            RefCountPtr<ID3D12Debug> pDebug;
+            RefCountPtr<ID3D12Debug1> pDebug1;
+            HR_RETURN(D3D12GetDebugInterface(IID_PPV_ARGS(&pDebug)));
+            HR_RETURN(pDebug->QueryInterface(IID_PPV_ARGS(&pDebug1)));
+            pDebug1->EnableDebugLayer();
+            //pDebug1->SetEnableGPUBasedValidation(true);
+            
+            //D3D12EnableExperimentalFeatures()
+        }
+
+        UINT dxgiFactoryFlags = m_DeviceParams.enableDebugRuntime ? DXGI_CREATE_FACTORY_DEBUG : 0;
+
+        HR_RETURN(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&m_DxgiFactory)));
+        BOOL supported = 0;
+        if (SUCCEEDED(m_DxgiFactory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &supported, sizeof(supported))))
+            m_TearingSupported = (supported != 0);
+
+        if (m_TearingSupported)
+        {
+            m_SwapChainDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+        }
+
+        HR_RETURN(D3D12CreateDevice(targetAdapter, D3D_FEATURE_LEVEL_11_1, IID_PPV_ARGS(&m_Device12)));
+
         if (m_DeviceParams.enableDebugRuntime)
         {
             RefCountPtr<ID3D12InfoQueue> pInfoQueue;
@@ -79,7 +212,8 @@ namespace Engine
             }
         }
 
-        // 创建命令队列
+        m_DxgiAdapter = targetAdapter;
+
         D3D12_COMMAND_QUEUE_DESC queueDesc;
         ZeroMemory(&queueDesc, sizeof(queueDesc));
         queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -92,14 +226,14 @@ namespace Engine
         {
             queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
             HR_RETURN(m_Device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_ComputeQueue)));
-            m_ComputeQueue->SetName(L"Compute Queue");
+        	m_ComputeQueue->SetName(L"Compute Queue");
         }
 
         if (m_DeviceParams.enableCopyQueue)
         {
             queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
             HR_RETURN(m_Device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_CopyQueue)));
-            m_CopyQueue->SetName(L"Copy Queue");
+        	m_CopyQueue->SetName(L"Copy Queue");
         }
 
         m_FullScreenDesc = {};
@@ -109,45 +243,12 @@ namespace Engine
         m_FullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
         m_FullScreenDesc.Windowed = !m_DeviceParams.startFullscreen;
 
-        // 创建交换链
-        ZeroMemory(&m_SwapChainDesc, sizeof(m_SwapChainDesc));
-		m_SwapChainDesc.Width = WindowSystem::GetInstance()->GetWindowWidth();
-		m_SwapChainDesc.Height = WindowSystem::GetInstance()->GetWindowHeight();
-		m_SwapChainDesc.SampleDesc.Count = m_DeviceParams.swapChainSampleCount;
-		m_SwapChainDesc.SampleDesc.Quality = 0;
-		m_SwapChainDesc.BufferUsage = DXGI_USAGE_SHADER_INPUT | DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		m_SwapChainDesc.BufferCount = m_DeviceParams.swapChainBufferCount;
-		m_SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-		m_SwapChainDesc.Flags = m_DeviceParams.allowModeSwitch ? DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH : 0;
-		switch (m_DeviceParams.swapChainFormat)
-		{
-		case nvrhi::Format::SRGBA8_UNORM:
-			m_SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			break;
-		case nvrhi::Format::SBGRA8_UNORM:
-			m_SwapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-			break;
-		default:
-			m_SwapChainDesc.Format = nvrhi::d3d12::convertFormat(m_DeviceParams.swapChainFormat);
-			break;
-		}
-		if (m_DeviceParams.enableDebugRuntime)
-		{
-			RefCountPtr<ID3D12Debug> pDebug;
-			HR_RETURN(D3D12GetDebugInterface(IID_PPV_ARGS(&pDebug)));
-			
-			pDebug->EnableDebugLayer();
-		}
-        if (m_TearingSupported)
-        {
-            m_SwapChainDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-        }
         RefCountPtr<IDXGISwapChain1> pSwapChain1;
-        HR_RETURN(pDxgiFactory5->CreateSwapChainForHwnd(m_GraphicsQueue, (HWND)WindowSystem::GetInstance()->GetWindowHandle(), &m_SwapChainDesc, &m_FullScreenDesc, nullptr, &pSwapChain1));
+        HR_RETURN(m_DxgiFactory->CreateSwapChainForHwnd(m_GraphicsQueue.Get(), (HWND)WindowSystem::GetInstance()->GetWindowHandle(true), &m_SwapChainDesc, &m_FullScreenDesc, nullptr, &pSwapChain1));
+
         HR_RETURN(pSwapChain1->QueryInterface(IID_PPV_ARGS(&m_SwapChain)));
 
-
-		nvrhi::d3d12::DeviceDesc deviceDesc;
+        nvrhi::d3d12::DeviceDesc deviceDesc;
         deviceDesc.errorCB = DefaultMessageCallback::GetInstance();
         deviceDesc.pDevice = m_Device12;
         deviceDesc.pGraphicsCommandQueue = m_GraphicsQueue;
@@ -166,10 +267,10 @@ namespace Engine
 
         HR_RETURN(m_Device12->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_FrameFence)));
 
-		for (UINT bufferIndex = 0; bufferIndex < m_SwapChainDesc.BufferCount; bufferIndex++)
-		{
-			m_FrameFenceEvents.push_back(CreateEvent(nullptr, false, true, NULL));
-		}
+        for (UINT bufferIndex = 0; bufferIndex < m_SwapChainDesc.BufferCount; bufferIndex++)
+        {
+            m_FrameFenceEvents.push_back(CreateEvent(nullptr, false, true, NULL));
+        }
 
         return true;
     }
@@ -233,7 +334,7 @@ namespace Engine
         {
             LOG_FATAL("CreateRenderTarget failed");
         }
-	}
+    }
 
 	void D3D12DeviceManager::BeginFrame()
 	{
@@ -261,6 +362,7 @@ namespace Engine
         auto bufferIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
         WaitForSingleObject(m_FrameFenceEvents[bufferIndex], INFINITE);
+
 	}
 
 	void D3D12DeviceManager::Present()
@@ -279,7 +381,7 @@ namespace Engine
         m_FrameFence->SetEventOnCompletion(m_FrameCount, m_FrameFenceEvents[bufferIndex]);
         m_GraphicsQueue->Signal(m_FrameFence, m_FrameCount);
         m_FrameCount++;
-	}
+    }
 
 	nvrhi::IDevice* D3D12DeviceManager::GetDevice() const
 	{
@@ -323,21 +425,22 @@ namespace Engine
         m_SwapChainBuffers.resize(m_SwapChainDesc.BufferCount);
         m_RhiSwapChainBuffers.resize(m_SwapChainDesc.BufferCount);
 
-        nvrhi::TextureDesc textureDesc;
-        textureDesc.width = m_DeviceParams.backBufferWidth;
-        textureDesc.height = m_DeviceParams.backBufferHeight;
-        textureDesc.sampleCount = m_DeviceParams.swapChainSampleCount;
-        textureDesc.sampleQuality = m_DeviceParams.swapChainSampleQuality;
-        textureDesc.format = m_DeviceParams.swapChainFormat;
-        textureDesc.debugName = "SwapChainBuffer";
-        textureDesc.isRenderTarget = true;
-        textureDesc.isUAV = false;
-        textureDesc.initialState = nvrhi::ResourceStates::Present;
-        textureDesc.keepInitialState = true;
-
         for (UINT n = 0; n < m_SwapChainDesc.BufferCount; n++)
         {
-            HR_RETURN(m_SwapChain->GetBuffer(n, IID_PPV_ARGS(&m_SwapChainBuffers[n])));
+            const HRESULT hr = m_SwapChain->GetBuffer(n, IID_PPV_ARGS(&m_SwapChainBuffers[n]));
+            HR_RETURN(hr);
+
+        	nvrhi::TextureDesc textureDesc;
+            textureDesc.width = m_DeviceParams.backBufferWidth;
+            textureDesc.height = m_DeviceParams.backBufferHeight;
+            textureDesc.sampleCount = m_DeviceParams.swapChainSampleCount;
+            textureDesc.sampleQuality = m_DeviceParams.swapChainSampleQuality;
+            textureDesc.format = m_DeviceParams.swapChainFormat;
+            textureDesc.debugName = "SwapChainBuffer";
+            textureDesc.isRenderTarget = true;
+            textureDesc.isUAV = false;
+            textureDesc.initialState = nvrhi::ResourceStates::Present;
+            textureDesc.keepInitialState = true;
 
             m_RhiSwapChainBuffers[n] = m_NvrhiDevice->createHandleForNativeTexture(nvrhi::ObjectTypes::D3D12_Resource, nvrhi::Object(m_SwapChainBuffers[n]), textureDesc);
         }

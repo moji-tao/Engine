@@ -763,12 +763,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\dev\Engine\engine\3rd\Assimp\include\assimp\Compiler\pstdint.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\dev\Engine\engine\3rd\Assimp\ZERO_CHECK.vcxproj">
-      <Project>{688BF9DE-5871-39FD-A46A-9517D91AD171}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
     <ProjectReference Include="D:\dev\Engine\engine\3rd\Assimp\contrib\zlib\zlibstatic.vcxproj">
       <Project>{C0707212-389D-3DEE-A0D6-94E56E153FCB}</Project>
       <Name>zlibstatic</Name>

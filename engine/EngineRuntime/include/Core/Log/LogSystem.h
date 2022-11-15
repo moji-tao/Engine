@@ -21,6 +21,15 @@ namespace Engine
 
 		void Finalize();
 
+
+#if (defined(_MSC_VER) && _MSVC_LANG >= 202002L) || (__cplusplus >= 202002L)
+	private:
+		static constexpr spdlog::source_loc GetLogSourceLocation(const std::source_location& location)
+		{
+			return spdlog::source_loc{ location.file_name(), static_cast<std::int32_t>(location.line()), location.function_name() };
+		}
+
+	public:
 		struct format_with_location
 		{
 			std::string_view value;
@@ -30,13 +39,20 @@ namespace Engine
 			format_with_location(const String& s, const std::source_location& location = std::source_location::current())
 				: value{ s }, loc{ GetLogSourceLocation(location) } { }
 		};
-
 		template <typename... Args>
 		void Log(spdlog::level::level_enum level, format_with_location fmt_, Args&&... args)
 		{
 			m_logger->log(fmt_.loc, level, fmt::runtime(fmt_.value),
 				std::forward<Args>(args)...);
 		}
+#else
+		template <typename... Args>
+		void Log(spdlog::level::level_enum level, Args&&... args)
+		{
+			m_logger->log(level, std::forward<Args>(args)...);
+		}
+
+#endif
 
 		template <typename... Args>
 		void FatalCallback(Args&&... args)
@@ -45,11 +61,6 @@ namespace Engine
 			throw std::runtime_error(format_str);
 		}
 
-	private:
-		static constexpr spdlog::source_loc GetLogSourceLocation(const std::source_location& location)
-		{
-			return spdlog::source_loc{ location.file_name(), static_cast<std::int32_t>(location.line()), location.function_name() };
-		}
 
 	private:
 		std::shared_ptr<spdlog::logger> m_logger;

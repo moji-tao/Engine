@@ -24,6 +24,24 @@
     <ClInclude Include="include\UI\EditorUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\UI\EditorUIPassBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\EditorUIProjectPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\EditorUIConsolePass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\EditorUIHierarchyPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\EditorUIScenePass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\EditorUIInspectorPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application\EngineEditor.cpp">
@@ -33,6 +51,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\EditorUIProjectPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\EditorUIConsolePass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\EditorUIHierarchyPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\EditorUIScenePass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\EditorUIInspectorPass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

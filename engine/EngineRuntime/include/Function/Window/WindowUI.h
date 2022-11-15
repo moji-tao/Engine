@@ -1,9 +1,12 @@
 #pragma once
-#include "EngineRuntime/include/Function/Window/WindowSystem.h"
-#include "EngineRuntime/include/Function/Render/RenderSystem.h"
+//#include "EngineRuntime/include/Function/Window/WindowSystem.h"
+//#include "EngineRuntime/include/Function/Render/RenderSystem.h"
 
 namespace Engine
 {
+	class WindowSystem;
+	class RenderSystem;
+
 	struct WindowUIInitInfo
 	{
 		WindowSystem* windowSystem;

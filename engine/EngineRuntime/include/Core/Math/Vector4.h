@@ -8,7 +8,7 @@ namespace Engine
 	public:
 		Vector4();
 
-		Vector4(float x, float y, float z, float w);
+		Vector4(float _x, float _y, float _z, float _w);
 
 		Vector4(const Vector3& v3, float w);
 
@@ -94,8 +94,12 @@ namespace Engine
 
 		Vector4& operator/=(const Vector4& rhs);
 
-	private:
-		float m_Value[4];
+	public:
+		//float m_Value[4];
+		float x;
+		float y;
+		float z;
+		float w;
 
 	public:
 		static const Vector4 ZERO;

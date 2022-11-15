@@ -9,135 +9,135 @@ namespace Engine
 
 	const Vector4 Vector4::UNIT_SCALE(1.0f, 1.0f, 1.0f, 1.0f);
 
-	Vector4::Vector4() : m_Value{ 0.0f, 0.0f, 0.0f, 0.0f } { }
+	Vector4::Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
 
-	Vector4::Vector4(const Vector3& v3, float w) : m_Value{ v3[0], v3[1], v3[2], w } { }
+	Vector4::Vector4(const Vector3& v3, float _w) : x(v3.x), y(v3.y), z(v3.z), w(_w) { }
 
-	Vector4::Vector4(float x, float y, float z, float w) : m_Value{ x, y, z, w } { }
+	Vector4::Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
 
-	Vector4::Vector4(float coords[4]) : m_Value{ coords[0], coords[1], coords[2], coords[3] } { }
+	Vector4::Vector4(float coords[4]) : x(coords[0]), y(coords[1]), z(coords[2]), w(coords[3]) { }
 
 	float* Vector4::ptr()
 	{
-		return (float*)m_Value;
+		return &x;
 	}
 
 	const float* Vector4::ptr() const
 	{
-		return (const float*)m_Value;
+		return &x;
 	}
 
 	float Vector4::GetX() const
 	{
-		return m_Value[0];
+		return x;
 	}
 
 	float Vector4::GetY() const
 	{
-		return m_Value[1];
+		return y;
 	}
 
 	float Vector4::GetZ() const
 	{
-		return m_Value[2];
+		return z;
 	}
 
 	float Vector4::GetW() const
 	{
-		return m_Value[3];
+		return w;
 	}
 
 	void Vector4::SetX(float scaler)
 	{
-		m_Value[0] = scaler;
+		x = scaler;
 	}
 
 	void Vector4::SetY(float scaler)
 	{
-		m_Value[1] = scaler;
+		y = scaler;
 	}
 
 	void Vector4::SetZ(float scaler)
 	{
-		m_Value[2] = scaler;
+		z = scaler;
 	}
 
 	void Vector4::SetW(float scaler)
 	{
-		m_Value[3] = scaler;
+		w = scaler;
 	}
 
 	float Vector4::DotProduct(const Vector4& vec) const
 	{
-		return m_Value[0] * vec[0] + m_Value[1] * vec[1] + m_Value[2] * vec[2] + m_Value[3] * vec[3];
+		return x * vec[0] + y * vec[1] + z * vec[2] + w * vec[3];
 	}
 
 	bool Vector4::IsNaN() const
 	{
-		return std::isnan(m_Value[0]) || std::isnan(m_Value[1]) || std::isnan(m_Value[2]) || std::isnan(m_Value[3]);
+		return std::isnan(x) || std::isnan(y) || std::isnan(z) || std::isnan(w);
 	}
 
 	float Vector4::operator[](size_t i) const
 	{
 		assert(i < 4);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	float& Vector4::operator[](size_t i)
 	{
 		assert(i < 4);
-		return m_Value[i];
+		return *(&x + i);
 	}
 
 	Vector4& Vector4::operator=(float scalar)
 	{
-		m_Value[0] = scalar;
-		m_Value[1] = scalar;
-		m_Value[2] = scalar;
-		m_Value[3] = scalar;
+		x = scalar;
+		y = scalar;
+		z = scalar;
+		w = scalar;
 		return *this;
 	}
 
 	bool Vector4::operator==(const Vector4& rhs) const
 	{
-		return m_Value[0] == rhs.m_Value[0] && m_Value[1] == rhs.m_Value[1] && m_Value[2] == rhs.m_Value[2] && m_Value[3] == rhs.m_Value[3];
+		return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;
 	}
 
 	bool Vector4::operator!=(const Vector4& rhs) const
 	{
-		return m_Value[0] != rhs.m_Value[0] || m_Value[1] != rhs.m_Value[1] || m_Value[2] != rhs.m_Value[2] || m_Value[3] != rhs.m_Value[3];
+		return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w;
 	}
 
 	Vector4 Vector4::operator+(const Vector4& rhs) const
 	{
-		return Vector4(m_Value[0] + rhs.m_Value[0], m_Value[1] + rhs.m_Value[1], m_Value[2] + rhs.m_Value[2], m_Value[3] + rhs.m_Value[3]);
+		return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 	}
 
 	Vector4 Vector4::operator-(const Vector4& rhs) const
 	{
-		return Vector4(m_Value[0] - rhs.m_Value[0], m_Value[1] - rhs.m_Value[1], m_Value[2] - rhs.m_Value[2], m_Value[3] - rhs.m_Value[3]);
+		return Vector4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 	}
 
 	Vector4 Vector4::operator*(float scalar) const
 	{
-		return Vector4(m_Value[0] * scalar, m_Value[1] * scalar, m_Value[2] * scalar, m_Value[3] * scalar);
+		return Vector4(x * scalar, y * scalar, z * scalar, w * scalar);
 	}
 
 	Vector4 Vector4::operator*(const Vector4& rhs) const
 	{
-		return Vector4(m_Value[0] * rhs.m_Value[0], m_Value[1] * rhs.m_Value[1], m_Value[2] * rhs.m_Value[2], m_Value[3] * rhs.m_Value[3]);
+		return Vector4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
 	}
 
 	Vector4 Vector4::operator/(float scalar) const
 	{
 		assert(scalar != 0.0f);
-		return Vector4(m_Value[0] / scalar, m_Value[1] / scalar, m_Value[2] / scalar, m_Value[3] / scalar);
+		return Vector4(x / scalar, y / scalar, z / scalar, w / scalar);
 	}
 
 	Vector4 Vector4::operator/(const Vector4& rhs) const
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f && rhs.m_Value[3] != 0.0f);
-		return Vector4(m_Value[0] / rhs.m_Value[0], m_Value[1] / rhs.m_Value[1], m_Value[2] / rhs.m_Value[2], m_Value[3] / rhs.m_Value[3]);
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		return Vector4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 	}
 
 	const Vector4& Vector4::operator+() const
@@ -147,111 +147,111 @@ namespace Engine
 
 	Vector4 Vector4::operator-() const
 	{
-		return Vector4(-m_Value[0], -m_Value[1], -m_Value[2], -m_Value[3]);
+		return Vector4(-x, -y, -z, -w);
 	}
 
 	Vector4 operator*(float scalar, const Vector4& rhs)
 	{
-		return Vector4(scalar * rhs.m_Value[0], scalar * rhs.m_Value[1], scalar * rhs.m_Value[2], scalar * rhs.m_Value[3]);
+		return Vector4(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z, scalar * rhs.w);
 	}
 
 	Vector4 operator/(float scalar, const Vector4& rhs)
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f && rhs.m_Value[3] != 0.0f);
-		return Vector4(scalar / rhs.m_Value[0], scalar / rhs.m_Value[1], scalar / rhs.m_Value[2], scalar / rhs.m_Value[3]);
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		return Vector4(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z, scalar / rhs.w);
 	}
 
 	Vector4 operator+(const Vector4& lhs, float rhs)
 	{
-		return Vector4(lhs.m_Value[0] + rhs, lhs.m_Value[1] + rhs, lhs.m_Value[2] + rhs, lhs.m_Value[3] + rhs);
+		return Vector4(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs, lhs.w + rhs);
 	}
 
 	Vector4 operator+(float lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs + rhs.m_Value[0], lhs + rhs.m_Value[1], lhs + rhs.m_Value[2], lhs + rhs.m_Value[3]);
+		return Vector4(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z, lhs + rhs.w);
 	}
 
 	Vector4 operator-(const Vector4& lhs, float rhs)
 	{
-		return Vector4(lhs.m_Value[0] - rhs, lhs.m_Value[1] - rhs, lhs.m_Value[2] - rhs, lhs.m_Value[3] - rhs);
+		return Vector4(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs, lhs.w - rhs);
 	}
 
 	Vector4 operator-(float lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs - rhs.m_Value[0], lhs - rhs.m_Value[1], lhs - rhs.m_Value[2], lhs - rhs.m_Value[3]);
+		return Vector4(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z, lhs - rhs.w);
 	}
 
 	Vector4& Vector4::operator+=(const Vector4& rhs)
 	{
-		m_Value[0] += rhs.m_Value[0];
-		m_Value[1] += rhs.m_Value[1];
-		m_Value[2] += rhs.m_Value[2];
-		m_Value[3] += rhs.m_Value[3];
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		w += rhs.w;
 		return *this;
 	}
 
 	Vector4& Vector4::operator-=(const Vector4& rhs)
 	{
-		m_Value[0] -= rhs.m_Value[0];
-		m_Value[1] -= rhs.m_Value[1];
-		m_Value[2] -= rhs.m_Value[2];
-		m_Value[3] -= rhs.m_Value[3];
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		w -= rhs.w;
 		return *this;
 	}
 
 	Vector4& Vector4::operator*=(float scalar)
 	{
-		m_Value[0] *= scalar;
-		m_Value[1] *= scalar;
-		m_Value[2] *= scalar;
-		m_Value[3] *= scalar;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		w *= scalar;
 		return *this;
 	}
 
 	Vector4& Vector4::operator+=(float scalar)
 	{
-		m_Value[0] += scalar;
-		m_Value[1] += scalar;
-		m_Value[2] += scalar;
-		m_Value[3] += scalar;
+		x += scalar;
+		y += scalar;
+		z += scalar;
+		w += scalar;
 		return *this;
 	}
 
 	Vector4& Vector4::operator-=(float scalar)
 	{
-		m_Value[0] -= scalar;
-		m_Value[1] -= scalar;
-		m_Value[2] -= scalar;
-		m_Value[3] -= scalar;
+		x -= scalar;
+		y -= scalar;
+		z -= scalar;
+		w -= scalar;
 		return *this;
 	}
 
 	Vector4& Vector4::operator*=(const Vector4& rhs)
 	{
-		m_Value[0] *= rhs.m_Value[0];
-		m_Value[1] *= rhs.m_Value[1];
-		m_Value[2] *= rhs.m_Value[2];
-		m_Value[3] *= rhs.m_Value[3];
+		x *= rhs.x;
+		y *= rhs.y;
+		z *= rhs.z;
+		w *= rhs.w;
 		return *this;
 	}
 
 	Vector4& Vector4::operator/=(float scalar)
 	{
 		assert(scalar != 0.0f);
-		m_Value[0] /= scalar;
-		m_Value[1] /= scalar;
-		m_Value[2] /= scalar;
-		m_Value[3] /= scalar;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
+		w /= scalar;
 		return *this;
 	}
 
 	Vector4& Vector4::operator/=(const Vector4& rhs)
 	{
-		assert(rhs.m_Value[0] != 0.0f && rhs.m_Value[1] != 0.0f && rhs.m_Value[2] != 0.0f && rhs.m_Value[3] != 0.0f);
-		m_Value[0] /= rhs.m_Value[0];
-		m_Value[1] /= rhs.m_Value[1];
-		m_Value[2] /= rhs.m_Value[2];
-		m_Value[3] /= rhs.m_Value[3];
+		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		x /= rhs.x;
+		y /= rhs.y;
+		z /= rhs.z;
+		w /= rhs.w;
 		return *this;
 	}
 }

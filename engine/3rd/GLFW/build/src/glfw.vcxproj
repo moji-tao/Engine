@@ -73,7 +73,7 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";_GLFW_BUILD_DLL</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\GLFW\include;$(SolutionDir)engine\3rd\GLFW\src;$(SolutionDir)engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -116,7 +116,7 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_GLFW_WIN32;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";_GLFW_BUILD_DLL</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\GLFW\include;$(SolutionDir)engine\3rd\GLFW\src;$(SolutionDir)engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>D:\dev\Engine\engine\3rd\GLFW\include;D:\dev\Engine\engine\3rd\GLFW\src;D:\dev\Engine\engine\3rd\GLFW\build\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -205,14 +205,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_window.c" />
     <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\wgl_context.c" />
     <ResourceCompile Include="D:\dev\Engine\engine\3rd\GLFW\build\src\glfw.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="D:\dev\Engine\engine\3rd\GLFW\build\ZERO_CHECK.vcxproj">
-      <Project>{1D96FE24-8812-3F29-A7B6-7009E1970E8D}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

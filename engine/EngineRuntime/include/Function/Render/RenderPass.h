@@ -32,7 +32,7 @@ namespace Engine
 
 	class IRenderPass
 	{
-	private:
+	public:
 		DeviceManager* m_DeviceManager;
 
 	public:
@@ -42,8 +42,8 @@ namespace Engine
 
 		virtual ~IRenderPass() = default;
 
-		virtual void Render(nvrhi::IFramebuffer* framebuffer) { }
-		virtual void Animate(float fElapsedTimeSeconds) { }
+		virtual void Render(nvrhi::IFramebuffer* framebuffer, float deltaTile) { }
+		virtual void RenderAfter(nvrhi::IFramebuffer* framebuffer, float deltaTile) { }
 		virtual void BackBufferResizing() { }
 		virtual void BackBufferResized(const uint32_t width, const uint32_t height, const uint32_t sampleCount) { }
 

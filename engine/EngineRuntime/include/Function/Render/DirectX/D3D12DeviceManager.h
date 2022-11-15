@@ -47,14 +47,15 @@ namespace Engine
         void ReleaseRenderTargets();
 
 	protected:
-        RefCountPtr<ID3D12Device4>                   m_Device12;
+        RefCountPtr<IDXGIFactory5>                  m_DxgiFactory;
+        RefCountPtr<ID3D12Device4>                  m_Device12;
         RefCountPtr<ID3D12CommandQueue>             m_GraphicsQueue;
         RefCountPtr<ID3D12CommandQueue>             m_ComputeQueue;
         RefCountPtr<ID3D12CommandQueue>             m_CopyQueue;
         RefCountPtr<IDXGISwapChain3>                m_SwapChain;
         DXGI_SWAP_CHAIN_DESC1                       m_SwapChainDesc{};
         DXGI_SWAP_CHAIN_FULLSCREEN_DESC             m_FullScreenDesc{};
-        RefCountPtr<IDXGIAdapter1>                   m_DxgiAdapter;
+        RefCountPtr<IDXGIAdapter>                   m_DxgiAdapter;
         bool                                        m_TearingSupported = false;
 
         std::vector<RefCountPtr<ID3D12Resource>>    m_SwapChainBuffers;
