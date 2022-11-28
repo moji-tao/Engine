@@ -7,5 +7,7 @@ FodyWeavers.xsd
 /engine/3rd/GLFW/build/CMakeFiles
 /engine/3rd/GLFW/build/src/CMakeFiles
 /engine/3rd/nvrhi/CMakeFiles
-/bin
+/bin/*.dll
+/bin/*.exe
+/bin/*.pdb
 /engine/EngineRuntime/include/Function/Render/RHI.h
