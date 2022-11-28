@@ -62,7 +62,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\ImGUI\include\imgui\;$(SolutionDir)engine\3rd\GLFW\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\ImGUI\include\;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\ImGUI\include\imgui\backends\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,7 +78,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\ImGUI\include\imgui\;$(SolutionDir)engine\3rd\GLFW\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\3rd\ImGUI\include\;$(SolutionDir)engine\3rd\GLFW\include\;$(SolutionDir)engine\3rd\ImGUI\include\imgui\backends\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,14 +88,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="imgui.cpp" />
-    <ClCompile Include="imgui_demo.cpp" />
-    <ClCompile Include="imgui_draw.cpp" />
-    <ClCompile Include="imgui_tables.cpp" />
-    <ClCompile Include="imgui_widgets.cpp" />
+    <ClInclude Include="include\imgui\backends\imgui_impl_dx12.h" />
+    <ClInclude Include="include\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="include\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\imgui\imgui.h" />
+    <ClCompile Include="src\backends\imgui_impl_dx12.cpp" />
+    <ClCompile Include="src\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\imgui.cpp" />
+    <ClCompile Include="src\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui_widgets.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

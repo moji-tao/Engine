@@ -13,14 +13,13 @@ namespace Editor
 		virtual ~EngineEditor() override = default;
 
 	public:
-		virtual bool Initialize(const ApplicationDesc* config) override;
+		virtual bool Initialize(const EditorConfig* config) override;
 
 		virtual void Finalize() override;
 
 		virtual void Run() override;
 
 	private:
-		void AnalysisConfig(const ApplicationDesc* config, Engine::InitConfig& initConfig);
 
 	private:
 		static void FilesDrop(int fileCount, const char** filePath);

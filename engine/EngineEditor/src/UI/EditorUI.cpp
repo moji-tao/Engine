@@ -1,48 +1,43 @@
 #include "EngineEditor/include/UI/EditorUI.h"
+#include "EngineEditor/include/Application/IApplication.h"
+#include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
-#include "Function/UI/ImGuiRenderer.h"
-
-#include "Function/Window/WindowSystem.h"
-
+#include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineEditor/include/UI/EditorUIProjectPass.h"
 #include "EngineEditor/include/UI/EditorUIConsolePass.h"
 #include "EngineEditor/include/UI/EditorUIHierarchyPass.h"
 #include "EngineEditor/include/UI/EditorUIInspectorPass.h"
 #include "EngineEditor/include/UI/EditorUIScenePass.h"
-#include <d3d12.h>
+
 namespace Editor
 {
-	EditorUI::EditorUI()
+	EditorUI::EditorUI(const EditorConfig* config)
 	{
-		mEditorUIRender = std::make_shared<Engine::ImGuiRenderer>(Engine::RenderSystem::GetInstance()->GetRenderDeviceManager(), this);
+		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackend(this);
 
-		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackend(this, mEditorUIRender.get());
-
-		ImGuiIO& io = ImGui::GetIO();
-
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-		mFontsSimhei = mEditorUIRender->LoadFont("Resource/simhei.ttf", 20.0f);
+		LoadFonts(config->editorFontPath);
 
 		mProjectUI = std::make_shared<EditorUIProjectPass>();
 		mConsoleUI = std::make_shared<EditorUIConsolePass>();
 		mHierarchyUI = std::make_shared<EditorUIHierarchyPass>();
 		mSceneUI = std::make_shared<EditorUIScenePass>();
 		mInspectorUI = std::make_shared<EditorUIInspectorPass>();
-
 	}
 
 	EditorUI::~EditorUI()
 	{
+		mInspectorUI = nullptr;
+		mSceneUI = nullptr;
+		mHierarchyUI = nullptr;
 		mConsoleUI = nullptr;
 		mProjectUI = nullptr;
-		mEditorUIRender = nullptr;
+
+		Engine::RenderSystem::GetInstance()->FinalizeUIRenderBackend();
 	}
 
 	void EditorUI::Initialize(const Engine::WindowUIInitInfo& info)
 	{
-		mEditorUIRender->Init();
 		LOG_INFO("编辑器UI初始化完成");
 	}
 
@@ -207,6 +202,16 @@ namespace Editor
 		}
 
 		ImGui::End();
+	}
+
+	void EditorUI::LoadFonts(const std::filesystem::path& ph)
+	{
+		std::shared_ptr<Engine::Blob> font = Engine::EngineFileSystem::GetInstance()->ReadFile(ph);
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImFontConfig fontConfig;
+		fontConfig.FontDataOwnedByAtlas = false;
+		io.Fonts->AddFontFromMemoryTTF((void*)font->GetData(), font->GetSize(), 20.0f, &fontConfig, io.Fonts->GetGlyphRangesChineseFull());
 	}
 
 }

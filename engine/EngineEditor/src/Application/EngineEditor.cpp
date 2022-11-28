@@ -2,18 +2,21 @@
 #include "EngineEditor/include/Application/EngineEditor.h"
 #include "EngineRuntime.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
-#include "Platform/FileSystem/FileSystem.h"
+#include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 
 namespace Editor
 {
-	bool EngineEditor::Initialize(const ApplicationDesc* config)
+	bool EngineEditor::Initialize(const EditorConfig* config)
 	{
 		Engine::InitConfig initConfig;
-
-		AnalysisConfig(config, initConfig);
+		initConfig.WindowWidth = config->WindowWidth;
+		initConfig.WindowHeight = config->WindowHeight;
+		initConfig.Title = config->Title.c_str();
+		initConfig.enginePath = config->enginePath;
+		initConfig.workspacePath = config->workspacePath;
 
 		if (!Engine::EngineRuntime::GetInstance()->Initialize(&initConfig))
 		{
@@ -21,17 +24,13 @@ namespace Editor
 			return false;
 		}
 
-		
-		mEditorUI = std::make_shared<EditorUI>();
+		mEditorUI = std::make_shared<EditorUI>(config);
 
 		Engine::WindowUIInitInfo info;
 		info.windowSystem = Engine::WindowSystem::GetInstance();
 		info.renderSystem = Engine::RenderSystem::GetInstance();
 		
 		mEditorUI->Initialize(info);
-		
-
-		Engine::RenderSystem::GetInstance()->ResizeEngineContentViewport(420, 180, 1080, 720);
 
 		Engine::WindowSystem::GetInstance()->RegisterFilesDropCallback(FilesDrop);
 
@@ -53,16 +52,6 @@ namespace Editor
 			mIsQuit = !Engine::EngineRuntime::GetInstance()->Tick(deltaTime);
 		}
 
-	}
-
-	void EngineEditor::AnalysisConfig(const ApplicationDesc* config, Engine::InitConfig& initConfig)
-	{
-		initConfig.windowHandle = nullptr;
-		initConfig.WindowWidth = 1920;
-		initConfig.WindowHeight = 1080;
-		initConfig.Title = "MINI引擎";
-		initConfig.enginePath = config->enginePath;
-		initConfig.workspacePath = config->workspacePath;
 	}
 
 	void EngineEditor::FilesDrop(int fileCount, const char** filePath)

@@ -16,8 +16,6 @@ namespace Engine
 	public:
 		virtual bool Initialize(InitConfig* info) override;
 
-		//void Run();
-
 		virtual void Finalize() override;
 
 		virtual bool Tick(float deltaTime) override;

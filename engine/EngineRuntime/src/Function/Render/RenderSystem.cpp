@@ -1,93 +1,58 @@
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
-
 #include "EngineRuntime/include/Core/Base/macro.h"
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12DeviceManager.h"
-#include "EngineRuntime/include/Function/UI/ImGuiRenderer.h"
+#include "EngineRuntime/include/Function/Window/WindowSystem.h"
 
 namespace Engine
 {
+	RenderSystem::RenderSystem()
+	{
+		//mRenderAPI = std::make_shared<DirectXRender>();
+	}
+
 	RenderSystem::~RenderSystem()
-	{ }
+	{
+		//mRenderAPI = nullptr;
+	}
 
 	bool RenderSystem::Initialize(InitConfig* info)
 	{
-		/*
-		mRHI = std::make_shared<DirectXRender>();
-		mRHI->Initialize(info);
+		//mRenderAPI->Initialize();
+		mD3DRHI = std::make_unique<D3D12RHI>((HWND)WindowSystem::GetInstance()->GetWindowHandle(true), WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
 
-		mRenderResource = std::make_shared<RenderResource>();
-		mRenderResource->UploadGlobalRenderResource(mRHI);
-
-		mCamera = std::make_shared<RenderCamera>();
-		Vector3 mEyePos;
-		mEyePos[0] = 15.0f * sinf(0.2f * XM_PI) * cosf(1.5f * XM_PI);
-		mEyePos[2] = 15.0f * sinf(0.2f * XM_PI) * sinf(1.5f * XM_PI);
-		mEyePos[1] = 15.0f * cosf(0.2f * XM_PI);
-
-		mCamera->LookAt(mEyePos, Vector3::ZERO, Vector3::UNIT_Y);
-		mCamera->SetAspect(mRHI->GetAspect());
-
-		mRenderPipeline = std::make_shared<DeviceManager>();
-		mRenderPipeline->Initialize();
-		*/
-		DeviceCreationParameters param;
-		param.backBufferWidth = info->WindowWidth;
-		param.backBufferHeight = info->WindowHeight;
-		param.swapChainBufferCount = 3;
-		param.swapChainSampleCount = 1;
-		param.startFullscreen = false;
-		param.vsyncEnabled = true;
-		param.enableComputeQueue = true;
-		param.enableCopyQueue = true;
-
-#ifdef _DEBUG
-		//param.enableNvrhiValidationLayer = true;
-		param.enableDebugRuntime = true;
-#endif
-		mDeviceManager = std::make_shared<D3D12DeviceManager>();
-		if(!mDeviceManager->Initialize(param))
-		{
-			return false;
-		}
-
-		//mBasicTriangle = std::make_shared<BasicTriangle>(mDeviceManager.get());
-		//mDeviceManager->AddRenderPassToFront(mBasicTriangle.get());
-		mDDDD = std::make_shared<VertexBuffer>(mDeviceManager.get());
-		mDeviceManager->AddRenderPassToFront(mDDDD.get());
+		mD3DRHI->ResizeViewport(WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
 
 		return true;
 	}
 
 	bool RenderSystem::Tick(float deltaTile)
 	{
-		mDeviceManager->Render(deltaTile);
+		mD3DRHI->ResetCommandAllocator();
+		mD3DRHI->ResetCommandList();
 
+		mD3D12ImGuiDevice->DrawUI();
+
+		mD3DRHI->ExecuteCommandLists();
+		mD3DRHI->Present();
+		mD3DRHI->FlushCommandQueue();
+		mD3DRHI->EndFrame();
+		//mRenderAPI->Tick(deltaTile);
 		return true;
 	}
 
 	void RenderSystem::Finalize()
 	{
-		mDDDD = nullptr;
-		mDeviceManager->Finalize();
-		mDeviceManager = nullptr;
+		//mRenderAPI->Finalize();
 	}
 
-	void RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI, IRenderPass* editorPass)
+	void RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI)
 	{
-		//mEditorUI = std::make_shared<ImGuiRenderer>(mDeviceManager.get(), windowUI);
-		mDeviceManager->AddRenderPassToBack(editorPass);
+		mD3D12ImGuiDevice = std::make_unique<D3D12ImGuiDevice>(windowUI);
+
+		mD3DRHI->InitEditorUI(mD3D12ImGuiDevice.get());
 	}
 
-	void RenderSystem::ResizeEngineContentViewport(float offsetX, float offsetY, float width, float height)
+	void RenderSystem::FinalizeUIRenderBackend()
 	{
-		/*
-		mRHI->ResizeEngineContentViewport(offsetX, offsetY, width, height);
-		*/
+		mD3D12ImGuiDevice.reset();
 	}
-
-	DeviceManager* RenderSystem::GetRenderDeviceManager()
-	{
-		return mDeviceManager.get();
-	}
-
 }

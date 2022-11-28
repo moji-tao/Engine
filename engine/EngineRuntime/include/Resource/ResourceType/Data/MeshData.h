@@ -2,6 +2,7 @@
 #include <vector>
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Vector2.h"
+#include "EngineRuntime/include/Core/Math/Vector4.h"
 
 namespace Engine
 {
@@ -21,7 +22,12 @@ namespace Engine
 
 	struct Mesh
 	{
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
+		std::vector<Vertex> Vertices;
+		std::vector<unsigned int> Indices;
+	};
+
+	struct GeometryData
+	{
+		std::vector<Mesh> Meshes;
 	};
 }

@@ -1,133 +1,108 @@
 #pragma once
-#ifdef _WIN64
-#include <wrl.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include "EngineRuntime/include/Function/Render/RHI.h"
-#include "EngineRuntime/include/Function/Render/DirectX/FrameResource.h"
-using namespace Microsoft::WRL;
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12Device.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12Viewport.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12Texture.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12Buffer.h"
+#include "EngineRuntime/include/Function/Window/WindowUI.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/TextureData.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
 
 namespace Engine
 {
-	class D3D12RHI : public RHI
+	class D3D12RHI
 	{
 	public:
-		D3D12RHI() = default;
+		D3D12RHI(HWND WindowHandle, int WindowWidth, int WindowHeight);
 
-		virtual ~D3D12RHI() override = default;
-
-	public:
-		virtual bool Initialize(InitConfig* info) override;
-
-		virtual void Finalize() override;
-
-		virtual void ResizeEngineContentViewport(float offsetX, float offsetY, float width, float height) override;
-
-	public:
-		virtual void CommandListReset() override;
-
-		virtual void CommandListClose() override;
-
-		virtual void ExecuteCommandLists() override;
-
-		virtual void WaitForFences() override;
-
-		virtual void ResizeWindow() override;
-
-		virtual void SubmitRendering() override;
-
-		virtual void ResetCommandAllocator() override;
-
-		virtual void UploadVertexData(void* data, unsigned long long dataLength) override;
-
-		virtual void UploadIndexData(void* data, unsigned long long dataLength) override;
-
-		virtual void UploadMainPassData(const PassConstants& passComstants) override;
-
-		virtual float GetAspect() override;
-
-		virtual void PrepareContext() override;
+		~D3D12RHI();
 
 	private:
-#ifdef _DEBUG
+		void Initialze(HWND WindowHandle, int WindowWidth, int WindowHeight);
+
+		void Destroy();
+
+	public:
+		D3D12Device* GetDevice();
+
+		D3D12Viewport* GetViewport();
+
+		const D3D12ViewportInfo& GetViewportInfo();
+
+		IDXGIFactory4* GetDxgiFactory();
+
+		void InitEditorUI(D3D12ImGuiDevice* editorUI);
+
+	public:
+		void FlushCommandQueue();
+
+		void ExecuteCommandLists();
+
+		void ResetCommandList();
+
+		void ResetCommandAllocator();
+
+		void Present();
+
+		void ResizeViewport(int NewWidth, int NewHeight);
+
+		void TransitionResource(D3D12Resource* Resource, D3D12_RESOURCE_STATES StateAfter);
+
+		void CopyResource(D3D12Resource* DstResource, D3D12Resource* SrcResource);
+
+		void CopyBufferRegion(D3D12Resource* DstResource, uint64_t DstOffset, D3D12Resource* SrcResource, uint64_t SrcOffset, uint64_t Size);
+
+		void CopyTextureRegion(const D3D12_TEXTURE_COPY_LOCATION* Dst, UINT DstX, UINT DstY, UINT DstZ, const D3D12_TEXTURE_COPY_LOCATION* Src, const D3D12_BOX* SrcBox);
+
+		D3D12ConstantBufferRef CreateConstantBuffer(const void* Contents, uint32_t Size);
+
+		D3D12StructuredBufferRef CreateStructuredBuffer(const void* Contents, uint32_t ElementSize, uint32_t ElementCount);
+
+		D3D12RWStructuredBufferRef CreateRWStructuredBuffer(uint32_t ElementSize, uint32_t ElementCount);
+
+		D3D12VertexBufferRef CreateVertexBuffer(const void* Contents, uint32_t Size);
+
+		D3D12IndexBufferRef CreateIndexBuffer(const void* Contents, uint32_t Size);
+
+		D3D12ReadBackBufferRef CreateReadBackBuffer(uint32_t Size);
+
+		D3D12TextureRef CreateTexture(const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue = Vector4::ZERO);
+
+		// Use D3DResource to create texture, texture will manage this D3DResource
+		D3D12TextureRef CreateTexture(Microsoft::WRL::ComPtr<ID3D12Resource> D3DResource, D3D12TextureInfo& TextureInfo, uint32_t CreateFlags);
+
+		void UploadTextureData(D3D12TextureRef Texture, const TextureData* textureData);
+
+		void SetVertexBuffer(const D3D12VertexBufferRef& VertexBuffer, UINT Offset, UINT Stride, UINT Size);
+
+		void SetIndexBuffer(const D3D12IndexBufferRef& IndexBuffer, UINT Offset, DXGI_FORMAT Format, UINT Size);
+
+		void EndFrame();
+
+	private:
+		void CreateDefaultBuffer(uint32_t Size, uint32_t Alignment, D3D12_RESOURCE_FLAGS Flags, D3D12ResourceLocation& ResourceLocation);
+
+		void CreateAndInitDefaultBuffer(const void* Contents, uint32_t Size, uint32_t Alignment, D3D12ResourceLocation& ResourceLocation);
+
+		D3D12TextureRef CreateTextureResource(const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue);
+
+		void CreateTextureView(D3D12TextureRef TextureRef, const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags);
+
+	private:
 		void LogAdapters();
-#endif
 
-		void CreateCommandObjects();
+		void LogAdapterOutputs(IDXGIAdapter* adapter);
 
-		void CreateSwapChain(WindowSystem& window);
+		void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 
-		void CreateHeaps();
+		unsigned GetSupportMSAAQuality(DXGI_FORMAT BackBufferFormat);
 
-	protected:
-		ID3D12Resource* CurrentBackBuffer()const;
+	private:
+		std::unique_ptr<D3D12Device> Device = nullptr;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
+		std::unique_ptr<D3D12Viewport> Viewport = nullptr;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
+		D3D12ViewportInfo ViewportInfo;
 
-	protected:
-		int mClientWidth;
-		int mClientHeight;
-
-		UINT mRTVDescriptorSize = 0;
-		UINT mDSVDescriptorSize = 0;
-		UINT mCBV_SRV_UAVDescriptorSize = 0;
-
-		bool m4xMsaaState = false;
-		UINT m4xMsaaQuality;
-
-		const static UINT mSwapChainBufferCount = 2u;
-		ComPtr<IDXGIFactory5> mDXGIFactory;
-		ComPtr<ID3D12Device4> mD3DDevice;
-		ComPtr<ID3D12CommandAllocator> mCMDListAlloc;
-		ComPtr<ID3D12GraphicsCommandList> mCommandList;
-		ComPtr<ID3D12CommandQueue> mCommandQueue;
-		ComPtr<IDXGISwapChain3> mSwapChain;
-		ComPtr<ID3D12DescriptorHeap> mRTVHeap;
-		ComPtr<ID3D12DescriptorHeap> mDSVHeap;
-		ComPtr<ID3D12Resource> mSwapChainBuffer[mSwapChainBufferCount];
-		ComPtr<ID3D12Resource> mDepthStencilBuffer;
-		ComPtr<ID3D12Fence>	mFence;
-
-		int mCurrBackBufferIndex = 0;
-		UINT64 mCurrentFence;
-
-		D3D12_VIEWPORT mScreenViewport;
-		D3D12_RECT mScissorRect;
-
-		DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-		DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	protected:
-		void BuildRootSignature();
-
-		void BuildShadersAndInputLayout();
-
-		void BuildFrameResources(unsigned int renderItemCount);
-
-		void BuildDescriptorHeaps(unsigned int renderItemCount);
-
-		void BuildConstantBufferViews(unsigned int renderItemCount);
-
-		void BuildPSOs();
-
-	protected:
-		ComPtr<ID3D12DescriptorHeap> mCBVHeap = nullptr;
-		ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-		ComPtr<ID3DBlob> mVSByteCode;
-		ComPtr<ID3DBlob> mPSByteCode;
-		TArray<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
-		static const int gNumFrameResources;
-		int mCurrentFrameResourceIndex = 0;
-		TArray<std::unique_ptr<FrameResource>> mFrameResources;
-		UINT mPassCbvOffset;
-		ComPtr<ID3D12PipelineState> mPSO;
-
-		ComPtr<ID3D12Resource> mVertexBufferGPU;
-		ComPtr<ID3D12Resource> mVertexBufferUpload;
-		ComPtr<ID3D12Resource> mIndexBufferGPU;
-		ComPtr<ID3D12Resource> mIndexBufferUpload;
+		Microsoft::WRL::ComPtr<IDXGIFactory4> DxgiFactory = nullptr;
 	};
 }
-#endif

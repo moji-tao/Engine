@@ -1,20 +1,17 @@
 #pragma once
 #include <memory>
-#include "EngineRuntime/include/Function/Render/RenderCamera.h"
-#include "EngineRuntime/include/Function/Render/RenderResourceBase.h"
-#include "EngineRuntime/include/Function/Render/DeviceManager.h"
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
-
-#include "EngineRuntime/include/Function/Render/VertexBuffer.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
 
 namespace Engine
 {
 	class RenderSystem : public IRuntimeModule, public ISingleton<RenderSystem>
 	{
 	public:
-		RenderSystem() = default;
+		RenderSystem();
 
 		virtual ~RenderSystem() override;
 
@@ -25,15 +22,14 @@ namespace Engine
 
 		virtual void Finalize() override;
 
-		void InitializeUIRenderBackend(WindowUI* windowUI, IRenderPass* editorPass);
+		void InitializeUIRenderBackend(WindowUI* windowUI);
 
-		void ResizeEngineContentViewport(float offsetX, float offsetY, float width, float height);
-
-		DeviceManager* GetRenderDeviceManager();
+		void FinalizeUIRenderBackend();
 
 	private:
-		std::shared_ptr<DeviceManager> mDeviceManager;
+		//std::shared_ptr<DirectXRenderBase> mRenderAPI;
+		std::unique_ptr<D3D12RHI> mD3DRHI = nullptr;
 
-		std::shared_ptr<VertexBuffer> mDDDD;
+		std::unique_ptr<D3D12ImGuiDevice> mD3D12ImGuiDevice = nullptr;
 	};
 }

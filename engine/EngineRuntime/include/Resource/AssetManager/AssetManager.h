@@ -1,14 +1,11 @@
 #pragma once
-#include "EngineRuntime/include/Resource/ConfigManager/ConfigManager.h"
-#include "EngineRuntime/include/Resource/ResourceType/Data/MeshData.h"
-#include "EngineRuntime/include/Core/Random/Random.h"
-#include <unordered_map>
-
-
+#include <memory>
+#include "EngineRuntime/include/Framework/Interface/ISingleton.h"
+#include "EngineRuntime/include/Resource/AssetManager/MeshAssetManager.h"
+#include "EngineRuntime/include/Resource/AssetManager/TextureAssetManager.h"
 
 namespace Engine
 {
-
 	class AssetManager : public ISingleton<AssetManager>
 	{
 	public:
@@ -17,13 +14,13 @@ namespace Engine
 		void Finalize();
 
 	public:
-		GUID LoadAsset(const std::filesystem::path& assetUrl);
+		const MeshAssetManager* GetMeshAssetManager() const;
 
-		std::vector<Mesh>* GetAsset(const GUID& guid);
-
-	private:
+		const TextureAssetManager* GetTextureAssetManager() const;
 
 	private:
-		std::unordered_map<GUID, std::vector<Mesh>> mModelSet;
+		std::unique_ptr<MeshAssetManager> mMeshAsset;
+
+		std::unique_ptr<TextureAssetManager> mTextureAsset;
 	};
 }

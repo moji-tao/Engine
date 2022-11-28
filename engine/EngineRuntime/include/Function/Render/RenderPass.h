@@ -2,8 +2,6 @@
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Matrix4x4.h"
 #include "EngineRuntime/include/Core/Math/Vector2.h"
-#include "EngineRuntime/include/Function/Render/DeviceManager.h"
-#include "nvrhi/nvrhi.h"
 
 namespace Engine
 {
@@ -30,6 +28,7 @@ namespace Engine
 		float DeltaTime = 0.0f;
 	};
 
+	/*
 	class IRenderPass
 	{
 	public:
@@ -51,4 +50,5 @@ namespace Engine
 		nvrhi::IDevice* GetDevice() const { return m_DeviceManager->GetDevice(); }
 		uint64_t GetFrameIndex() const { return m_DeviceManager->GetFrameIndex(); }
 	};
+	*/
 }

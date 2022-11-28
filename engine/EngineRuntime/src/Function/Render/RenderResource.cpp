@@ -1,5 +1,4 @@
 #include "EngineRuntime/include/Function/Render/RenderResource.h"
-#include "EngineRuntime/include/Function/Render/RHI.h"
 
 namespace Engine
 {
@@ -13,6 +12,7 @@ namespace Engine
 
 	}
 
+	/*
 	void RenderResource::UploadPerFrameBuffer(std::shared_ptr<RHI> rhi, std::shared_ptr<RenderCamera> camera)
 	{
 		UpdateMainPassCB(camera);
@@ -20,6 +20,7 @@ namespace Engine
 
 		UpdateObjectCBs();
 	}
+	*/
 
 	void RenderResource::UpdateObjectCBs()
 	{

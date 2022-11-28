@@ -3,8 +3,12 @@
 
 namespace Editor
 {
-	struct ApplicationDesc
+	struct EditorConfig
 	{
+		uint16_t WindowWidth;
+		uint16_t WindowHeight;
+		std::string Title;
+		std::filesystem::path editorFontPath;
 		std::filesystem::path enginePath;
 		std::filesystem::path workspacePath;
 	};
@@ -17,7 +21,7 @@ namespace Editor
 		virtual ~IApplication() = default;
 
 	public:
-		virtual bool Initialize(const ApplicationDesc* config) = 0;
+		virtual bool Initialize(const EditorConfig* config) = 0;
 
 		virtual void Finalize() = 0;
 

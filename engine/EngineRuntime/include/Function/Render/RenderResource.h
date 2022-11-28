@@ -18,7 +18,7 @@ namespace Engine
 
 		virtual void UploadGameObjectRenderResource(std::shared_ptr<RHI> rhi) override;
 
-		virtual void UploadPerFrameBuffer(std::shared_ptr<RHI> rhi, std::shared_ptr<RenderCamera> camera) override;
+		//virtual void UploadPerFrameBuffer(std::shared_ptr<RHI> rhi, std::shared_ptr<RenderCamera> camera) override;
 
 	private:
 		void UpdateObjectCBs();

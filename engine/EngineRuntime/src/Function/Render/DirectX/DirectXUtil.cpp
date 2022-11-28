@@ -72,6 +72,23 @@ namespace Engine
 		return (byteSize + 255) & ~255;
 	}
 
+	uint32_t AlignArbitrary(uint32_t Val, uint32_t Alignment)
+	{
+		return ((Val + Alignment - 1) / Alignment) * Alignment;
+	}
+
+	DxException::DxException(HRESULT hr, const std::wstring& functionName, int lineNumber)
+		:ErrorCode(hr), FunctionName(functionName), LineNumber(lineNumber)
+	{ }
+
+	std::wstring DxException::ToString() const
+	{
+		// Get the string description of the error code.
+		_com_error err(ErrorCode);
+		std::wstring msg = err.ErrorMessage();
+
+		return FunctionName + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
+	}
 
 }
 #endif

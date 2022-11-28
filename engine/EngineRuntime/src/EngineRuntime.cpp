@@ -71,6 +71,7 @@ namespace Engine
 	{
 		RenderSystem::GetInstance()->Finalize();
 		WindowSystem::GetInstance()->Finalize();
+		AssetManager::GetInstance()->Finalize();
 		ConfigManager::GetInstance()->Finalize();
 		NativeFileSystem::GetInstance()->Finalize();
 		LogSystem::GetInstance()->Finalize();

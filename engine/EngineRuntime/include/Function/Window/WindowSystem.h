@@ -1,6 +1,5 @@
 #pragma once
 #include <functional>
-#include "EngineRuntime/include/Core/STL/Array.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "GLFW/glfw3.h"
@@ -294,22 +293,22 @@ namespace Engine
 		void OnScroll(double xoffset, double yoffset);
 
 	private:
-		TArray<CharInputFunc> m_xOnCharInputFunc;
-		TArray<CharModsInputFunc> m_xOnCharModsInputFunc;
-		TArray<MouseEnterWindowFunc> m_xOnMouseEnterWindowFunc;
-		TArray<MouseMoveFunc> m_xOnMouseMoveFunc;
-		TArray<FilesDropFunc> m_xOnFilesDropFunc;
-		TArray<FramebufferResizeFunc> m_xOnFramebufferResizeFunc;
-		TArray<DownOrReleaseKeyFunc> m_xOnDownOrReleaseKeyFunc;
-		TArray<MouseKeyInputFunc> m_xOnMouseKeyInputFunc;
-		TArray<WindowResizeFunc> m_xOnWindowResizeFunc;
-		TArray<WindowMoveFunc> m_xOnWindowMoveFunc;
-		TArray<WindowMaximizeFunc> m_xOnWindowMaximizeFunc;
-		TArray<WindowIconifyFunc> m_xOnWindowIconifyFunc;
-		TArray<WindowFocusFunc> m_xOnWindowFocusFunc;
-		TArray<WindowContentScaleFunc> m_xOnWindowContentScaleFunc;
-		TArray<WindowCloseFunc> m_xOnWindowCloseFunc;
-		TArray<ScrollFunc> m_xOnScrollFunc;
+		std::vector<CharInputFunc> m_xOnCharInputFunc;
+		std::vector<CharModsInputFunc> m_xOnCharModsInputFunc;
+		std::vector<MouseEnterWindowFunc> m_xOnMouseEnterWindowFunc;
+		std::vector<MouseMoveFunc> m_xOnMouseMoveFunc;
+		std::vector<FilesDropFunc> m_xOnFilesDropFunc;
+		std::vector<FramebufferResizeFunc> m_xOnFramebufferResizeFunc;
+		std::vector<DownOrReleaseKeyFunc> m_xOnDownOrReleaseKeyFunc;
+		std::vector<MouseKeyInputFunc> m_xOnMouseKeyInputFunc;
+		std::vector<WindowResizeFunc> m_xOnWindowResizeFunc;
+		std::vector<WindowMoveFunc> m_xOnWindowMoveFunc;
+		std::vector<WindowMaximizeFunc> m_xOnWindowMaximizeFunc;
+		std::vector<WindowIconifyFunc> m_xOnWindowIconifyFunc;
+		std::vector<WindowFocusFunc> m_xOnWindowFocusFunc;
+		std::vector<WindowContentScaleFunc> m_xOnWindowContentScaleFunc;
+		std::vector<WindowCloseFunc> m_xOnWindowCloseFunc;
+		std::vector<ScrollFunc> m_xOnScrollFunc;
 	};
 
 }

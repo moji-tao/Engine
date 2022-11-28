@@ -12,19 +12,33 @@
 
 namespace Engine
 {
-#define ThrowIfFailed(hr, ...)                                                \
-	{                                                                         \
-		if(FAILED(hr))                                                        \
-		{                                                                     \
-			LOG_ERROR(__VA_ARGS__);                                           \
-			_com_error err(hr);                                               \
-			size_t Length = UnicodeToAnsiLengthBuffer(err.ErrorMessage());    \
-			char* buffer = (char*)GetBuffer(Length);                          \
-			UnicodeToAnsi(err.ErrorMessage(), buffer);                        \
-			LOG_FATAL(buffer);                                                \
-			PushBuffer(buffer);                                               \
-		}                                                                     \
+	class DxException
+	{
+	public:
+		DxException() = default;
+		DxException(HRESULT hr, const std::wstring& functionName, int lineNumber);
+
+		std::wstring ToString()const;
+
+		HRESULT ErrorCode = S_OK;
+		std::wstring FunctionName;
+		int LineNumber = -1;
+	};
+
+#define ThrowIfFailed(hr, ...)													\
+	{																			\
+		HRESULT hr__ = (hr);													\
+		if(FAILED(hr__))														\
+		{																		\
+			LOG_ERROR(__VA_ARGS__);												\
+			throw DxException(hr__, L#hr, __LINE__);							\
+		}																		\
 	}
+
+#ifndef ReleaseCom
+#define ReleaseCom(x) { if(x){ x->Release(); x = 0; } }
+#endif
+
 
 	class D3DUtil
 	{
@@ -44,6 +58,19 @@ namespace Engine
 
 		static UINT CalcConstantBufferByteSize(UINT byteSize);
 	};
+
+	uint32_t AlignArbitrary(uint32_t Val, uint32_t Alignment);
+
+	template<UINT TNameLength>
+	inline void SetDebugName(_In_ ID3D12DeviceChild* resource, _In_z_ const wchar_t(&name)[TNameLength]) noexcept
+	{
+#if !defined(NO_D3D12_DEBUG_NAME) && (defined(_DEBUG) || defined(PROFILE))
+		resource->SetName(name);
+#else
+		UNREFERENCED_PARAMETER(resource);
+		UNREFERENCED_PARAMETER(name);
+#endif
+	}
 
 	struct SubmeshGeometry
 	{

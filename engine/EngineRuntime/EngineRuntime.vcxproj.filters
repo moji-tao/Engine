@@ -39,19 +39,7 @@
     <ClInclude Include="include\core\Alloter\MemoryPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\STL\Array.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\STL\Map.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\STL\Set.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Platform\CharSet.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Function\Render\RHI.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\core\Math\Math.h">
@@ -90,9 +78,6 @@
     <ClInclude Include="include\Function\Render\RenderSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\Render\DeviceManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resource\ConfigManager\ConfigManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -108,9 +93,6 @@
     <ClInclude Include="include\Function\Render\RenderPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\Render\DirectX\D3D12DeviceManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resource\AssetManager\AssetManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -120,16 +102,91 @@
     <ClInclude Include="include\Core\Random\Random.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\UI\ImGuiRHI.h">
+    <ClInclude Include="include\Function\Render\RHIResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\Render\ShaderUtil.h">
+    <ClInclude Include="include\Function\Render\DirectX\d3dx12.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\UI\ImGuiRenderer.h">
+    <ClInclude Include="include\Function\Render\DirectX\DirectXUtil.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Function\Render\VertexBuffer.h">
+    <ClInclude Include="include\Function\Render\DirectX\RenderInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12MemoryAllocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Framework\World\WorldManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Framework\Level\Level.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Framework\Object\Object.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Framework\Component\Component.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12HeapSlotAllocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12View.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Device.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12DescriptorCache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12CommandContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12RHI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Viewport.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12Shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12InputLayout.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12PiplineState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource\ResourceType\Data\TextureData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource\AssetManager\TextureAssetManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource\AssetManager\MeshAssetManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\RenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function\Render\DirectX\D3D12ImGuiDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -182,9 +239,6 @@
     <ClCompile Include="src\Function\Render\RenderSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\Render\DeviceManager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resource\ConfigManager\ConfigManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -194,25 +248,88 @@
     <ClCompile Include="src\Function\Render\RenderCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\Render\DirectX\D3D12DeviceManager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resource\AssetManager\AssetManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Random\Random.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\UI\ImGuiRHI.cpp">
+    <ClCompile Include="src\Function\Render\DirectX\DirectXUtil.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\Render\ShaderUtil.cpp">
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Resource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\UI\ImGuiRenderer.cpp">
+    <ClCompile Include="src\Function\Render\DirectX\D3D12MemoryAllocator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Function\Render\VertexBuffer.cpp">
+    <ClCompile Include="src\Function\Framework\World\WorldManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Framework\Level\Level.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Framework\Object\Object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Framework\Component\Component.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12HeapSlotAllocator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12View.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Device.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12DescriptorCache.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12CommandContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12RHI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Viewport.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12Shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12InputLayout.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12PiplineState.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\RenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12RenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource\ResourceType\Data\TextureData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource\AssetManager\MeshAssetManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource\AssetManager\TextureAssetManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\RenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Function\Render\DirectX\D3D12ImGuiDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
