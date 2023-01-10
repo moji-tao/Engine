@@ -20,7 +20,11 @@ Editor::EditorConfig Initialize(int argc, char** argv)
 	config.WindowWidth = editorField.get<uint16_t>("WindowWidth");
 	config.WindowHeight = editorField.get<uint16_t>("WindowHeight");
 	config.Title = editorField.get<std::string>("Title");
-	config.editorFontPath = editorField.get<std::filesystem::path>("FontFile");
+	config.editorResourceConfig.editorFontPath = editorField.get<std::filesystem::path>("FontFile");
+	config.editorResourceConfig.editorFileIcon = editorField.get<std::filesystem::path>("FileIcon");
+	config.editorResourceConfig.editorFolderIcon = editorField.get<std::filesystem::path>("FolderIcon");
+	config.editorResourceConfig.editorImageIcon = editorField.get<std::filesystem::path>("ImageIcon");
+	config.editorResourceConfig.editorIntegralIcon = editorField.get<std::filesystem::path>("IntegralIcon");
 
 	return config;
 }
@@ -30,7 +34,7 @@ int main(int argc, char** argv)
 	try
 	{
 		Editor::EditorConfig config = Initialize(argc, argv);
-
+		
 		Editor::EngineEditor editor;
 
 		editor.Initialize(&config);
@@ -42,7 +46,7 @@ int main(int argc, char** argv)
 	catch (std::string& e)
 	{
 		std::cout << e << std::endl;
-	}
+	} 
 
 	return 0;
 }

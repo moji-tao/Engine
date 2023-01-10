@@ -1,0 +1,19 @@
+<RightMenuUI>
+    <Context>
+        <SubMenu Name="创建" Enable="true">
+            <Context>
+                <Item Name="文件夹" Enable="true" Method="Ref_CreateFolder"/>
+                <Separator/>
+                <Item Name="Lua脚本" Enable="true" Method="Ref_CreateLuaScript"/>
+                <Separator/>
+                <Item Name="场景" Enable="true" Method="Ref_CreateScene"/>
+            </Context>
+        </SubMenu>
+        <Item Name="在资源管理器中显示" Enable="true" Method="Ref_ShowFolderInExplorer"/>
+        <Item Name="打开" Enable="$mIsSelectedFile" Method="Ref_Open"/>
+        <Item Name="删除" Enable="$mIsSelectedFile" Method="Ref_Delete"/>
+        <Item Name="重命名" Enable="$mIsSelectedFile" Method="Ref_Rename"/>
+        <Separator/>
+        <Item Name="导入资产" Enable="true" Method="Ref_ImportAsset"/>
+    </Context>
+</RightMenuUI>

@@ -1,4 +1,3 @@
-#include <cassert>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12PiplineState.h"
 #include "EngineRuntime/include/Function/Render/DirectX/DirectXUtil.h"
 
@@ -37,7 +36,7 @@ namespace Engine
 
 		if(it == mPSOMap.end())
 		{
-			assert(0);
+			ASSERT(0);
 
 			return nullptr;
 		}
@@ -52,7 +51,7 @@ namespace Engine
 
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayouts;
 		mInputLayoutManager->GetInputLayout(descriptor.mInputLayoutName, inputLayouts);
-		psoDesc.InputLayout.NumElements = inputLayouts.size();
+		psoDesc.InputLayout.NumElements = (UINT)inputLayouts.size();
 		psoDesc.InputLayout.pInputElementDescs = inputLayouts.data();
 
 		Shader* shader = descriptor.mShader;
@@ -99,7 +98,7 @@ namespace Engine
 
 		if (it == mPSOMap.end())
 		{
-			assert(0);
+			ASSERT(0);
 
 			return nullptr;
 		}

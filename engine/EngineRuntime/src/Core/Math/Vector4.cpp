@@ -1,10 +1,16 @@
 #include "EngineRuntime/include/Core/Math/Vector4.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
-#include <cassert>
-#include <cmath>
+#include "EngineRuntime/include/Core/Meta/Reflection.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
+	REGISTER_CLASS(Vector4);
+	REGISTER_CLASS_FIELD(Vector4, x, float);
+	REGISTER_CLASS_FIELD(Vector4, y, float);
+	REGISTER_CLASS_FIELD(Vector4, z, float);
+	REGISTER_CLASS_FIELD(Vector4, w, float);
+
 	const Vector4 Vector4::ZERO(0, 0, 0, 0);
 
 	const Vector4 Vector4::UNIT_SCALE(1.0f, 1.0f, 1.0f, 1.0f);
@@ -79,13 +85,13 @@ namespace Engine
 
 	float Vector4::operator[](size_t i) const
 	{
-		assert(i < 4);
+		ASSERT(i < 4);
 		return *(&x + i);
 	}
 
 	float& Vector4::operator[](size_t i)
 	{
-		assert(i < 4);
+		ASSERT(i < 4);
 		return *(&x + i);
 	}
 
@@ -130,13 +136,13 @@ namespace Engine
 
 	Vector4 Vector4::operator/(float scalar) const
 	{
-		assert(scalar != 0.0f);
+		ASSERT(scalar != 0.0f);
 		return Vector4(x / scalar, y / scalar, z / scalar, w / scalar);
 	}
 
 	Vector4 Vector4::operator/(const Vector4& rhs) const
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
 		return Vector4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 	}
 
@@ -157,7 +163,7 @@ namespace Engine
 
 	Vector4 operator/(float scalar, const Vector4& rhs)
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
 		return Vector4(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z, scalar / rhs.w);
 	}
 
@@ -237,7 +243,7 @@ namespace Engine
 
 	Vector4& Vector4::operator/=(float scalar)
 	{
-		assert(scalar != 0.0f);
+		ASSERT(scalar != 0.0f);
 		x /= scalar;
 		y /= scalar;
 		z /= scalar;
@@ -247,7 +253,7 @@ namespace Engine
 
 	Vector4& Vector4::operator/=(const Vector4& rhs)
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f && rhs.w != 0.0f);
 		x /= rhs.x;
 		y /= rhs.y;
 		z /= rhs.z;

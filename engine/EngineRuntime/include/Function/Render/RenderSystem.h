@@ -3,8 +3,9 @@
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
+#include "EngineRuntime/include/Function/Render/RHI.h"
+#include "EngineRuntime/include/Function/Render/ImGuiDevice.h"
+#include "EngineRuntime/include/Function/Render/RenderPipeline.h"
 
 namespace Engine
 {
@@ -22,14 +23,19 @@ namespace Engine
 
 		virtual void Finalize() override;
 
-		void InitializeUIRenderBackend(WindowUI* windowUI);
+		ImGuiDevice* InitializeUIRenderBackend(WindowUI* windowUI);
+
+		void InitializeUIRenderBackendEnd();
 
 		void FinalizeUIRenderBackend();
 
-	private:
-		//std::shared_ptr<DirectXRenderBase> mRenderAPI;
-		std::unique_ptr<D3D12RHI> mD3DRHI = nullptr;
+		void RenderViewResize(int width, int height);
 
-		std::unique_ptr<D3D12ImGuiDevice> mD3D12ImGuiDevice = nullptr;
+	private:
+		std::unique_ptr<RHI> mRHI = nullptr;
+
+		std::unique_ptr<RenderPipeline> mRenderPipeline = nullptr;
+
+		std::unique_ptr<ImGuiDevice> mImGuiDevice = nullptr;
 	};
 }

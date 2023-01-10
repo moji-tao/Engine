@@ -1,18 +1,19 @@
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
-
 #include <dxgidebug.h>
-
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12RenderPipeline.h"
 #include "EngineRuntime/include/Function/Render/DirectX/DirectXUtil.h"
 
 namespace Engine
 {
-#define InstalledDebugLayers true;
+#define InstalledDebugLayers true
 
 	using Microsoft::WRL::ComPtr;
 
-	D3D12RHI::D3D12RHI(HWND WindowHandle, int WindowWidth, int WindowHeight)
+	D3D12RHI::D3D12RHI(WindowSystem* windowSystem)
+		:RHI(windowSystem)
 	{
-		Initialze(WindowHandle, WindowWidth, WindowHeight);
+		Initialize((HWND)windowSystem->GetWindowHandle(true), windowSystem->GetWindowWidth(), windowSystem->GetWindowHeight());
 	}
 
 	D3D12RHI::~D3D12RHI()
@@ -20,7 +21,7 @@ namespace Engine
 		Destroy();
 	}
 
-	void D3D12RHI::Initialze(HWND WindowHandle, int WindowWidth, int WindowHeight)
+	void D3D12RHI::Initialize(HWND WindowHandle, int WindowWidth, int WindowHeight)
 	{
 		unsigned DxgiFactoryFlags = 0;
 
@@ -71,6 +72,11 @@ namespace Engine
 		Device.reset();
 	}
 
+	void D3D12RHI::InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline)
+	{
+		renderPipeline = std::make_unique<D3D12RenderPipeline>(this);
+	}
+
 	D3D12Device* D3D12RHI::GetDevice()
 	{
 		return Device.get();
@@ -91,11 +97,17 @@ namespace Engine
 		return DxgiFactory.Get();
 	}
 
-	void D3D12RHI::InitEditorUI(D3D12ImGuiDevice* editorUI)
+	void D3D12RHI::InitEditorUI(std::unique_ptr<ImGuiDevice>& editorUI, WindowUI* windowUI)
 	{
+		editorUI = std::make_unique<D3D12ImGuiDevice>(windowUI);
+
 		ID3D12GraphicsCommandList* imguiCommandList = GetDevice()->GetCommandContext()->CreateImGuiCommand();
 
-		editorUI->Initialize(GetDevice()->GetNativeDevice(), imguiCommandList, GetViewport());
+		D3D12ImGuiDevice* d3dEditorUI = dynamic_cast<D3D12ImGuiDevice*>(editorUI.get());
+
+		ASSERT(d3dEditorUI != nullptr);
+
+		d3dEditorUI->Initialize(GetDevice()->GetNativeDevice(), imguiCommandList, GetViewport());
 	}
 
 	void D3D12RHI::FlushCommandQueue()
@@ -123,9 +135,9 @@ namespace Engine
 		GetViewport()->Present();
 	}
 
-	void D3D12RHI::ResizeViewport(int NewWidth, int NewHeight)
+	void D3D12RHI::ResizeViewport(int width, int height)
 	{
-		GetViewport()->OnResize(NewWidth, NewHeight);
+		GetViewport()->OnResize(width, height);
 	}
 
 	void D3D12RHI::TransitionResource(D3D12Resource* Resource, D3D12_RESOURCE_STATES StateAfter)
@@ -169,7 +181,7 @@ namespace Engine
 
 	D3D12StructuredBufferRef D3D12RHI::CreateStructuredBuffer(const void* Contents, uint32_t ElementSize, uint32_t ElementCount)
 	{
-		assert(Contents != nullptr && ElementSize > 0 && ElementCount > 0);
+		ASSERT(Contents != nullptr && ElementSize > 0 && ElementCount > 0);
 
 		D3D12StructuredBufferRef StructuredBufferRef = std::make_shared<D3D12StructuredBuffer>();
 
@@ -283,9 +295,10 @@ namespace Engine
 
 	D3D12TextureRef D3D12RHI::CreateTexture(const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue)
 	{
-		// TODO: D3D12TextureRef D3D12RHI::CreateTexture(const TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue)
+		// 创建纹理资源
 		D3D12TextureRef textureRef = CreateTextureResource(TextureInfo, CreateFlags, RTVClearValue);
 
+		// 为纹理资源添加描述符
 		CreateTextureView(textureRef, TextureInfo, CreateFlags);
 
 		return textureRef;
@@ -293,7 +306,6 @@ namespace Engine
 
 	D3D12TextureRef D3D12RHI::CreateTexture(Microsoft::WRL::ComPtr<ID3D12Resource> D3DResource, D3D12TextureInfo& TextureInfo, uint32_t CreateFlags)
 	{
-		// TODO: D3D12TextureRef D3D12RHI::CreateTexture(Microsoft::WRL::ComPtr<ID3D12Resource> D3DResource, TextureInfo& TextureInfo, uint32_t CreateFlags)
 		D3D12TextureRef TextureRef = std::make_shared<D3D12Texture>();
 
 		D3D12Resource* NewResource = new D3D12Resource(D3DResource, TextureInfo.InitState);
@@ -307,7 +319,6 @@ namespace Engine
 
 	void D3D12RHI::UploadTextureData(D3D12TextureRef Texture, const TextureData* textureData)
 	{
-		// TODO: void D3D12RHI::UploadTextureData(D3D12TextureRef Texture, const std::vector<D3D12_SUBRESOURCE_DATA>& InitData)
 		D3D12_SUBRESOURCE_DATA data = { textureData->mPixels, textureData->Info.mRowPitch, textureData->Info.mSlicePitch };
 		auto TextureResource = Texture->GetResource();
 		D3D12_RESOURCE_DESC TexDesc = TextureResource->D3DResource->GetDesc();
@@ -316,29 +327,27 @@ namespace Engine
 		D3D12_PLACED_SUBRESOURCE_FOOTPRINT Layout;
 		uint32_t NumRow;
 		uint64_t RowSizesInByte;
-
+		
 		uint64_t RequiredSize = 0;
 		Device->GetNativeDevice()->GetCopyableFootprints(&TexDesc, 0, 1, 0, &Layout, &NumRow, &RowSizesInByte, &RequiredSize);
 
-		//Create upload resource
-		D3D12ResourceLocation UploadResourceLocation;
+		// 从分配器获取上传堆
+		D3D12ResourceLocation uploadResourceLocation;
 		auto UploadBufferAllocator = GetDevice()->GetUploadBufferAllocator();
-		void* MappedData = UploadBufferAllocator->AllocUploadResource((uint32_t)RequiredSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT, UploadResourceLocation);
-		ID3D12Resource* UploadBuffer = UploadResourceLocation.UnderlyingResource->D3DResource.Get();
+		void* MappedData = UploadBufferAllocator->AllocUploadResource((uint32_t)RequiredSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT, uploadResourceLocation);
+		ID3D12Resource* UploadBuffer = uploadResourceLocation.UnderlyingResource->D3DResource.Get();
 
-		//Copy contents to upload resource
-		if (RowSizesInByte > SIZE_T(-1))
-		{
-			assert(0);
-		}
-		D3D12_MEMCPY_DEST DestData = { (BYTE*)MappedData + Layout.Offset, Layout.Footprint.RowPitch, SIZE_T(Layout.Footprint.RowPitch) * SIZE_T(NumRow) };
-		MemcpySubresource(&DestData, &data, static_cast<SIZE_T>(RowSizesInByte), NumRow, Layout.Footprint.Depth);
+		// 拷贝数据到上传堆
+		D3D12_MEMCPY_DEST DestData;
+		DestData.pData = (unsigned char*)MappedData + Layout.Offset;
+		DestData.RowPitch = Layout.Footprint.RowPitch;
+		DestData.SlicePitch = SIZE_T(Layout.Footprint.RowPitch) * NumRow;
+		MemcpySubresource(&DestData, &data, RowSizesInByte, NumRow, Layout.Footprint.Depth);
 
-
-		//Copy data from upload resource to default resource
+		// 设置资源屏障
 		TransitionResource(TextureResource, D3D12_RESOURCE_STATE_COPY_DEST);
 
-		Layout.Offset += UploadResourceLocation.OffsetFromBaseOfResource;
+		Layout.Offset += uploadResourceLocation.OffsetFromBaseOfResource;
 
 		CD3DX12_TEXTURE_COPY_LOCATION Src;
 		Src.pResource = UploadBuffer;
@@ -352,9 +361,8 @@ namespace Engine
 
 		CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
 
-
+		//设置资源屏障
 		TransitionResource(TextureResource, D3D12_RESOURCE_STATE_COMMON);
-
 	}
 
 	void D3D12RHI::SetVertexBuffer(const D3D12VertexBufferRef& VertexBuffer, UINT Offset, UINT Stride, UINT Size)
@@ -424,7 +432,6 @@ namespace Engine
 
 	D3D12TextureRef D3D12RHI::CreateTextureResource(const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue)
 	{
-		// TODO: D3D12TextureRef D3D12RHI::CreateTextureResource(const TextureInfo& TextureInfo, uint32_t CreateFlags, Vector4 RTVClearValue)
 		D3D12TextureRef textureRef = std::make_unique<D3D12Texture>();
 
 		D3D12_RESOURCE_STATES resourceState = D3D12_RESOURCE_STATE_COMMON;
@@ -471,7 +478,7 @@ namespace Engine
 			TextureResourceAllocator->AllocTextureResource(resourceState, texDesc, textureRef->ResourceLocation);
 
 			auto TextureResource = textureRef->GetD3DResource();
-			assert(TextureResource);
+			ASSERT(TextureResource);
 		}
 		else
 		{
@@ -514,107 +521,103 @@ namespace Engine
 
 	void D3D12RHI::CreateTextureView(D3D12TextureRef TextureRef, const D3D12TextureInfo& TextureInfo, uint32_t CreateFlags)
 	{
-		// TODO: void D3D12RHI::CreateTextureView(D3D12TextureRef TextureRef, const TextureInfo& TextureInfo, uint32_t CreateFlags)
-		auto TextureResource = TextureRef->GetD3DResource();
+		auto textureResource = TextureRef->GetD3DResource();
 
-		// Create SRV
+		// 如果纹理可以作为着色器目标 创建SRV
 		if (CreateFlags & TexCreate_SRV)
 		{
-			D3D12_SHADER_RESOURCE_VIEW_DESC SrvDesc = {};
-			SrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 			if (TextureInfo.SRVFormat == DXGI_FORMAT_UNKNOWN)
 			{
-				SrvDesc.Format = TextureInfo.Format;
+				srvDesc.Format = TextureInfo.Format;
 			}
 			else
 			{
-				SrvDesc.Format = TextureInfo.SRVFormat;
+				srvDesc.Format = TextureInfo.SRVFormat;
 			}
 			
 			if (TextureInfo.Type == IMAGE_TYPE::IMAGE_TYPE_2D)
 			{
-				SrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-				SrvDesc.Texture2D.MostDetailedMip = 0;
-				SrvDesc.Texture2D.MipLevels = (uint16_t)TextureInfo.MipCount;
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 			}
 			else if (TextureInfo.Type == IMAGE_TYPE::IMAGE_TYPE_CUBE)
 			{
-				SrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-				SrvDesc.TextureCube.MostDetailedMip = 0;
-				SrvDesc.TextureCube.MipLevels = (uint16_t)TextureInfo.MipCount;
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 			}
 			else
 			{
-				SrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
-				SrvDesc.Texture3D.MostDetailedMip = 0;
-				SrvDesc.Texture3D.MipLevels = (uint16_t)TextureInfo.MipCount;
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 			}
 
-			TextureRef->AddSRV(std::make_unique<D3D12ShaderResourceView>(GetDevice(), SrvDesc, TextureResource));
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			srvDesc.Texture2D.MipLevels = (uint16_t)TextureInfo.MipCount;
+
+			TextureRef->AddSRV(std::make_unique<D3D12ShaderResourceView>(GetDevice(), srvDesc, textureResource));
 		}
 
-		// Create RTV
+		// 如果纹理可以作为渲染目标 创建RTV
 		if (CreateFlags & TexCreate_RTV)
 		{
-			D3D12_RENDER_TARGET_VIEW_DESC RtvDesc = {};
-			RtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			RtvDesc.Texture2D.MipSlice = 0;
-			RtvDesc.Texture2D.PlaneSlice = 0;
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			rtvDesc.Texture2D.MipSlice = 0;
+			rtvDesc.Texture2D.PlaneSlice = 0;
 
 			if (TextureInfo.RTVFormat == DXGI_FORMAT_UNKNOWN)
 			{
-				RtvDesc.Format = TextureInfo.Format;
+				rtvDesc.Format = TextureInfo.Format;
 			}
 			else
 			{
-				RtvDesc.Format = TextureInfo.RTVFormat;
+				rtvDesc.Format = TextureInfo.RTVFormat;
 			}
 
-			TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), RtvDesc, TextureResource));
+			TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), rtvDesc, textureResource));
 		}
 		else if (CreateFlags & TexCreate_CubeRTV)
 		{
 			for (size_t i = 0; i < 6; i++)
 			{
-				D3D12_RENDER_TARGET_VIEW_DESC RtvDesc = {};
-				RtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
-				RtvDesc.Texture2DArray.MipSlice = 0;
-				RtvDesc.Texture2DArray.PlaneSlice = 0;
-				RtvDesc.Texture2DArray.FirstArraySlice = (UINT)i;
-				RtvDesc.Texture2DArray.ArraySize = 1;
+				D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+				rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+				rtvDesc.Texture2DArray.MipSlice = 0;
+				rtvDesc.Texture2DArray.PlaneSlice = 0;
+				rtvDesc.Texture2DArray.FirstArraySlice = (UINT)i;
+				rtvDesc.Texture2DArray.ArraySize = 1;
 
 				if (TextureInfo.RTVFormat == DXGI_FORMAT_UNKNOWN)
 				{
-					RtvDesc.Format = TextureInfo.Format;
+					rtvDesc.Format = TextureInfo.Format;
 				}
 				else
 				{
-					RtvDesc.Format = TextureInfo.RTVFormat;
+					rtvDesc.Format = TextureInfo.RTVFormat;
 				}
 
-				TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), RtvDesc, TextureResource));
+				TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), rtvDesc, textureResource));
 			}
 		}
 
-		// Create DSV
+		// 创建DSV
 		if (CreateFlags & TexCreate_DSV)
 		{
-			D3D12_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
-			DSVDesc.Flags = D3D12_DSV_FLAG_NONE;
-			DSVDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			DSVDesc.Texture2D.MipSlice = 0;
+			D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+			dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+			dsvDesc.Texture2D.MipSlice = 0;
 
 			if (TextureInfo.DSVFormat == DXGI_FORMAT_UNKNOWN)
 			{
-				DSVDesc.Format = TextureInfo.Format;
+				dsvDesc.Format = TextureInfo.Format;
 			}
 			else
 			{
-				DSVDesc.Format = TextureInfo.DSVFormat;
+				dsvDesc.Format = TextureInfo.DSVFormat;
 			}
 
-			TextureRef->AddDSV(std::make_unique<D3D12DepthStencilView>(GetDevice(), DSVDesc, TextureResource));
+			TextureRef->AddDSV(std::make_unique<D3D12DepthStencilView>(GetDevice(), dsvDesc, textureResource));
 		}
 		else if (CreateFlags & TexCreate_CubeDSV)
 		{
@@ -636,27 +639,27 @@ namespace Engine
 					DSVDesc.Format = TextureInfo.DSVFormat;
 				}
 
-				TextureRef->AddDSV(std::make_unique<D3D12DepthStencilView>(GetDevice(), DSVDesc, TextureResource));
+				TextureRef->AddDSV(std::make_unique<D3D12DepthStencilView>(GetDevice(), DSVDesc, textureResource));
 			}
 		}
 
-		// Create UAV
+		// 创建UAV
 		if (CreateFlags & TexCreate_UAV)
 		{
-			D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc = {};
-			UAVDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-			UAVDesc.Texture2D.MipSlice = 0;
+			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+			uavDesc.Texture2D.MipSlice = 0;
 
 			if (TextureInfo.UAVFormat == DXGI_FORMAT_UNKNOWN)
 			{
-				UAVDesc.Format = TextureInfo.Format;
+				uavDesc.Format = TextureInfo.Format;
 			}
 			else
 			{
-				UAVDesc.Format = TextureInfo.UAVFormat;
+				uavDesc.Format = TextureInfo.UAVFormat;
 			}
 
-			TextureRef->AddUAV(std::make_unique<D3D12UnorderedAccessView>(GetDevice(), UAVDesc, TextureResource));
+			TextureRef->AddUAV(std::make_unique<D3D12UnorderedAccessView>(GetDevice(), uavDesc, textureResource));
 		}
 	}
 
@@ -747,7 +750,7 @@ namespace Engine
 			sizeof(msQualityLevels)), "");
 
 		UINT QualityOf4xMsaa = msQualityLevels.NumQualityLevels;
-		assert(QualityOf4xMsaa > 0 && "Unexpected MSAA quality level.");
+		ASSERT(QualityOf4xMsaa > 0 && "Unexpected MSAA quality level.");
 
 		return QualityOf4xMsaa;
 	}

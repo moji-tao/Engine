@@ -1,5 +1,6 @@
 #include "EngineRuntime/include/EngineRuntime.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
+#include "EngineRuntime/include/Function/Framework/World/WorldManager.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
@@ -62,6 +63,14 @@ namespace Engine
 
 		LOG_INFO("渲染系统初始化完成");
 
+		if (!WorldManager::GetInstance()->Initialize())
+		{
+			LOG_ERROR("游戏场景初始化失败");
+			return false;
+		}
+
+		LOG_INFO("游戏场景初始化完成");
+
 		mLastTickTimePoint = std::chrono::steady_clock::now();
 
 		return true;
@@ -69,6 +78,7 @@ namespace Engine
 
 	void EngineRuntime::Finalize()
 	{
+		WorldManager::GetInstance()->Finalize();
 		RenderSystem::GetInstance()->Finalize();
 		WindowSystem::GetInstance()->Finalize();
 		AssetManager::GetInstance()->Finalize();
@@ -79,6 +89,7 @@ namespace Engine
 
 	bool EngineRuntime::Tick(float deltaTime)
 	{
+		WorldManager::GetInstance()->Tick(deltaTime);
 		RenderSystem::GetInstance()->Tick(deltaTime);
 		WindowSystem::GetInstance()->Tick(deltaTime);
 

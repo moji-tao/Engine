@@ -45,9 +45,9 @@ namespace Engine
 	class TextureData
 	{
 	public:
-		void* mPixels = nullptr;
-
 		TextureInfo Info;
+
+		void* mPixels = nullptr;
 
 		TextureData() = default;
 

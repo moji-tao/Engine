@@ -1,5 +1,8 @@
 #include "EngineRuntime/include/Function/Framework/World/WorldManager.h"
 #include "EngineRuntime/include/Function/Framework/Level/Level.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
+#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
+#include "EngineRuntime/include/Resource/ConfigManager/ConfigManager.h"
 
 namespace Engine
 {
@@ -15,26 +18,34 @@ namespace Engine
 
 	bool WorldManager::Initialize()
 	{
-		return false;
+		std::filesystem::path defaultScenePath = ConfigManager::GetInstance()->GetDefaultScenePath();
+		mCurrentActiveLevel = ResourceSerializer::LoadResourceFromFile<Level>(defaultScenePath);
+		
+		return true;
 	}
 
 	void WorldManager::Tick(float deltaTime)
 	{
+		/*
 		if(mIsWorldLoaded)
 		{
 			LoadWorld(mCurrentWorldUrl);
 		}
+		*/
 
-		std::shared_ptr<Level> activeLevel = mCurrentActiveLevel.lock();
-		if(activeLevel)
+		if(mCurrentActiveLevel != nullptr)
 		{
-			activeLevel->Tick(deltaTime);
+			mCurrentActiveLevel->Tick(deltaTime);
 		}
 	}
 
 	void WorldManager::Finalize()
 	{
-
+		//ConfigManager::GetInstance()->SetDefaultScenePath();
+		if (mCurrentActiveLevel != nullptr)
+		{
+			delete mCurrentActiveLevel;
+		}
 	}
 
 	void WorldManager::ReloadCurrentLevel()
@@ -45,6 +56,21 @@ namespace Engine
 	void WorldManager::SaveCurrentLevel()
 	{
 
+	}
+
+	Level* WorldManager::GetCurrentActiveLevel() const
+	{
+		ASSERT(mCurrentActiveLevel != nullptr);
+
+		return mCurrentActiveLevel;
+	}
+
+	Level* WorldManager::SpanEmptyScene(const std::string& sceneName)
+	{
+		Level* level = new Level();
+		level->mSceneName = sceneName;
+
+		return level;
 	}
 
 	bool WorldManager::LoadWorld(const std::string& worldUrl)

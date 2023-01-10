@@ -2,12 +2,18 @@
 #include <cassert>
 #include "EngineRuntime/include/Core/Log/LogSystem.h"
 
+#ifdef _DEBUG
+#define ASSERT(...) assert(__VA_ARGS__)
+#elif 
+#define ASSERT(...)
+#endif
+
 #define LOG_HANDEL(LOG_LEVEL, String, ...) \
 	Engine::LogSystem::GetInstance()->Log(LOG_LEVEL, String, __VA_ARGS__);
 
 #define LOG_FATAL_HANDEL(LOG_LEVEL, String, ...)							\
 	Engine::LogSystem::GetInstance()->Log(LOG_LEVEL, String,  __VA_ARGS__);	\
-	assert(0);
+	ASSERT(0);
 
 #define LOG_DEBUG(String, ...) \
 	LOG_HANDEL(spdlog::level::debug, String, __VA_ARGS__);

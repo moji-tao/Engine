@@ -1,5 +1,5 @@
 #include "EngineEditor/include/UI/EditorUI.h"
-#include "EngineEditor/include/Application/IApplication.h"
+#include "EngineEditor/include/Application/EngineEditor.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
@@ -9,20 +9,32 @@
 #include "EngineEditor/include/UI/EditorUIHierarchyPass.h"
 #include "EngineEditor/include/UI/EditorUIInspectorPass.h"
 #include "EngineEditor/include/UI/EditorUIScenePass.h"
+#include "EngineEditor/include/EditorTools/ModelLoader.h"
+#include "EngineEditor/include/UI/ImGuiExtensions/imgui_notify.h"
 
 namespace Editor
 {
-	EditorUI::EditorUI(const EditorConfig* config)
+	EditorUI::EditorUI(EngineEditor* editor)
+		:mEditor(editor)
 	{
-		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackend(this);
-
-		LoadFonts(config->editorFontPath);
+		mDevice = Engine::RenderSystem::GetInstance()->InitializeUIRenderBackend(this);
+		
+		LoadFonts(editor->Config.editorResourceConfig.editorFontPath);
 
 		mProjectUI = std::make_shared<EditorUIProjectPass>();
+		mProjectUI->Initialize(mDevice, editor);
 		mConsoleUI = std::make_shared<EditorUIConsolePass>();
+		mConsoleUI->Initialize(mDevice, editor);
 		mHierarchyUI = std::make_shared<EditorUIHierarchyPass>();
+		mHierarchyUI->Initialize(mDevice, editor);
 		mSceneUI = std::make_shared<EditorUIScenePass>();
+		mSceneUI->Initialize(mDevice, editor);
 		mInspectorUI = std::make_shared<EditorUIInspectorPass>();
+		mInspectorUI->Initialize(mDevice, editor);
+		
+		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackendEnd();
+
+		ConfigStyleColor();
 	}
 
 	EditorUI::~EditorUI()
@@ -71,6 +83,7 @@ namespace Editor
 
 		if (!opt_padding)
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
 		ImGui::Begin("DockSpace Demo", nullptr, window_flags);
 		if (!opt_padding)
 			ImGui::PopStyleVar();
@@ -102,7 +115,7 @@ namespace Editor
 				ImGui::MenuItem("新建场景");
 				ImGui::MenuItem("打开场景");
 				ImGui::Separator();
-				if(ImGui::MenuItem("退出"))
+				if (ImGui::MenuItem("退出"))
 				{
 					Engine::WindowSystem::GetInstance()->CloseWindow();
 				}
@@ -127,81 +140,148 @@ namespace Editor
 		}
 
 		ImGui::End();
-
-		mProjectUI->ShowUI();
+		
 		mConsoleUI->ShowUI();
+		mProjectUI->ShowUI();
 		mHierarchyUI->ShowUI();
 		mSceneUI->ShowUI();
 		mInspectorUI->ShowUI();
 
-		static bool my_tool_active = false;
-		static float colors[4] = { 0,0,0,0 };
-
-		ImGui::Begin("测试1", &my_tool_active, ImGuiWindowFlags_MenuBar);
-		if (ImGui::BeginMenuBar())
+		// 测试1
 		{
-			if (ImGui::BeginMenu("File"))
+			static bool my_tool_active = false;
+			static float colors[4] = { 0,0,0,0 };
+
+			ImGui::Begin("测试1", &my_tool_active, ImGuiWindowFlags_MenuBar);
+			if (ImGui::BeginMenuBar())
 			{
-				if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-				if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
-				if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
-				ImGui::EndMenu();
+				if (ImGui::BeginMenu("File"))
+				{
+					if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+					if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+					if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
 			}
-			ImGui::EndMenuBar();
+
+			// 编辑颜色 (stored as ~4 floats)
+			ImGui::ColorEdit4("Color", colors);
+
+			// Plot some values
+			const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
+			ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
+
+			// 在滚动区域中显示内容
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Important Stuff");
+
+			static int k = 9999;
+
+			ImGui::BeginChild("Scrolling");
+			for (int n = 0; n < 50; n++)
+				ImGui::Text("%04d: Some text %d", n, k);
+			ImGui::EndChild();
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				const ImGuiPayload* dddd = ImGui::AcceptDragDropPayload("Drag Index Button");
+				if (dddd)
+				{
+					k = *(int*)dddd->Data;
+				}
+				ImGui::Text(std::to_string(k).c_str());
+
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::End();
+
 		}
 
-		// 编辑颜色 (stored as ~4 floats)
-		ImGui::ColorEdit4("Color", colors);
-
-		// Plot some values
-		const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
-		ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
-
-		// 在滚动区域中显示内容
-		ImGui::TextColored(ImVec4(1, 1, 0, 1), "Important Stuff");
-
-		static int k = 9999;
-
-
-
-		ImGui::BeginChild("Scrolling");
-		for (int n = 0; n < 50; n++)
-			ImGui::Text("%04d: Some text %d", n, k);
-		ImGui::EndChild();
-
-		if (ImGui::BeginDragDropTarget())
+		// 测试2
 		{
-			const ImGuiPayload* dddd = ImGui::AcceptDragDropPayload("Drag Index Button");
-			if (dddd)
-			{
-				k = *(int*)dddd->Data;
-			}
-			ImGui::Text(std::to_string(k).c_str());
+			ImGui::Begin("测试2");
 
-			ImGui::EndDragDropTarget();
+			for (int i = 0; i < 5; ++i)
+			{
+				ImGui::Button(std::to_string(i).c_str());
+
+
+				if (ImGui::BeginDragDropSource())
+				{
+					ImGui::Text((std::string("Drag i: ") + std::to_string(i)).c_str());
+
+					ImGui::SetDragDropPayload("Drag Index Button", &i, sizeof(int));
+					ImGui::EndDragDropSource();
+				}
+
+				if (i != 4)
+					ImGui::SameLine();
+			}
+
+			ImGui::End();
+
 		}
 
 
-		ImGui::End();
-
-		ImGui::Begin("测试2");
-
-		for (int i = 0; i < 5; ++i)
+		// 自定义控件
 		{
-			ImGui::Button(std::to_string(i).c_str());
-			if (i != 4)
-				ImGui::SameLine();
+			ImGui::Begin("自定义控件");
+
+			static const char* item_names[] = { "一", "二", "三", "四", "五" };
+			for (int n = 0; n < 5; n++)
+			{
+				const char* item = item_names[n];
+				ImGui::Selectable(item);
+
+				if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
+				{
+					int n_next = n + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+					if (n_next >= 0 && n_next < 5)
+					{
+						item_names[n] = item_names[n_next];
+						item_names[n_next] = item;
+						ImGui::ResetMouseDragDelta();
+					}
+				}
+			}
+
+			float xx = ImGui::GetMouseDragDelta(0).x;
+			float yy = ImGui::GetMouseDragDelta(0).y;
+
+			if (ImGui::IsKeyReleased(ImGuiKey_M))
+			{
+				ImGui::ResetMouseDragDelta();
+			}
+
+			ImGui::Text(std::to_string(xx).c_str());
+			ImGui::Text(std::to_string(yy).c_str());
+
+			ImGui::End();
+
+		}
+
+		// Demo
+		{
+			static bool demo = true;
+			ImGui::ShowDemoWindow(&demo);
+		}
+
+		{
+			ImGui::Begin("文件窗体");
+
 			
-			if (ImGui::BeginDragDropSource())
-			{
-				ImGui::Text((std::string("Drag i: ") + std::to_string(i)).c_str());
 
-				ImGui::SetDragDropPayload("Drag Index Button", &i, sizeof(int));
-				ImGui::EndDragDropSource();
-			}
+
+			ImGui::End();
 		}
 
-		ImGui::End();
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(43.f / 255.f, 43.f / 255.f, 43.f / 255.f, 100.f / 255.f));
+		ImGui::RenderNotifications();
+		ImGui::PopStyleVar(1); // Don't forget to Pop()
+		ImGui::PopStyleColor(1);
+
 	}
 
 	void EditorUI::LoadFonts(const std::filesystem::path& ph)
@@ -211,7 +291,12 @@ namespace Editor
 
 		ImFontConfig fontConfig;
 		fontConfig.FontDataOwnedByAtlas = false;
-		io.Fonts->AddFontFromMemoryTTF((void*)font->GetData(), font->GetSize(), 20.0f, &fontConfig, io.Fonts->GetGlyphRangesChineseFull());
+		io.Fonts->AddFontFromMemoryTTF((void*)font->GetData(), (int)font->GetSize(), 20.0f, &fontConfig, io.Fonts->GetGlyphRangesChineseFull());
 	}
 
+	void EditorUI::ConfigStyleColor()
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		
+	}
 }

@@ -1,13 +1,11 @@
-#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
-
-#include <cassert>
 #include <cstring>
 #include <cmath>
-
+#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -93,7 +91,7 @@ namespace Engine
 
 	Vector3 Matrix3x3::GetColumn(size_t colIndex) const
 	{
-		assert(0 <= colIndex && colIndex < 3);
+		ASSERT(0 <= colIndex && colIndex < 3);
 		return Vector3(m_Value[0][colIndex], m_Value[1][colIndex], m_Value[2][colIndex]);
 	}
 
@@ -409,7 +407,7 @@ namespace Engine
 
 	float* Matrix3x3::operator[](size_t rowIndex) const
 	{
-		assert(rowIndex < 3);
+		ASSERT(rowIndex < 3);
 		return (float*)m_Value[rowIndex];
 	}
 

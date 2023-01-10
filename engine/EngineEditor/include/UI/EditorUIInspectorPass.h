@@ -10,6 +10,8 @@ namespace Editor
 
 		virtual ~EditorUIInspectorPass() override;
 
+		virtual void Initialize(Engine::ImGuiDevice* device, EngineEditor* editor) override;
+
 	public:
 		virtual void ShowUI() override;
 	};

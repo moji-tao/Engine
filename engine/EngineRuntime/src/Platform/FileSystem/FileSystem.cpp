@@ -1,6 +1,6 @@
 #include <fstream>
-
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -45,7 +45,7 @@ namespace Engine
 		if (!FileExists(filePath))
 			return nullptr;
 
-		std::ifstream file(filePath, std::ios::binary);
+		std::ifstream file(filePath, std::ios::binary | std::ios::in);
 
 		file.seekg(0, std::ios::end);
 		uint64_t size = file.tellg();
@@ -65,7 +65,20 @@ namespace Engine
 
 	bool NativeFileSystem::WriteFile(const path& filePath, const void* data, size_t size)
 	{
-		std::ofstream file(filePath, std::ios::binary);
+		path parentDir = filePath.parent_path();
+		if(!exists(parentDir))
+		{
+			if (create_directories(parentDir))
+			{
+				LOG_INFO("创建目录 {0}", parentDir.generic_string().c_str());
+			}
+			else
+			{
+				LOG_ERROR("创建目录失败 {0}", parentDir.generic_string().c_str());
+			}
+		}
+
+		std::ofstream file(filePath, std::ios::binary | std::ios::out);
 		if (!file.is_open())
 		{
 			return false;
@@ -80,9 +93,44 @@ namespace Engine
 		{
 			return false;
 		}
+		file.close();
 
 		return true;
+	}
 
+	bool NativeFileSystem::WriteFile(const path& filePath, const std::string& data)
+	{
+		path parentDir = filePath.parent_path();
+		if (!exists(parentDir))
+		{
+			if (create_directories(parentDir))
+			{
+				LOG_INFO("创建目录 {0}", parentDir.generic_string().c_str());
+			}
+			else
+			{
+				LOG_ERROR("创建目录失败 {0}", parentDir.generic_string().c_str());
+			}
+		}
+
+		std::ofstream file(filePath, std::ios::binary | std::ios::out);
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		if (data.size() > 0)
+		{
+			file << data;
+		}
+
+		if (!file.good())
+		{
+			return false;
+		}
+		file.close();
+
+		return true;
 	}
 
 	bool NativeFileSystem::FolderExists(const path& folderPath)
@@ -122,6 +170,11 @@ namespace Engine
 		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data, size);
 	}
 
+	bool EngineFileSystem::WriteFile(const path& filePath, const std::string& data)
+	{
+		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data);
+	}
+
 	bool EngineFileSystem::FolderExists(const path& folderPath)
 	{
 		return NativeFileSystem::GetInstance()->FolderExists(mRootPath / folderPath);
@@ -158,6 +211,11 @@ namespace Engine
 	bool ProjectFileSystem::WriteFile(const path& filePath, const void* data, size_t size)
 	{
 		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data, size);
+	}
+
+	bool ProjectFileSystem::WriteFile(const path& filePath, const std::string& data)
+	{
+		return NativeFileSystem::GetInstance()->WriteFile(mRootPath / filePath, data);
 	}
 
 	bool ProjectFileSystem::FolderExists(const path& folderPath)

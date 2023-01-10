@@ -37,6 +37,8 @@ namespace Engine
 
 		bool WriteFile(const path& filePath, const void* data, size_t size);
 
+		bool WriteFile(const path& filePath, const std::string& data);
+
 		bool FolderExists(const path& folderPath);
 
 		bool FileExists(const path& filePath);
@@ -55,6 +57,8 @@ namespace Engine
 		std::shared_ptr<Blob> ReadFile(const path& filePath);
 
 		bool WriteFile(const path& filePath, const void* data, size_t size);
+
+		bool WriteFile(const path& filePath, const std::string& data);
 
 		bool FolderExists(const path& folderPath);
 
@@ -79,6 +83,8 @@ namespace Engine
 		std::shared_ptr<Blob> ReadFile(const path& filePath);
 
 		bool WriteFile(const path& filePath, const void* data, size_t size);
+
+		bool WriteFile(const path& filePath, const std::string& data);
 
 		bool FolderExists(const path& folderPath);
 

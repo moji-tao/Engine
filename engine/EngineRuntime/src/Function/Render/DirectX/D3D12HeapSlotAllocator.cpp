@@ -1,5 +1,4 @@
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12HeapSlotAllocator.h"
-
 #include "EngineRuntime/include/Function/Render/DirectX/DirectXUtil.h"
 
 namespace Engine
@@ -31,7 +30,7 @@ namespace Engine
 		}
 
 		HeapEntry& Entry = HeapMap[EntryIndex];
-		assert(Entry.FreeList.size() > 0);
+		ASSERT(Entry.FreeList.size() > 0);
 
 		FreeRange& Range = Entry.FreeList.front();
 		HeapSlot Slot = { (uint32_t)EntryIndex, Range.Start };
@@ -47,7 +46,7 @@ namespace Engine
 
 	void D3D12HeapSlotAllocator::FreeHeapSlot(const HeapSlot& Slot)
 	{
-		assert(Slot.HeapIndex < HeapMap.size());
+		ASSERT(Slot.HeapIndex < HeapMap.size());
 		HeapEntry& Entry = HeapMap[Slot.HeapIndex];
 
 		FreeRange NewRange =
@@ -60,7 +59,7 @@ namespace Engine
 		for (auto Node = Entry.FreeList.begin(); Node != Entry.FreeList.end() && !bFound; Node++)
 		{
 			FreeRange& Range = *Node;
-			assert(Range.Start < Range.End);
+			ASSERT(Range.Start < Range.End);
 
 			if (Range.Start == NewRange.End) 
 			{
@@ -74,7 +73,7 @@ namespace Engine
 			}
 			else
 			{
-				assert(Range.End < NewRange.Start || Range.Start > NewRange.Start);
+				ASSERT(Range.End < NewRange.Start || Range.Start > NewRange.Start);
 				if (Range.Start > NewRange.Start) 
 				{
 					Entry.FreeList.insert(Node, NewRange);
@@ -97,7 +96,7 @@ namespace Engine
 		desc.Type = Type;
 		desc.NumDescriptors = NumDescriptorsPerHeap;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
+		
 		return desc;
 	}
 
@@ -108,7 +107,7 @@ namespace Engine
 		SetDebugName(Heap.Get(), L"D3D12HeapSlotAllocator Descriptor Heap");
 
 		DescriptorHandle HeapBase = Heap->GetCPUDescriptorHandleForHeapStart();
-		assert(HeapBase.ptr != 0);
+		ASSERT(HeapBase.ptr != 0);
 
 		HeapEntry Entry;
 		Entry.Heap = Heap;

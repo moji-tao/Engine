@@ -1,58 +1,81 @@
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
 
 namespace Engine
 {
 	RenderSystem::RenderSystem()
-	{
-		//mRenderAPI = std::make_shared<DirectXRender>();
-	}
+	{ }
 
 	RenderSystem::~RenderSystem()
-	{
-		//mRenderAPI = nullptr;
-	}
+	{ }
 
 	bool RenderSystem::Initialize(InitConfig* info)
 	{
-		//mRenderAPI->Initialize();
-		mD3DRHI = std::make_unique<D3D12RHI>((HWND)WindowSystem::GetInstance()->GetWindowHandle(true), WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
+		mRHI = std::make_unique<D3D12RHI>(WindowSystem::GetInstance());
 
-		mD3DRHI->ResizeViewport(WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
+		mRHI->ResizeViewport(WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
+
+		WindowSystem::GetInstance()->RegisterWindowResizeCallback([this](int NewWidth, int NewHeight)
+			{
+				if (NewWidth == 0 && NewHeight == 0)
+				{
+					return;
+				}
+				this->mRHI->ResizeViewport(NewWidth, NewHeight);
+			});
+
+		mRHI->InitializeRenderPipeline(mRenderPipeline);
 
 		return true;
 	}
 
 	bool RenderSystem::Tick(float deltaTile)
 	{
-		mD3DRHI->ResetCommandAllocator();
-		mD3DRHI->ResetCommandList();
+		mRenderPipeline->DeferredRender();
 
-		mD3D12ImGuiDevice->DrawUI();
-
-		mD3DRHI->ExecuteCommandLists();
-		mD3DRHI->Present();
-		mD3DRHI->FlushCommandQueue();
-		mD3DRHI->EndFrame();
-		//mRenderAPI->Tick(deltaTile);
 		return true;
 	}
 
 	void RenderSystem::Finalize()
 	{
-		//mRenderAPI->Finalize();
+		mRenderPipeline.reset();
+
+		mImGuiDevice.reset();
+
+		mRHI.reset();
 	}
 
-	void RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI)
+	ImGuiDevice* RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI)
 	{
-		mD3D12ImGuiDevice = std::make_unique<D3D12ImGuiDevice>(windowUI);
+		mRHI->InitEditorUI(mImGuiDevice, windowUI);
 
-		mD3DRHI->InitEditorUI(mD3D12ImGuiDevice.get());
+		mRenderPipeline->InitEditorUI(mImGuiDevice.get());
+
+		mRHI->ResetCommandAllocator();
+
+		mRHI->ResetCommandList();
+
+		return mImGuiDevice.get();
+	}
+
+	void RenderSystem::InitializeUIRenderBackendEnd()
+	{
+		mRHI->ExecuteCommandLists();
+
+		mRHI->FlushCommandQueue();
 	}
 
 	void RenderSystem::FinalizeUIRenderBackend()
 	{
-		mD3D12ImGuiDevice.reset();
+		mImGuiDevice.reset();
+	}
+
+	void RenderSystem::RenderViewResize(int width, int height)
+	{
+		ASSERT(mRenderPipeline != nullptr);
+
+		mRenderPipeline->RenderTargetResize(width, height);
 	}
 }

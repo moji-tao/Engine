@@ -1,11 +1,13 @@
 #include <filesystem>
+#include <Windows.h>
 #include "EngineEditor/include/Application/EngineEditor.h"
-#include "EngineRuntime.h"
+#include "EngineEditor/include/EditorTools/LuaScriptTemplate.h"
+#include "EngineRuntime/include/EngineRuntime.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
-#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
+#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
 namespace Editor
 {
@@ -15,8 +17,10 @@ namespace Editor
 		initConfig.WindowWidth = config->WindowWidth;
 		initConfig.WindowHeight = config->WindowHeight;
 		initConfig.Title = config->Title.c_str();
-		initConfig.enginePath = config->enginePath;
-		initConfig.workspacePath = config->workspacePath;
+		mEnginePath = initConfig.enginePath = config->enginePath;
+		mWorkSpacePath = initConfig.workspacePath = config->workspacePath;
+
+		Config = *config;
 
 		if (!Engine::EngineRuntime::GetInstance()->Initialize(&initConfig))
 		{
@@ -24,7 +28,7 @@ namespace Editor
 			return false;
 		}
 
-		mEditorUI = std::make_shared<EditorUI>(config);
+		mEditorUI = std::make_shared<EditorUI>(this);
 
 		Engine::WindowUIInitInfo info;
 		info.windowSystem = Engine::WindowSystem::GetInstance();
@@ -80,5 +84,67 @@ namespace Editor
 		}
 		*/
 
+	}
+
+	bool EngineEditor::OpenFileSelector(std::filesystem::path& filePath) const
+	{
+		OPENFILENAME ofn;			// 公共对话框结构
+		WCHAR szFile[MAX_PATH];		// 保存获取文件名称的缓冲区   
+		ZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+		ofn.lStructSize = sizeof(OPENFILENAMEA);
+		ofn.hwndOwner = (HWND)Engine::WindowSystem::GetInstance()->GetWindowHandle(true);
+		ofn.lpstrFile = szFile;
+		ofn.lpstrFile[0] = '\0';
+		ofn.nMaxFile = sizeof(szFile);
+		ofn.lpstrFilter = L"All files (*.*)\0*.*\0"; //过滤规则
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = mWorkSpacePath.c_str();	//指定默认路径
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+		ofn.lpstrTitle = L"导入新资产";
+
+		if (GetOpenFileName(&ofn))
+		{
+			//显示选择的文件。 
+			filePath = ofn.lpstrFile;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void EngineEditor::OpenExplorer(const std::filesystem::path& folderPath) const
+	{
+		auto pathses = Engine::ProjectFileSystem::GetInstance()->GetActualPath(folderPath);
+		ASSERT(std::filesystem::is_directory(pathses));
+		
+		ShellExecute(nullptr, L"open", L"explorer.exe", pathses.c_str(), nullptr, SW_SHOWNORMAL);
+	}
+
+	void EngineEditor::DeleteFileOrFolder(const std::filesystem::path& filePath) const
+	{
+		std::filesystem::path pathses = Engine::ProjectFileSystem::GetInstance()->GetActualPath(filePath);
+		if (std::filesystem::is_directory(pathses))
+		{
+			//Engine::AssetManager::GetInstance()->DeleteAssetFolder(filePath);
+			std::filesystem::remove_all(pathses);
+		}
+		else
+		{
+			//Engine::AssetManager::GetInstance()->DeleteAssetUrl(filePath);
+			std::filesystem::remove(pathses);
+		}
+	}
+
+	void EngineEditor::RenameFileOrFolder(const std::filesystem::path& oldPath, const std::filesystem::path& newPath)
+	{
+		std::filesystem::rename(Engine::ProjectFileSystem::GetInstance()->GetActualPath(oldPath), Engine::ProjectFileSystem::GetInstance()->GetActualPath(newPath));
+	}
+
+	void EngineEditor::CreateLuaScript(const std::filesystem::path& scriptPath)
+	{
+		Engine::ProjectFileSystem::GetInstance()->WriteFile(scriptPath, luaScriptTemplate);
 	}
 }

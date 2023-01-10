@@ -3,12 +3,16 @@
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
-#include <algorithm>
-#include <cassert>
-#include <cmath>
+#include "EngineRuntime/include/Core/Meta/Reflection.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
+	REGISTER_CLASS(Vector3);
+	REGISTER_CLASS_FIELD(Vector3, x, float);
+	REGISTER_CLASS_FIELD(Vector3, y, float);
+	REGISTER_CLASS_FIELD(Vector3, z, float);
+
 	const Vector3 Vector3::ZERO(0, 0, 0);
 	const Vector3 Vector3::UNIT_X(1, 0, 0);
 	const Vector3 Vector3::UNIT_Y(0, 1, 0);
@@ -253,13 +257,13 @@ namespace Engine
 
 	float Vector3::operator[](size_t i) const
 	{
-		assert(i < 3);
+		ASSERT(i < 3);
 		return *(&x + i);
 	}
 
 	float& Vector3::operator[](size_t i)
 	{
-		assert(i < 3);
+		ASSERT(i < 3);
 		return *(&x + i);
 	}
 
@@ -295,13 +299,13 @@ namespace Engine
 
 	Vector3 Vector3::operator/(float scalar) const
 	{
-		assert(scalar != 0.0f);
+		ASSERT(scalar != 0.0f);
 		return Vector3(x / scalar, y / scalar, z / scalar);
 	}
 
 	Vector3 Vector3::operator/(const Vector3& rhs) const
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
 		return Vector3(x / rhs.x, y / rhs.y, z / rhs.z);
 	}
 
@@ -322,7 +326,7 @@ namespace Engine
 
 	Vector3 operator/(float scalar, const Vector3& rhs)
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
 		return Vector3(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z);
 	}
 
@@ -396,7 +400,7 @@ namespace Engine
 
 	Vector3& Vector3::operator/=(const Vector3& rhs)
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f && rhs.z != 0.0f);
 		x /= rhs.x;
 		y /= rhs.y;
 		z /= rhs.z;
@@ -405,7 +409,7 @@ namespace Engine
 
 	Vector3& Vector3::operator/=(float scalar)
 	{
-		assert(scalar != 0.0f);
+		ASSERT(scalar != 0.0f);
 		x /= scalar;
 		y /= scalar;
 		z /= scalar;

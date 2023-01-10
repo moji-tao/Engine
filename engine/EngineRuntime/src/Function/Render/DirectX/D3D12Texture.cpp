@@ -1,7 +1,7 @@
-#include <cassert>
 #include <unordered_map>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Texture.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -32,7 +32,7 @@ namespace Engine
 
     D3D12ShaderResourceView* D3D12Texture::GetSRV(unsigned Index)
     {
-        assert(SRVs.size() > Index);
+        ASSERT(SRVs.size() > Index);
 
         return SRVs[Index].get();
     }
@@ -44,7 +44,7 @@ namespace Engine
 
     D3D12RenderTargetView* D3D12Texture::GetRTV(unsigned Index)
     {
-        assert(RTVs.size() > Index);
+        ASSERT(RTVs.size() > Index);
 
         return RTVs[Index].get();
     }
@@ -56,7 +56,7 @@ namespace Engine
 
     D3D12DepthStencilView* D3D12Texture::GetDSV(unsigned Index)
     {
-        assert(DSVs.size() > Index);
+        ASSERT(DSVs.size() > Index);
 
         return DSVs[Index].get();
     }
@@ -68,7 +68,7 @@ namespace Engine
 
     D3D12UnorderedAccessView* D3D12Texture::GetUAV(unsigned Index)
     {
-        assert(UAVs.size() > Index);
+        ASSERT(UAVs.size() > Index);
 
         return UAVs[Index].get();
     }

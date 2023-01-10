@@ -1,23 +1,32 @@
 #pragma once
-#include "EngineEditor/include/Application/IApplication.h"
-#include "Framework/Interface/IRuntimeModule.h"
+#include "EngineEditor/include/Application/EditorConfig.h"
 #include "EngineEditor/include/UI/EditorUI.h"
 
 namespace Editor
 {
-	class EngineEditor : public IApplication
+	class EngineEditor
 	{
 	public:
 		EngineEditor() = default;
 
-		virtual ~EngineEditor() override = default;
+		~EngineEditor() = default;
 
 	public:
-		virtual bool Initialize(const EditorConfig* config) override;
+		bool Initialize(const EditorConfig* config);
 
-		virtual void Finalize() override;
+		void Finalize();
 
-		virtual void Run() override;
+		void Run();
+
+		bool OpenFileSelector(std::filesystem::path& filePath) const;
+
+		void OpenExplorer(const std::filesystem::path& folderPath) const;
+
+		void DeleteFileOrFolder(const std::filesystem::path& filePath) const;
+
+		void RenameFileOrFolder(const std::filesystem::path& oldPath, const std::filesystem::path& newPath);
+
+		void CreateLuaScript(const std::filesystem::path& scriptPath);
 
 	private:
 
@@ -27,6 +36,12 @@ namespace Editor
 	protected:
 		bool mIsQuit = false;
 
+		std::filesystem::path mEnginePath;
+		std::filesystem::path mWorkSpacePath;
+
 		std::shared_ptr<EditorUI> mEditorUI;
+
+	public:
+		EditorConfig Config;
 	};
 }

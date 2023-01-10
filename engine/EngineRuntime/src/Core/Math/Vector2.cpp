@@ -1,10 +1,14 @@
-#include <cmath>
-#include <cassert>
 #include "EngineRuntime/include/Core/Math/Vector2.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
+#include "EngineRuntime/include/Core/Meta/Reflection.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
+	REGISTER_CLASS(Vector2);
+	REGISTER_CLASS_FIELD(Vector2, x, float);
+	REGISTER_CLASS_FIELD(Vector2, y, float);
+
 	const Vector2 Vector2::ZERO(0, 0);
 	const Vector2 Vector2::UNIT_X(1, 0);
 	const Vector2 Vector2::UNIT_Y(0, 1);
@@ -147,13 +151,13 @@ namespace Engine
 
 	float Vector2::operator[](size_t i) const
 	{
-		assert(i < 2);
+		ASSERT(i < 2);
 		return *(&x + i);
 	}
 
 	float& Vector2::operator[](size_t i)
 	{
-		assert(i < 2);
+		ASSERT(i < 2);
 		return *(&x + i);
 	}
 
@@ -189,14 +193,14 @@ namespace Engine
 
 	Vector2 Vector2::operator/(const Vector2& rhs) const
 	{
-		assert(rhs.x != 0.0f && rhs.y != 0.0f);
+		ASSERT(rhs.x != 0.0f && rhs.y != 0.0f);
 
 		return Vector2(x / rhs.x, y / rhs.y);
 	}
 
 	Vector2 Vector2::operator/(float scaler) const
 	{
-		assert(scaler != 0.0f);
+		ASSERT(scaler != 0.0f);
 
 		return Vector2(x / scaler, y / scaler);
 	}

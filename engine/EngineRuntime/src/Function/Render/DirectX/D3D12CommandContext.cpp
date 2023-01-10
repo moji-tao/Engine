@@ -26,10 +26,12 @@ namespace Engine
 		QueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		ThrowIfFailed(Device->GetNativeDevice()->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(CommandQueue.ReleaseAndGetAddressOf())), "创建命令队列失败");
+		CommandQueue->SetName(L"场景CommandQueue");
 
 		ThrowIfFailed(Device->GetNativeDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CommandListAlloc.ReleaseAndGetAddressOf())), "创建命令分配器失败");
 
 		ThrowIfFailed(Device->GetNativeDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandListAlloc.Get(), nullptr, IID_PPV_ARGS(CommandList.ReleaseAndGetAddressOf())), "创建命令列表失败");
+		CommandList->SetName(L"场景CommandList");
 
 		ThrowIfFailed(CommandList->Close(), "命令列表关闭失败");
 	}
@@ -116,6 +118,7 @@ namespace Engine
 		ThrowIfFailed(Device->GetNativeDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(ImGuiCommandListAlloc.ReleaseAndGetAddressOf())), "创建ImGui命令分配器失败");
 
 		ThrowIfFailed(Device->GetNativeDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandListAlloc.Get(), nullptr, IID_PPV_ARGS(ImGuiCommandList.ReleaseAndGetAddressOf())), "创建ImGui命令列表失败");
+		ImGuiCommandList->SetName(L"ImGui CommandList");
 
 		ThrowIfFailed(ImGuiCommandList->Close(), "ImGui命令列表关闭失败");
 

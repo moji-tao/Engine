@@ -1,0 +1,522 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\Core">
+      <UniqueIdentifier>{4818172f-3a7d-4d31-994a-d3c5399a1dcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Framework">
+      <UniqueIdentifier>{37da594b-9ca0-45fa-8bc2-02534086ae76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function">
+      <UniqueIdentifier>{7ebc35a8-8eb9-4566-aa00-feb5501e8f0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Platform">
+      <UniqueIdentifier>{51d2e068-eb38-45c1-b59e-be90a6397f1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource">
+      <UniqueIdentifier>{21c5b774-5c1c-48c3-855c-22b78c0a0d94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Alloter">
+      <UniqueIdentifier>{30c7abf0-9432-43f8-8feb-f513ab228df3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Base">
+      <UniqueIdentifier>{e6a6f613-7b5e-4688-85cf-4a31d463b0bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Log">
+      <UniqueIdentifier>{48475ab9-c95f-42cc-96c6-85b75c1f525b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Math">
+      <UniqueIdentifier>{f70a3b9a-2a2c-488b-aac4-a74ab3a1fc68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Meta">
+      <UniqueIdentifier>{9a12b6a2-d597-4449-9aec-649c855195d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Core\Random">
+      <UniqueIdentifier>{8724ca26-5438-409e-907c-e106389432b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Framework\Interface">
+      <UniqueIdentifier>{6484d3e7-95d3-4e68-badf-1689efb9ad63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Framework">
+      <UniqueIdentifier>{0e49e2f3-bede-447a-85e3-b3408cf3a312}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Render">
+      <UniqueIdentifier>{0e02c01e-5242-4383-ad2a-e55337834003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Window">
+      <UniqueIdentifier>{4e938590-3285-4785-b20f-8f354f667ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Framework\Component">
+      <UniqueIdentifier>{b3707179-2f8d-4abd-9317-763265454308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Framework\Level">
+      <UniqueIdentifier>{25d2adb0-397d-482e-a115-d92fbeaf6743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Framework\Object">
+      <UniqueIdentifier>{3ad0848f-d9cc-4347-a47e-3607c090c55b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Framework\World">
+      <UniqueIdentifier>{2a5fe516-6a52-41db-8bdd-9b08801872fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Function\Render\DirectX">
+      <UniqueIdentifier>{896f7924-948d-445c-ba3b-ac01616bac2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Platform\FileSystem">
+      <UniqueIdentifier>{42216df7-c9e5-4f8a-bf10-6d419eac00ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource\AssetManager">
+      <UniqueIdentifier>{c70d0281-8db3-41ce-922d-197ec8eba4a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource\ConfigManager">
+      <UniqueIdentifier>{d1e9b5cb-8711-46c9-be88-01cae82b9599}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource\ResourceType">
+      <UniqueIdentifier>{3511fd59-208f-4437-85a4-59acb20f73e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource\ResourceType\Data">
+      <UniqueIdentifier>{3886dd77-db00-4411-a00f-c54e607b5493}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core">
+      <UniqueIdentifier>{865b15f6-130d-469a-810a-52d2bef90240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function">
+      <UniqueIdentifier>{d69b7a12-7f5b-4548-b6a3-d64bc1aff517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Platform">
+      <UniqueIdentifier>{e0c7d566-000b-4274-ac86-682e9042ec59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Resource">
+      <UniqueIdentifier>{b5f9093c-c3b1-44c3-85aa-51b1963a6777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Resource\AssetManager">
+      <UniqueIdentifier>{4ecb05f8-6f52-4f4e-9441-3963d1667657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Resource\ConfigManager">
+      <UniqueIdentifier>{42dffe88-9d46-43ac-8344-96a6142bf193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Resource\ResourceType">
+      <UniqueIdentifier>{bcf66c8a-f182-4cf3-9200-7caaa27c6726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Resource\ResourceType\Data">
+      <UniqueIdentifier>{351b6beb-4fd6-4bba-a28e-1f63d7e17bf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Platform\FileSystem">
+      <UniqueIdentifier>{11dc3074-3d82-410b-adfd-5b413f02a7ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Framework">
+      <UniqueIdentifier>{4d85a7b6-a011-4aa1-98d1-6256a611e3c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Render">
+      <UniqueIdentifier>{55a87616-6eb7-4e07-b0e2-bd98015cf794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Window">
+      <UniqueIdentifier>{81615b09-3f56-4846-854f-f6be45454f1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Framework\Component">
+      <UniqueIdentifier>{01a85745-d26c-4e96-a7d7-078aa318174d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Framework\Level">
+      <UniqueIdentifier>{969c13d0-ac60-4b02-892c-4c81d69d4419}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Framework\Object">
+      <UniqueIdentifier>{749dabd4-2d6e-449f-b0f8-7e50cb83bef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Framework\World">
+      <UniqueIdentifier>{aba1c393-8174-4005-bcad-9c23d09083da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Function\Render\DirectX">
+      <UniqueIdentifier>{751d7e27-445c-4596-bc9f-bb8d365f819e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Alloter">
+      <UniqueIdentifier>{5193df6f-a017-49a6-9a1d-5a9bd202a561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Log">
+      <UniqueIdentifier>{17cb6d28-ed30-425a-84e3-1879c72a7bc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Math">
+      <UniqueIdentifier>{0ff273ac-591f-40ed-ada7-17be4f9a22a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Memory">
+      <UniqueIdentifier>{1b478ff0-a91d-47fc-89d4-498a878e253f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Meta">
+      <UniqueIdentifier>{0ad2fb26-0abc-459c-8948-e12a418cf910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Core\Random">
+      <UniqueIdentifier>{646fea62-6362-4782-aec6-2c0b208df9d1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\EngineRuntime.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Alloter\MemoryPool.h">
+      <Filter>头文件\Core\Alloter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Base\macro.h">
+      <Filter>头文件\Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Log\LogSystem.h">
+      <Filter>头文件\Core\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Angle.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Color.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Math.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Matrix3x3.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Matrix4x4.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Quaternion.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Transform.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Vector2.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Vector3.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Vector4.h">
+      <Filter>头文件\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Reflection.h">
+      <Filter>头文件\Core\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Serializer.h">
+      <Filter>头文件\Core\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Object.h">
+      <Filter>头文件\Core\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Random\Random.h">
+      <Filter>头文件\Core\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\ISerializable.h">
+      <Filter>头文件\Framework\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\ISingleton.h">
+      <Filter>头文件\Framework\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\IRuntimeModule.h">
+      <Filter>头文件\Framework\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\Component.h">
+      <Filter>头文件\Function\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\MeshRendererComponent.h">
+      <Filter>头文件\Function\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\TransformComponent.h">
+      <Filter>头文件\Function\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Level\Level.h">
+      <Filter>头文件\Function\Framework\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\Actor.h">
+      <Filter>头文件\Function\Framework\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\World\WorldManager.h">
+      <Filter>头文件\Function\Framework\World</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Window\WindowSystem.h">
+      <Filter>头文件\Function\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Window\WindowUI.h">
+      <Filter>头文件\Function\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\ImGuiDevice.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderCamera.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPass.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPipeline.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResource.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResourceBase.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderSystem.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RHI.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RHIResource.h">
+      <Filter>头文件\Function\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Buffer.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12CommandContext.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12DescriptorCache.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Device.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12HeapSlotAllocator.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12ImGuiDevice.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12InputLayout.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12MemoryAllocator.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12PiplineState.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RenderPipeline.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Resource.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RHI.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Shader.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Texture.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12View.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Viewport.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\d3dx12.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\DirectXUtil.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderInfo.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderTarget.h">
+      <Filter>头文件\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Platform\CharSet.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Platform\FileSystem\FileSystem.h">
+      <Filter>头文件\Platform\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MeshData.h">
+      <Filter>头文件\Resource\ResourceType\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\TextureData.h">
+      <Filter>头文件\Resource\ResourceType\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MaterialData.h">
+      <Filter>头文件\Resource\ResourceType\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ConfigManager\ConfigManager.h">
+      <Filter>头文件\Resource\ConfigManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\AssetManager\AssetManager.h">
+      <Filter>头文件\Resource\AssetManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\SkeletonData.h">
+      <Filter>头文件\Resource\ResourceType\Data</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\EngineRuntime.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextureData.cpp">
+      <Filter>源文件\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ConfigManager\ConfigManager.cpp">
+      <Filter>源文件\Resource\ConfigManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\AssetManager\AssetManager.cpp">
+      <Filter>源文件\Resource\AssetManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Platform\CharSet.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Platform\FileSystem\FileSystem.cpp">
+      <Filter>源文件\Platform\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\Component.cpp">
+      <Filter>源文件\Function\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\MeshRendererComponent.cpp">
+      <Filter>源文件\Function\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\TransformComponent.cpp">
+      <Filter>源文件\Function\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Level\Level.cpp">
+      <Filter>源文件\Function\Framework\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\Actor.cpp">
+      <Filter>源文件\Function\Framework\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\World\WorldManager.cpp">
+      <Filter>源文件\Function\Framework\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Window\WindowSystem.cpp">
+      <Filter>源文件\Function\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\ImGuiDevice.cpp">
+      <Filter>源文件\Function\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderCamera.cpp">
+      <Filter>源文件\Function\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderPipeline.cpp">
+      <Filter>源文件\Function\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderResource.cpp">
+      <Filter>源文件\Function\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderSystem.cpp">
+      <Filter>源文件\Function\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Buffer.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12CommandContext.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12DescriptorCache.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Device.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12HeapSlotAllocator.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12ImGuiDevice.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12InputLayout.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12MemoryAllocator.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12PiplineState.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RenderPipeline.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Resource.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RHI.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Shader.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Texture.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12View.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Viewport.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\DirectXUtil.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\RenderTarget.cpp">
+      <Filter>源文件\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Random\Random.cpp">
+      <Filter>源文件\Core\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Reflection.cpp">
+      <Filter>源文件\Core\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Serializer.cpp">
+      <Filter>源文件\Core\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Object.cpp">
+      <Filter>源文件\Core\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Math.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Matrix3x3.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Matrix4x4.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Quaternion.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Transform.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Vector2.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Vector3.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Vector4.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Angle.cpp">
+      <Filter>源文件\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Log\LogSystem.cpp">
+      <Filter>源文件\Core\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Alloter\MemoryPool.cpp">
+      <Filter>源文件\Core\Alloter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MeshData.cpp">
+      <Filter>源文件\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MaterialData.cpp">
+      <Filter>源文件\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

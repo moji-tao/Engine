@@ -3,6 +3,7 @@
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Vector2.h"
 #include "EngineRuntime/include/Core/Math/Vector4.h"
+#include "EngineRuntime/include/Framework/Interface/ISerializable.h"
 
 namespace Engine
 {
@@ -20,14 +21,27 @@ namespace Engine
 		Vector2 TexCoords;
 	};
 
-	struct Mesh
+	class SubMesh : public ISerializable
 	{
+	public:
+		virtual void Serialize(Engine::SerializerDataFrame& stream) const override;
+
+		virtual bool Deserialize(Engine::SerializerDataFrame& stream) override;
+
+	public:
 		std::vector<Vertex> Vertices;
 		std::vector<unsigned int> Indices;
+		uint32_t MaterialIndex;
 	};
 
-	struct GeometryData
+	struct Mesh : public ISerializable
 	{
-		std::vector<Mesh> Meshes;
+	public:
+		virtual void Serialize(Engine::SerializerDataFrame& stream) const override;
+
+		virtual bool Deserialize(Engine::SerializerDataFrame& stream) override;
+
+	public:
+		std::vector<SubMesh> Meshes;
 	};
 }

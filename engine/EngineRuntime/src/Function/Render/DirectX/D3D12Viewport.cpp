@@ -92,6 +92,7 @@ namespace Engine
 	{
 		// swap the back and front buffers
 		ThrowIfFailed(SwapChain->Present(0, 0), "");
+
 		CurrBackBuffer = (CurrBackBuffer + 1) % SwapChainBufferCount;
 	}
 

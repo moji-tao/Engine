@@ -1,6 +1,6 @@
-#include <cassert>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12View.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Device.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -12,7 +12,7 @@ namespace Engine
 		if(HeapSlotAllocator)
 		{
 			HeapSlot = HeapSlotAllocator->AllocateHeapSlot();
-			assert(HeapSlot.Handle.ptr != 0);
+			ASSERT(HeapSlot.Handle.ptr != 0);
 		}
 	}
 

@@ -1,27 +1,31 @@
 #pragma once
+#include "EngineRuntime/include/Function/Render/RHI.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Device.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Viewport.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Texture.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Buffer.h"
-#include "EngineRuntime/include/Function/Window/WindowUI.h"
 #include "EngineRuntime/include/Resource/ResourceType/Data/TextureData.h"
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
 
 namespace Engine
 {
-	class D3D12RHI
+	class ImGuiDevice;
+	class RenderPipeline;
+
+	class D3D12RHI : public RHI
 	{
 	public:
-		D3D12RHI(HWND WindowHandle, int WindowWidth, int WindowHeight);
+		D3D12RHI(WindowSystem* windowSystem);
 
-		~D3D12RHI();
+		virtual ~D3D12RHI() override;
 
 	private:
-		void Initialze(HWND WindowHandle, int WindowWidth, int WindowHeight);
+		void Initialize(HWND WindowHandle, int WindowWidth, int WindowHeight);
 
 		void Destroy();
 
 	public:
+		virtual void InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline) override;
+
 		D3D12Device* GetDevice();
 
 		D3D12Viewport* GetViewport();
@@ -30,20 +34,22 @@ namespace Engine
 
 		IDXGIFactory4* GetDxgiFactory();
 
-		void InitEditorUI(D3D12ImGuiDevice* editorUI);
+		virtual void InitEditorUI(std::unique_ptr<ImGuiDevice>& editorUI, WindowUI* windowUI) override;
 
 	public:
-		void FlushCommandQueue();
+		virtual void FlushCommandQueue() override;
 
-		void ExecuteCommandLists();
+		virtual void ExecuteCommandLists() override;
 
-		void ResetCommandList();
+		virtual void ResetCommandList() override;
 
-		void ResetCommandAllocator();
+		virtual void ResetCommandAllocator() override;
 
-		void Present();
+		virtual void Present() override;
 
-		void ResizeViewport(int NewWidth, int NewHeight);
+		virtual void EndFrame() override;
+
+		virtual void ResizeViewport(int width, int height) override;
 
 		void TransitionResource(D3D12Resource* Resource, D3D12_RESOURCE_STATES StateAfter);
 
@@ -75,8 +81,6 @@ namespace Engine
 		void SetVertexBuffer(const D3D12VertexBufferRef& VertexBuffer, UINT Offset, UINT Stride, UINT Size);
 
 		void SetIndexBuffer(const D3D12IndexBufferRef& IndexBuffer, UINT Offset, DXGI_FORMAT Format, UINT Size);
-
-		void EndFrame();
 
 	private:
 		void CreateDefaultBuffer(uint32_t Size, uint32_t Alignment, D3D12_RESOURCE_FLAGS Flags, D3D12ResourceLocation& ResourceLocation);

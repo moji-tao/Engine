@@ -2,17 +2,22 @@
 #include <memory>
 #include <filesystem>
 #include <imgui/imgui.h>
+#include "EngineRuntime/include/Function/Render/ImGuiDevice.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
-#include "EngineEditor/include/UI/EditorUIPassBase.h"
 
 namespace Editor
 {
 	struct EditorConfig;
+	class EngineEditor;
+	class EditorUIPassBase;
+
+#define UIProjectFileDrag "UIProjectFileDrag##Drag"
+#define HierarchyNodeDrag "HierarchyNodeDrag##Drag"
 
 	class EditorUI : public Engine::WindowUI
 	{
 	public:
-		EditorUI(const EditorConfig* config);
+		EditorUI(EngineEditor* editor);
 
 		virtual ~EditorUI() override;
 
@@ -24,6 +29,8 @@ namespace Editor
 	private:
 		void LoadFonts(const std::filesystem::path& ph);
 
+		void ConfigStyleColor();
+
 	private:
 		std::shared_ptr<EditorUIPassBase> mProjectUI;
 		std::shared_ptr<EditorUIPassBase> mConsoleUI;
@@ -32,7 +39,14 @@ namespace Editor
 		std::shared_ptr<EditorUIPassBase> mInspectorUI;
 
 	private:
+		Engine::ImGuiDevice* mDevice = nullptr;
 
 		ImFont* mFontsSimhei = nullptr;
+
+		EngineEditor* mEditor = nullptr;
+
+	//test
+	private:
+
 	};
 }

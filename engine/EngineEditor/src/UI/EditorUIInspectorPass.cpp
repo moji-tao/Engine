@@ -4,13 +4,17 @@
 namespace Editor
 {
 	EditorUIInspectorPass::EditorUIInspectorPass()
-	{
-
-	}
+		:EditorUIPassBase()
+	{ }
 
 	EditorUIInspectorPass::~EditorUIInspectorPass()
 	{
 
+	}
+
+	void EditorUIInspectorPass::Initialize(Engine::ImGuiDevice* device, EngineEditor* editor)
+	{
+		EditorUIPassBase::Initialize(device, editor);
 	}
 
 	void EditorUIInspectorPass::ShowUI()

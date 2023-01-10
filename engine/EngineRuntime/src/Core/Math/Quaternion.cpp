@@ -1,10 +1,10 @@
-#include <cassert>
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 #include "EngineRuntime/include/Core/Math/Matrix4x4.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -536,7 +536,7 @@ namespace Engine
 
 	Quaternion Quaternion::operator/(float scalar) const
 	{
-		assert(scalar != 0.0f);
+		ASSERT(scalar != 0.0f);
 		return Quaternion(w / scalar, x / scalar, y / scalar, z / scalar);
 	}
 

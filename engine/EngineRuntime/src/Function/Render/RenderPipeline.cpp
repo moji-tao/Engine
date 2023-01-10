@@ -2,5 +2,8 @@
 
 namespace Engine
 {
-	
+	void RenderPipeline::InitEditorUI(ImGuiDevice* imguiDevice)
+	{
+		mImGuiDevice = imguiDevice;
+	}
 }

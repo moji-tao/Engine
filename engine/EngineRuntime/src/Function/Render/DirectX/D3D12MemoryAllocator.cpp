@@ -45,9 +45,9 @@ namespace Engine
 				AlignedOffsetFromResourceBase = AlignArbitrary(OffsetFromBaseOfResource, Alignment);
 
 				uint32_t Padding = AlignedOffsetFromResourceBase - OffsetFromBaseOfResource;
-				assert((Padding + Size) <= AllocSize);
+				ASSERT((Padding + Size) <= AllocSize);
 			}
-			assert((AlignedOffsetFromResourceBase % Alignment) == 0);
+			ASSERT((AlignedOffsetFromResourceBase % Alignment) == 0);
 
 			// Save allocation info to ResourceLocation
 			ResourceLocation.SetType(D3D12ResourceLocation::ResourceLocationType::SubAllocation);
@@ -183,7 +183,7 @@ namespace Engine
 
 		if (Order > MaxOrder)
 		{
-			assert(false);
+			ASSERT(false);
 		}
 
 		if (FreeBlocks[Order].size() == 0)
@@ -275,7 +275,7 @@ namespace Engine
 		if (InitData.AllocationStrategy == AllocationStrategy::PlacedResource)
 		{
 			// Release place resource
-			assert(Block.PlacedResource != nullptr);
+			ASSERT(Block.PlacedResource != nullptr);
 
 			delete Block.PlacedResource;
 		}
@@ -335,7 +335,7 @@ namespace Engine
 		mAllocators.push_back(Allocator);
 
 		bool Result = Allocator->AllocResource(Size, Alignment, ResourceLocation);
-		assert(Result);
+		ASSERT(Result);
 
 		return true;
 	}

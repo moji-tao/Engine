@@ -6,13 +6,18 @@
 namespace Editor
 {
 	EditorUIConsolePass::EditorUIConsolePass()
-	{
-		mOldcout = std::cout.rdbuf(fo.rdbuf());
-	}
+		:EditorUIPassBase()
+	{ }
 
 	EditorUIConsolePass::~EditorUIConsolePass()
 	{
 		
+	}
+
+	void EditorUIConsolePass::Initialize(Engine::ImGuiDevice* device, EngineEditor* editor)
+	{
+		EditorUIPassBase::Initialize(device, editor);
+		mOldcout = std::cout.rdbuf(fo.rdbuf());
 	}
 
 	void EditorUIConsolePass::ShowUI()

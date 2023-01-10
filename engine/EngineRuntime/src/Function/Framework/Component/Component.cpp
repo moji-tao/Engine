@@ -1,24 +1,20 @@
 #include "EngineRuntime/include/Function/Framework/Component/Component.h"
+#include "EngineRuntime/include/Function/Framework/Object/Actor.h"
 
 namespace Engine
 {
-	Component::Component()
-	{
+	IMPLEMENT_RTTI(Component, Object);
 
-	}
+	Component::Component()
+		:mIsEnable(true)
+	{ }
 
 	Component::~Component()
-	{
+	{ }
 
-	}
-
-	bool Component::Initialize(std::weak_ptr<GameObject> parentObject)
+	void Component::SetParent(Actor* parentObject)
 	{
 		mParentObject = parentObject;
-
-		mIsEnable = true;
-
-		return true;
 	}
 
 	void Component::Tick(float deltaTime)

@@ -1,4 +1,3 @@
-#include <cassert>
 #include <d3d12shader.h>
 #include <d3dcompiler.h>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Shader.h"
@@ -11,7 +10,7 @@ namespace Engine
 	{
 		Initialize();
 
-		assert((mShaderInfo.mVertexShader != nullptr || mShaderInfo.mPixelShader != nullptr) ^ mShaderInfo.mComputeShader != nullptr);
+		ASSERT((mShaderInfo.mVertexShader != nullptr || mShaderInfo.mPixelShader != nullptr) ^ mShaderInfo.mComputeShader != nullptr);
 	}
 
 	bool Shader::SetParameter(const std::string& ParamName, D3D12ConstantBufferRef ConstantBufferRef)
@@ -47,7 +46,7 @@ namespace Engine
 		{
 			if(param.mName == ParamName)
 			{
-				assert(SRVList.size() == param.mBindCount);
+				ASSERT(SRVList.size() == param.mBindCount);
 
 				param.mSRVList = SRVList;
 
@@ -74,7 +73,7 @@ namespace Engine
 		{
 			if (param.mName == ParamName)
 			{
-				assert(UAVList.size() == param.mBindCount);
+				ASSERT(UAVList.size() == param.mBindCount);
 
 				param.mUAVList = UAVList;
 
@@ -110,7 +109,7 @@ namespace Engine
 		ID3D12ShaderReflection* reflection = nullptr;
 		D3DReflect(ShaderBlob->GetData(), ShaderBlob->GetSize(), IID_ID3D12ShaderReflection, (void**)&reflection);
 
-		assert(reflection != nullptr);
+		ASSERT(reflection != nullptr);
 
 		D3D12_SHADER_DESC shaderDesc;
 		reflection->GetDesc(&shaderDesc);
@@ -151,7 +150,7 @@ namespace Engine
 			else if (resourceType == D3D_SHADER_INPUT_TYPE::D3D_SIT_UAV_RWSTRUCTURED
 				|| resourceType == D3D_SHADER_INPUT_TYPE::D3D_SIT_UAV_RWTYPED)
 			{
-				assert(Type == ShaderType::COMPUTE_SHADER);
+				ASSERT(Type == ShaderType::COMPUTE_SHADER);
 
 				ShaderUAVParameter Param;
 				Param.mName = shaderVarName;
@@ -164,7 +163,7 @@ namespace Engine
 			}
 			else if (resourceType == D3D_SHADER_INPUT_TYPE::D3D_SIT_SAMPLER)
 			{
-				assert(Type == ShaderType::PIXEL_SHADER);
+				ASSERT(Type == ShaderType::PIXEL_SHADER);
 
 				ShaderSamplerParameter Param;
 				Param.mName = shaderVarName;
@@ -195,7 +194,7 @@ namespace Engine
 		}
 		else
 		{
-			assert(0);
+			ASSERT(0);
 		}
 
 		return shaderVisibility;
@@ -290,7 +289,7 @@ namespace Engine
 	{
 		std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter;
 
-		mCBVSignatureBaseBindSlot = slotRootParameter.size();
+		mCBVSignatureBaseBindSlot = (unsigned)slotRootParameter.size();
 
 		for (const ShaderCBVParameter& param : mCBVParams)
 		{
@@ -306,7 +305,7 @@ namespace Engine
 
 		if(mSRVCount > 0)
 		{
-			mSRVSignatureBaseBindSlot = slotRootParameter.size();
+			mSRVSignatureBaseBindSlot = (unsigned)slotRootParameter.size();
 
 			CD3DX12_DESCRIPTOR_RANGE SRVTable;
 			SRVTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, mSRVCount, 0, 0);
@@ -323,7 +322,7 @@ namespace Engine
 
 		if(mUAVCount > 0)
 		{
-			mUAVSignatureBaseBindSlot = slotRootParameter.size();
+			mUAVSignatureBaseBindSlot = (unsigned)slotRootParameter.size();
 
 			CD3DX12_DESCRIPTOR_RANGE UAVTable;
 			UAVTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, mUAVCount, 0, 0);
@@ -335,8 +334,8 @@ namespace Engine
 
 		auto staticSamples = CreateStaticSamplers();
 
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(slotRootParameter.size(), slotRootParameter.data(),
-			staticSamples.size(), staticSamples.data(), 
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc((unsigned)slotRootParameter.size(), slotRootParameter.data(),
+			(unsigned)staticSamples.size(), staticSamples.data(),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
@@ -361,17 +360,17 @@ namespace Engine
 	{
 		for (ShaderCBVParameter& param : mCBVParams)
 		{
-			assert(param.mConstantBufferRef != nullptr);
+			ASSERT(param.mConstantBufferRef != nullptr);
 		}
 
 		for (ShaderSRVParameter& param : mSRVParams)
 		{
-			assert(param.mSRVList.size() > 0);
+			ASSERT(param.mSRVList.size() > 0);
 		}
 
 		for (ShaderUAVParameter& param : mUAVParams)
 		{
-			assert(param.mUAVList.size() > 0);
+			ASSERT(param.mUAVList.size() > 0);
 		}
 	}
 

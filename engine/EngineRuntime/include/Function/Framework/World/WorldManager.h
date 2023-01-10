@@ -2,12 +2,13 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 
 namespace Engine
 {
 	class Level;
 
-	class WorldManager
+	class WorldManager : public ISingleton<WorldManager>
 	{
 	public:
 		WorldManager();
@@ -26,6 +27,11 @@ namespace Engine
 
 		void SaveCurrentLevel();
 
+		Level* GetCurrentActiveLevel() const;
+
+	public:
+		Level* SpanEmptyScene(const std::string& sceneName);
+
 	private:
 		bool LoadWorld(const std::string& worldUrl);
 
@@ -38,6 +44,6 @@ namespace Engine
 
 		std::unordered_map<std::string, std::shared_ptr<Level>> mLoadedLevels;
 
-		std::weak_ptr<Level> mCurrentActiveLevel;
+		Level* mCurrentActiveLevel = nullptr;
 	};
 }

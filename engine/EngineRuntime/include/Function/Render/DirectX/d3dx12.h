@@ -2646,7 +2646,7 @@ struct D3DX12_MESH_SHADER_PIPELINE_STATE_DESC
 struct CD3DX12_PIPELINE_STATE_STREAM2
 {
 	CD3DX12_PIPELINE_STATE_STREAM2() = default;
-	// Mesh and amplification shaders must be set manually, since they do not have representation in D3D12_GRAPHICS_PIPELINE_STATE_DESC
+	// SubMesh and amplification shaders must be set manually, since they do not have representation in D3D12_GRAPHICS_PIPELINE_STATE_DESC
 	CD3DX12_PIPELINE_STATE_STREAM2(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& Desc) noexcept
 		: Flags(Desc.Flags)
 		, NodeMask(Desc.NodeMask)
@@ -2764,7 +2764,7 @@ struct CD3DX12_PIPELINE_STATE_STREAM2
 struct CD3DX12_PIPELINE_STATE_STREAM1
 {
 	CD3DX12_PIPELINE_STATE_STREAM1() = default;
-	// Mesh and amplification shaders must be set manually, since they do not have representation in D3D12_GRAPHICS_PIPELINE_STATE_DESC
+	// SubMesh and amplification shaders must be set manually, since they do not have representation in D3D12_GRAPHICS_PIPELINE_STATE_DESC
 	CD3DX12_PIPELINE_STATE_STREAM1(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& Desc) noexcept
 		: Flags(Desc.Flags)
 		, NodeMask(Desc.NodeMask)

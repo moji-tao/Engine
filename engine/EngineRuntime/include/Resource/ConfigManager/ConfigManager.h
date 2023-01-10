@@ -11,7 +11,17 @@ namespace Engine
 
 		void Finalize();
 
+	public:
+		std::filesystem::path GetDefaultScenePath();
+
+		void SetDefaultScenePath(const std::filesystem::path& defaultPath);
+
 	private:
-		//std::filesystem::path
+		void LoadAssertConfig();
+
+		void SaveAssertConfig();
+
+	private:
+		std::filesystem::path mCurrentDefaultScenePath;
 	};
 }

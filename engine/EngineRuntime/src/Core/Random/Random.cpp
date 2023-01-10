@@ -1,8 +1,8 @@
-#include "EngineRuntime/include/Core/Random/Random.h"
-
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include "EngineRuntime/include/Core/Random/Random.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -16,7 +16,7 @@ namespace Engine
 
 	int Random::GetRandom(int min, int max)
 	{
-		assert(min <= max);
+		ASSERT(min <= max);
 		return min + mt() % (max - min);
 	}
 

@@ -1,7 +1,7 @@
-#include <cassert>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12DescriptorCache.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Device.h"
 #include "EngineRuntime/include/Function/Render/DirectX/DirectXUtil.h"
+#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -29,7 +29,7 @@ namespace Engine
 	CD3DX12_GPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendCbvSrvUavDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& SrcDescriptors)
 	{
 		uint32_t SlotsNeeded = (uint32_t)SrcDescriptors.size();
-		assert(CbvSrvUavDescriptorOffset + SlotsNeeded < MaxCbvSrvUavDescripotrCount);
+		ASSERT(CbvSrvUavDescriptorOffset + SlotsNeeded < MaxCbvSrvUavDescripotrCount);
 
 		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheCbvSrvUavDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), CbvSrvUavDescriptorOffset, CbvSrvUavDescriptorSize);
 		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, SrcDescriptors.data(), nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -41,11 +41,26 @@ namespace Engine
 		return GpuDescriptorHandle;
 	}
 
+	CD3DX12_GPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendCbvSrvUavDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& SrcDescriptor)
+	{
+		uint32_t SlotsNeeded = 1;
+
+		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheCbvSrvUavDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), CbvSrvUavDescriptorOffset, CbvSrvUavDescriptorSize);
+		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, &SrcDescriptor, nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		auto GpuDescriptorHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(CacheCbvSrvUavDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), CbvSrvUavDescriptorOffset, CbvSrvUavDescriptorSize);
+
+		CbvSrvUavDescriptorOffset += SlotsNeeded;
+
+		return GpuDescriptorHandle;
+
+	}
+	/*
 	void D3D12DescriptorCache::AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle)
 	{
 		// Append to heap
 		uint32_t SlotsNeeded = (uint32_t)RtvDescriptors.size();
-		assert(RtvDescriptorOffset + SlotsNeeded < MaxRtvDescriptorCount);
+		ASSERT(RtvDescriptorOffset + SlotsNeeded < MaxRtvDescriptorCount);
 
 		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
 		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, RtvDescriptors.data(), nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -56,6 +71,58 @@ namespace Engine
 
 		// Increase descriptor offset
 		RtvDescriptorOffset += SlotsNeeded;
+	}
+	*/
+	CD3DX12_CPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors)
+	{
+		// Append to heap
+		uint32_t SlotsNeeded = (uint32_t)RtvDescriptors.size();
+		ASSERT(RtvDescriptorOffset + SlotsNeeded < MaxRtvDescriptorCount);
+
+		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, RtvDescriptors.data(), nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+		CD3DX12_CPU_DESCRIPTOR_HANDLE OutCpuHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+
+		// Increase descriptor offset
+		RtvDescriptorOffset += SlotsNeeded;
+
+		return OutCpuHandle;
+	}
+	/*
+	void D3D12DescriptorCache::AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle)
+	{
+		// Append to heap
+		uint32_t SlotsNeeded = 1;
+		ASSERT(RtvDescriptorOffset + SlotsNeeded < MaxRtvDescriptorCount);
+
+		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, &RtvDescriptor, nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+		OutGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+
+		OutCpuHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+
+		// Increase descriptor offset
+		RtvDescriptorOffset += SlotsNeeded;
+
+	}
+	*/
+	CD3DX12_CPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor)
+	{
+		// Append to heap
+		uint32_t SlotsNeeded = 1;
+		ASSERT(RtvDescriptorOffset + SlotsNeeded < MaxRtvDescriptorCount);
+
+		auto CpuDescriptorHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+		Device->GetNativeDevice()->CopyDescriptors(1, &CpuDescriptorHandle, &SlotsNeeded, SlotsNeeded, &RtvDescriptor, nullptr, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+		CD3DX12_CPU_DESCRIPTOR_HANDLE OutCpuHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(CacheRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), RtvDescriptorOffset, RtvDescriptorSize);
+
+		// Increase descriptor offset
+		RtvDescriptorOffset += SlotsNeeded;
+
+		return OutCpuHandle;
 	}
 
 	void D3D12DescriptorCache::Reset()

@@ -1,8 +1,5 @@
 #include "EngineRuntime/include/Core/Math/Matrix4x4.h"
-
-#include <cassert>
-#include <cmath>
-
+#include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
 #include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
@@ -549,7 +546,7 @@ namespace Engine
 
 	Matrix4x4 Matrix4x4::InverseAffine() const
 	{
-		assert(IsAffine());
+		ASSERT(IsAffine());
 
 		float m10 = m_Value[1][0], m11 = m_Value[1][1], m12 = m_Value[1][2];
 		float m20 = m_Value[2][0], m21 = m_Value[2][1], m22 = m_Value[2][2];
@@ -593,7 +590,7 @@ namespace Engine
 
 	Matrix4x4 Matrix4x4::ConcatenateAffine(const Matrix4x4& m2) const
 	{
-		assert(IsAffine() && m2.IsAffine());
+		ASSERT(IsAffine() && m2.IsAffine());
 
 		return Matrix4x4(
 			m_Value[0][0] * m2.m_Value[0][0] + m_Value[0][1] * m2.m_Value[1][0] + m_Value[0][2] * m2.m_Value[2][0],
@@ -621,7 +618,7 @@ namespace Engine
 
 	Vector3 Matrix4x4::TransformAffine(const Vector3& v) const
 	{
-		assert(IsAffine());
+		ASSERT(IsAffine());
 
 		return Vector3(
 			m_Value[0][0] * v[0] + m_Value[0][1] * v[1] + m_Value[0][2] * v[2] + m_Value[0][3],
@@ -631,7 +628,7 @@ namespace Engine
 
 	Vector4 Matrix4x4::TransformAffine(const Vector4& v) const
 	{
-		assert(IsAffine());
+		ASSERT(IsAffine());
 
 		return Vector4(
 			m_Value[0][0] * v[0] + m_Value[0][1] * v[1] + m_Value[0][2] * v[2] + m_Value[0][3] * v[3],
@@ -717,13 +714,13 @@ namespace Engine
 
 	float* Matrix4x4::operator[](size_t row_index)
 	{
-		assert(row_index < 4);
+		ASSERT(row_index < 4);
 		return m_Value[row_index];
 	}
 
 	const float* Matrix4x4::operator[](size_t row_index) const
 	{
-		assert(row_index < 4);
+		ASSERT(row_index < 4);
 		return m_Value[row_index];
 	}
 

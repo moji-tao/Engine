@@ -1,24 +1,28 @@
 #pragma once
 #include <memory>
+#include "EngineRuntime/include/Core/Meta/Object.h"
+#include "EngineRuntime/include/Framework/Interface/ISerializable.h"
 
 namespace Engine
 {
-	class GameObject;
+	class Actor;
+	class TransformComponent;
 
-	class Component
+	class Component : public Object, public ISerializable
 	{
+		DECLARE_RTTI;
 	public:
 		Component();
 
 		virtual ~Component();
 
 	public:
-		bool Initialize(std::weak_ptr<GameObject> parentObject);
+		void SetParent(Actor* parentObject);
 
 		virtual void Tick(float deltaTime);
 
 	protected:
-		std::weak_ptr<GameObject> mParentObject;
+		Actor* mParentObject;
 
 		bool mIsEnable = true;
 	};
