@@ -42,7 +42,7 @@ namespace Editor
 	{
 		if (!mIsOpen)
 			return;
-
+		
 		ImGui::Begin("场景层级", &mIsOpen, ImGuiWindowFlags_NoCollapse);
 
 		ImGui::BeginChild("Drag", ImGui::GetWindowSize());
@@ -72,6 +72,7 @@ namespace Editor
 		ShowPopupWindow();
 
 		ImGui::End();
+		
 	}
 
 	// 在给定的节点上放置拖拽的节点

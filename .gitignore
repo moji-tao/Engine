@@ -1,11 +1,11 @@
 .vs/
-# Fody - auto-generated XML schema
+.git/
 FodyWeavers.xsd
 /bin-int
+/bin
 /lib
-/engine/3rd/Assimp/CMakeFiles
-/engine/3rd/GLFW/build/CMakeFiles
-/engine/3rd/GLFW/build/src/CMakeFiles
+/build
 /bin/*.dll
 /bin/*.exe
 /bin/*.pdb
+/*.sln

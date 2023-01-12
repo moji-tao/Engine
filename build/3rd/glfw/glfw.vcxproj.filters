@@ -1,119 +1,114 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\input.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\monitor.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\platform.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\vulkan.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\egl_context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\osmesa_context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_monitor.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\null_joystick.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_module.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_time.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_thread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_joystick.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_monitor.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_window.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\dev\Engine\engine\3rd\GLFW\src\wgl_context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\include\GLFW\glfw3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\include\GLFW\glfw3native.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\platform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\mappings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\null_platform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\null_joystick.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_thread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_platform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\dev\Engine\engine\3rd\GLFW\src\win32_joystick.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="D:\dev\Engine\engine\3rd\GLFW\src\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="D:\dev\Engine\engine\3rd\GLFW\build\src\glfw.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{0A51D0B5-3169-3AA7-A228-8AE9B67D6085}</UniqueIdentifier>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{2EA4366B-63C4-3EBE-B987-BCF6CDEAE36D}</UniqueIdentifier>
+    <Filter Include="include\GLFW">
+      <UniqueIdentifier>{6888C969-54EB-580E-FD70-91C4E9B22491}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\include\GLFW\glfw3.h">
+      <Filter>include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\include\GLFW\glfw3native.h">
+      <Filter>include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\internal.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\mappings.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\null_joystick.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\null_platform.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\platform.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\win32_joystick.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\win32_platform.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\win32_thread.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\3rd\glfw\src\win32_time.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\context.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\egl_context.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\init.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\input.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\monitor.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\null_init.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\null_joystick.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\null_monitor.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\null_window.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\osmesa_context.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\platform.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\vulkan.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\wgl_context.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_init.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_joystick.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_module.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_monitor.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_thread.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_time.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\win32_window.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\3rd\glfw\src\window.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

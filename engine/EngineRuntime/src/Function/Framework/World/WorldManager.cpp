@@ -26,13 +26,6 @@ namespace Engine
 
 	void WorldManager::Tick(float deltaTime)
 	{
-		/*
-		if(mIsWorldLoaded)
-		{
-			LoadWorld(mCurrentWorldUrl);
-		}
-		*/
-
 		if(mCurrentActiveLevel != nullptr)
 		{
 			mCurrentActiveLevel->Tick(deltaTime);

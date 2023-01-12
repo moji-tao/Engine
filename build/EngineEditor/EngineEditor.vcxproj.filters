@@ -1,144 +1,135 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="include\Application">
+      <UniqueIdentifier>{CC804ED1-38E2-2BDF-C14F-72912DB0629E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="资源文件">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="include\EditorTools">
+      <UniqueIdentifier>{F002D7D8-5C64-B4E6-E5D1-FA985132EBA5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\Application">
-      <UniqueIdentifier>{c637cbf4-37fa-4ffd-b048-d72295a15890}</UniqueIdentifier>
+    <Filter Include="include\UI">
+      <UniqueIdentifier>{1642B8DA-02FA-F927-6B01-D38357D89418}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\EditorTools">
-      <UniqueIdentifier>{e54706e7-ff65-49d5-bd1c-ecfc88aac55c}</UniqueIdentifier>
+    <Filter Include="include\UI\ImGuiExtensions">
+      <UniqueIdentifier>{F0957A59-DCA5-262A-455F-8B48318E15C3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\UI">
-      <UniqueIdentifier>{34ffd6c8-fe32-44dc-80df-a1b3b1234f10}</UniqueIdentifier>
+    <Filter Include="include\UI\SubFrame">
+      <UniqueIdentifier>{5AF26590-C653-439E-4FC1-8950BB217A5D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Application">
-      <UniqueIdentifier>{3127c2d5-7b6b-498d-9cb0-2dbdd6a3ee75}</UniqueIdentifier>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\EditorTools">
-      <UniqueIdentifier>{1635acb6-8c6e-4267-80ab-03316a387b0f}</UniqueIdentifier>
+    <Filter Include="src\Application">
+      <UniqueIdentifier>{701253C7-DC9D-C08B-E5AE-438051B91C8C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\UI">
-      <UniqueIdentifier>{bc234463-6c54-4b14-a413-7e0a147882e4}</UniqueIdentifier>
+    <Filter Include="src\EditorTools">
+      <UniqueIdentifier>{9494DBCE-0020-4993-0931-CC87753BA593}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\UI\ImGuiExtensions">
-      <UniqueIdentifier>{53d10b31-b11a-4497-9514-5a9107ac5d91}</UniqueIdentifier>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{3A4B661C-26ED-90F2-0FA8-A446FBE81743}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\UI\ImGuiExtensions">
-      <UniqueIdentifier>{004a71ed-5322-42d4-bf8d-4faf50b264fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\UI\SubFrame">
-      <UniqueIdentifier>{551af7cf-747c-48c0-aa54-e75727afad27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\UI\SubFrame">
-      <UniqueIdentifier>{89bc93dd-88f9-4668-9df9-39679bff72a9}</UniqueIdentifier>
+    <Filter Include="src\UI\SubFrame">
+      <UniqueIdentifier>{FE836A86-6A0F-D84A-7320-5B3FDF2A344B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\engine\EngineEditor\include\Application\AssetFIle.h">
+      <Filter>include\Application</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\EditorConfig.h">
-      <Filter>头文件\Application</Filter>
+      <Filter>include\Application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\EngineEditor.h">
-      <Filter>头文件\Application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\ModelLoader.h">
-      <Filter>头文件\EditorTools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUI.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIConsolePass.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIHierarchyPass.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIInspectorPass.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIPassBase.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIProjectPass.h">
-      <Filter>头文件\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIScenePass.h">
-      <Filter>头文件\UI</Filter>
+      <Filter>include\Application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\AssetTool.h">
-      <Filter>头文件\EditorTools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\Application\AssetFIle.h">
-      <Filter>头文件\Application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\SubFrame\EditorRightMenu.h">
-      <Filter>头文件\UI\SubFrame</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\imgui_notify.h">
-      <Filter>头文件\UI\ImGuiExtensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\tahoma.h">
-      <Filter>头文件\UI\ImGuiExtensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\fa_solid_900.h">
-      <Filter>头文件\UI\ImGuiExtensions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\font_awesome_5.h">
-      <Filter>头文件\UI\ImGuiExtensions</Filter>
+      <Filter>include\EditorTools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\LuaScriptTemplate.h">
-      <Filter>头文件\EditorTools</Filter>
+      <Filter>include\EditorTools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\ModelLoader.h">
+      <Filter>include\EditorTools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUI.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIConsolePass.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIHierarchyPass.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIInspectorPass.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIPassBase.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIProjectPass.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIScenePass.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\fa_solid_900.h">
+      <Filter>include\UI\ImGuiExtensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\font_awesome_5.h">
+      <Filter>include\UI\ImGuiExtensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\imgui_notify.h">
+      <Filter>include\UI\ImGuiExtensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\tahoma.h">
+      <Filter>include\UI\ImGuiExtensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\SubFrame\EditorRightMenu.h">
+      <Filter>include\UI\SubFrame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\engine\EngineEditor\src\main.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\..\engine\EngineEditor\src\Application\AssetFile.cpp">
+      <Filter>src\Application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\Application\EngineEditor.cpp">
-      <Filter>源文件\Application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\ModelLoader.cpp">
-      <Filter>源文件\EditorTools</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUI.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIConsolePass.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIHierarchyPass.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIInspectorPass.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIPassBase.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIProjectPass.cpp">
-      <Filter>源文件\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIScenePass.cpp">
-      <Filter>源文件\UI</Filter>
+      <Filter>src\Application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\AssetTool.cpp">
-      <Filter>源文件\EditorTools</Filter>
+      <Filter>src\EditorTools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\ModelLoader.cpp">
+      <Filter>src\EditorTools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUI.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIConsolePass.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIHierarchyPass.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIInspectorPass.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIPassBase.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIProjectPass.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIScenePass.cpp">
+      <Filter>src\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\SubFrame\EditorRightMenu.cpp">
-      <Filter>源文件\UI\SubFrame</Filter>
+      <Filter>src\UI\SubFrame</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\Application\AssetFile.cpp">
-      <Filter>源文件\Application</Filter>
+    <ClCompile Include="..\..\engine\EngineEditor\src\main.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
