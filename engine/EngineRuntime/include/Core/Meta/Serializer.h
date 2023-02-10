@@ -6,7 +6,8 @@
 #include <unordered_set>
 #include <map>
 #include <set>
-#include "EngineRuntime/include/core/base/macro.h"
+#include "EngineRuntime/include/Core/base/macro.h"
+#include "EngineRuntime/include/Core/Random/GUID.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 
 namespace Engine
@@ -20,6 +21,22 @@ namespace Engine
 	class Matrix3x3;
 	class Matrix4x4;
 	struct Vertex;
+
+	class MetaFrame
+	{
+	public:
+		virtual ~MetaFrame();
+
+		virtual void Save(const std::filesystem::path& metaPath) = 0;
+
+	public:
+		const GUID& GetGuid() const;
+
+		void SetGuid(const GUID& guid);
+
+	protected:
+		GUID* mGuid = nullptr;
+	};
 
 	class SerializerDataFrame
 	{
@@ -48,6 +65,7 @@ namespace Engine
 			MATRIX4,
 			VERTEX,
 			STRING,
+			GUID,
 			ARRAY,
 			LIST,
 			MAP,
@@ -59,7 +77,7 @@ namespace Engine
 		};
 
 	public:
-		void Save(const std::filesystem::path& savePath);
+		void Save(const std::filesystem::path& savePath, MetaFrame* meta = nullptr);
 
 		void Load(const std::filesystem::path& loadPath);
 
@@ -77,6 +95,7 @@ namespace Engine
 		SerializerDataFrame& operator<<(float value);
 		SerializerDataFrame& operator<<(double value);
 		SerializerDataFrame& operator<<(const std::string& value);
+		SerializerDataFrame& operator<<(const GUID& value);
 		SerializerDataFrame& operator<<(const Vector2& value);
 		SerializerDataFrame& operator<<(const Vector3& value);
 		SerializerDataFrame& operator<<(const Vector4& value);
@@ -120,6 +139,7 @@ namespace Engine
 		SerializerDataFrame& operator>>(float& value);
 		SerializerDataFrame& operator>>(double& value);
 		SerializerDataFrame& operator>>(std::string& value);
+		SerializerDataFrame& operator>>(GUID& value);
 		SerializerDataFrame& operator>>(Vector2& value);
 		SerializerDataFrame& operator>>(Vector3& value);
 		SerializerDataFrame& operator>>(Vector4& value);
@@ -163,6 +183,7 @@ namespace Engine
 		void Write(float value);
 		void Write(double value);
 		void Write(const std::string& value);
+		void Write(const GUID& value);
 		void Write(const Vector2& value);
 		void Write(const Vector3& value);
 		void Write(const Vector4& value);
@@ -206,6 +227,7 @@ namespace Engine
 		bool Read(float& value);
 		bool Read(double& value);
 		bool Read(std::string& value);
+		bool Read(GUID& value);
 		bool Read(Vector2& value);
 		bool Read(Vector3& value);
 		bool Read(Vector4& value);
@@ -244,41 +266,6 @@ namespace Engine
 	private:
 		std::vector<char> mBuffer;
 		uint64_t mOffset;
-	};
-
-	class ResourceSerializer
-	{
-	public:
-		template<typename T>
-		static T* LoadResourceFromFile(const std::filesystem::path& resourcePath)
-		{
-			SerializerDataFrame frame;
-			frame.Load(resourcePath);
-
-			if (!ProjectFileSystem::GetInstance()->FileExists(resourcePath))
-			{
-				return nullptr;
-			}
-
-			std::shared_ptr<Blob> blob = ProjectFileSystem::GetInstance()->ReadFile(resourcePath);
-
-			T* result = new T();
-			frame >> *result;
-
-			return result;
-		}
-
-		template<typename T>
-		static T* LoadResourceFromMemory(const void* data, uint32_t length)
-		{
-			SerializerDataFrame frame;
-			frame.Load(data, length);
-
-			T* result = new T();
-			frame >> *result;
-
-			return result;
-		}
 	};
 
 	template<typename T>

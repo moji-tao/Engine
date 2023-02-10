@@ -1,17 +1,19 @@
 #pragma once
+#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
+#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
+
 namespace Engine
 {
-	class Matrix3x3;
-	class Radian;
-	class Vector3;
-	class Matrix4x4;
-
 	class Quaternion
 	{
 	public:
 		Quaternion() = default;
 
 		Quaternion(float w_, float x_, float y_, float z_);
+
+		Quaternion(Degree roll, Degree pitch, Degree yaw);
+
+		Quaternion(Radian roll, Radian pitch, Radian yaw);
 
 		explicit Quaternion(const Matrix3x3& rot);
 
@@ -24,14 +26,19 @@ namespace Engine
 		float* ptr();
 
 	public:
+		// 从旋转矩阵设置四元数
 		void SetDataFromRotationMatrix(const Matrix3x3& rotation);
 
+		// 四元数转换为旋转矩阵
 		void GetRotationMatrix(Matrix3x3& rotation) const;
 
+		// 四元数转换为旋转矩阵
 		void GetRotationMatrix(Matrix4x4& rotation) const;
 
+		// 给定旋转轴和旋转角设置四元数
 		void SetDataFromAngleAxis(const Radian& angle, const Vector3& axis);
 
+		// 给定旋转轴和旋转角获取四元数
 		static Quaternion GetQuaternionFromAngleAxis(const Radian& angle, const Vector3& axis);
 
 		void SetDataFromDirection(const Vector3& direction, const Vector3& up_direction);
@@ -72,17 +79,23 @@ namespace Engine
 
 		float Length() const;
 
-		void Normalise();
+		void Normalize();
 
 		Quaternion Mul(const Quaternion& rhs);
 
 		Quaternion Inverse() const;
 
-		Radian GetRoll(bool reproject_axis = true) const;
+		//Radian GetRoll(bool reproject_axis) const;
 
-		Radian GetPitch(bool reproject_axis = true) const;
+		Radian GetRoll() const; //
 
-		Radian GetYaw(bool reproject_axis = true) const;
+		//Radian GetPitch(bool reproject_axis) const;
+		
+		Radian GetPitch() const; //
+
+		//Radian GetYaw(bool reproject_axis) const;
+
+		Radian GetYaw() const; //
 
 		static Quaternion sLerp(float t, const Quaternion& kp, const Quaternion& kq, bool shortest_path = false);
 
@@ -93,15 +106,25 @@ namespace Engine
 	public:
 		Quaternion operator+(const Quaternion& rhs) const;
 
+		Quaternion& operator+=(const Quaternion& rhs);
+
 		Quaternion operator-(const Quaternion& rhs) const;
+
+		Quaternion& operator-=(const Quaternion& rhs);
 
 		Quaternion operator*(const Quaternion& rhs) const;
 
+		Quaternion& operator*=(const Quaternion& rhs);
+
 		Quaternion operator*(float scalar) const;
+
+		Quaternion& operator*=(float scalar);
 
 		Vector3 operator*(const Vector3& rhs) const;
 
 		Quaternion operator/(float scalar) const;
+
+		Quaternion& operator/=(float scalar);
 
 		friend Quaternion operator*(float scalar, const Quaternion& rhs);
 
@@ -118,7 +141,7 @@ namespace Engine
 
 		static const float k_epsilon;
 
-	private:
-		float w{ 1.f }, x{ 0.f }, y{ 0.f }, z{ 0.f };
+	public:
+		float x{ 0.f }, y{ 0.f }, z{ 0.f }, w{ 1.f };
 	};
 }

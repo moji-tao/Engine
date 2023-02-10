@@ -1,3 +1,4 @@
+#include <imgui/imgui_internal.h>
 #include "EngineEditor/include/UI/EditorUI.h"
 #include "EngineEditor/include/Application/EngineEditor.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
@@ -11,6 +12,10 @@
 #include "EngineEditor/include/UI/EditorUIScenePass.h"
 #include "EngineEditor/include/EditorTools/ModelLoader.h"
 #include "EngineEditor/include/UI/ImGuiExtensions/imgui_notify.h"
+#include "EngineRuntime/include/Core/Math/Angle.h"
+#include "EngineRuntime/include/Core/Math/Math.h"
+
+using Engine::Math;
 
 namespace Editor
 {
@@ -21,16 +26,18 @@ namespace Editor
 		
 		LoadFonts(editor->Config.editorResourceConfig.editorFontPath);
 
-		mProjectUI = std::make_shared<EditorUIProjectPass>();
-		mProjectUI->Initialize(mDevice, editor);
-		mConsoleUI = std::make_shared<EditorUIConsolePass>();
-		mConsoleUI->Initialize(mDevice, editor);
-		mHierarchyUI = std::make_shared<EditorUIHierarchyPass>();
-		mHierarchyUI->Initialize(mDevice, editor);
-		mSceneUI = std::make_shared<EditorUIScenePass>();
-		mSceneUI->Initialize(mDevice, editor);
-		mInspectorUI = std::make_shared<EditorUIInspectorPass>();
-		mInspectorUI->Initialize(mDevice, editor);
+		mUIMessage = new EditorUIMessage;
+
+		mProjectUI = new EditorUIProjectPass();
+		mProjectUI->Initialize(mUIMessage, mDevice, editor);
+		mConsoleUI = new EditorUIConsolePass();
+		mConsoleUI->Initialize(mUIMessage, mDevice, editor);
+		mHierarchyUI = new EditorUIHierarchyPass();
+		mHierarchyUI->Initialize(mUIMessage, mDevice, editor);
+		mSceneUI = new EditorUIScenePass();
+		mSceneUI->Initialize(mUIMessage, mDevice, editor);
+		mInspectorUI = new EditorUIInspectorPass();
+		mInspectorUI->Initialize(mUIMessage, mDevice, editor);
 		
 		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackendEnd();
 
@@ -39,11 +46,13 @@ namespace Editor
 
 	EditorUI::~EditorUI()
 	{
-		mInspectorUI = nullptr;
-		mSceneUI = nullptr;
-		mHierarchyUI = nullptr;
-		mConsoleUI = nullptr;
-		mProjectUI = nullptr;
+		delete mInspectorUI;
+		delete mSceneUI;
+		delete mHierarchyUI;
+		delete mConsoleUI;
+		delete mProjectUI;
+
+		delete mUIMessage;
 
 		Engine::RenderSystem::GetInstance()->FinalizeUIRenderBackend();
 	}
@@ -114,6 +123,10 @@ namespace Editor
 			{
 				ImGui::MenuItem("新建场景");
 				ImGui::MenuItem("打开场景");
+				if (ImGui::MenuItem("保存场景"))
+				{
+					Engine::WorldManager::GetInstance()->SaveCurrentLevel();
+				}
 				ImGui::Separator();
 				if (ImGui::MenuItem("退出"))
 				{
@@ -140,7 +153,7 @@ namespace Editor
 		}
 
 		ImGui::End();
-		
+
 		mConsoleUI->ShowUI();
 		mProjectUI->ShowUI();
 		mHierarchyUI->ShowUI();
@@ -268,10 +281,130 @@ namespace Editor
 		}
 
 		{
-			ImGui::Begin("文件窗体");
+			ImGui::Begin("场景摄像机");
 
-			
+			Engine::RenderCamera* editorCamera = mEditor->GetEditorCamera();
+			Engine::Vector3 position = editorCamera->GetPosition();
+			ImGui::Text("渲染摄像机参数");
+			ImGui::Text("Position (%f, %f, %f)", position.x, position.y, position.z);
+			Engine::Vector3 forward = editorCamera->Forward();
+			ImGui::Text("Forward  (%f, %f, %f)", forward.x, forward.y, forward.z);
+			Engine::Vector3 right = editorCamera->Right();
+			ImGui::Text("Right    (%f, %f, %f)", right.x, right.y, right.z);
+			Engine::Vector3 up = editorCamera->Up();
+			ImGui::Text("Up       (%f, %f, %f)", up.x, up.y, up.z);
 
+			/*
+			Engine::Radian angle;
+			Engine::Vector3 axis;
+			editorCamera->GetRotation().GetAngleAxis(angle, axis);
+			ImGui::Text("Axis-Angle (%f, %f, %f), %f", axis.x, axis.y, axis.z, angle.ValueDegrees());
+			*/
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::Begin("摄像机资源");
+
+			const Engine::CameraPassConstants* camera_pass = Engine::RenderSystem::GetInstance()->GetRenderResource()->GetCameraPass();
+
+			/*
+				Matrix4x4 View = Matrix4x4::IDENTITY;
+				Matrix4x4 InvView = Matrix4x4::IDENTITY;
+				Matrix4x4 Proj = Matrix4x4::IDENTITY;
+				Matrix4x4 InvProj = Matrix4x4::IDENTITY;
+				Matrix4x4 ViewProj = Matrix4x4::IDENTITY;
+				Matrix4x4 InvViewProj = Matrix4x4::IDENTITY;
+				Vector3 EyePosW = Vector3::ZERO;
+				float cbPerObjectPad1 = 0.0f;
+				Vector2 RenderTargetSize = Vector2::ZERO;
+				Vector2 InvRenderTargetSize = Vector2::ZERO;
+				float NearZ = 0.0f;
+				float FarZ = 0.0f;
+				float TotalTime = 0.0f;
+				float DeltaTime = 0.0f;
+
+				Vector4 FogColor = Vector4::ZERO;
+				float FogStart = 0.0f;
+				float FogRange = 0.0f;
+				Vector2 cbPassPad2 = Vector2::ZERO;
+			 */
+
+			ImGui::Text("Matrix4x4 View");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->View[0][0], camera_pass->View[0][1], camera_pass->View[0][2], camera_pass->View[0][3],
+				camera_pass->View[1][0], camera_pass->View[1][1], camera_pass->View[1][2], camera_pass->View[1][3],
+				camera_pass->View[2][0], camera_pass->View[2][1], camera_pass->View[2][2], camera_pass->View[2][3],
+				camera_pass->View[3][0], camera_pass->View[3][1], camera_pass->View[3][2], camera_pass->View[3][3]);
+
+			ImGui::Text("Matrix4x4 InvView");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->InvView[0][0], camera_pass->InvView[0][1], camera_pass->InvView[0][2], camera_pass->InvView[0][3],
+				camera_pass->InvView[1][0], camera_pass->InvView[1][1], camera_pass->InvView[1][2], camera_pass->InvView[1][3],
+				camera_pass->InvView[2][0], camera_pass->InvView[2][1], camera_pass->InvView[2][2], camera_pass->InvView[2][3],
+				camera_pass->InvView[3][0], camera_pass->InvView[3][1], camera_pass->InvView[3][2], camera_pass->InvView[3][3]);
+
+			ImGui::Text("Matrix4x4 Proj");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->Proj[0][0], camera_pass->Proj[0][1], camera_pass->Proj[0][2], camera_pass->Proj[0][3],
+				camera_pass->Proj[1][0], camera_pass->Proj[1][1], camera_pass->Proj[1][2], camera_pass->Proj[1][3],
+				camera_pass->Proj[2][0], camera_pass->Proj[2][1], camera_pass->Proj[2][2], camera_pass->Proj[2][3],
+				camera_pass->Proj[3][0], camera_pass->Proj[3][1], camera_pass->Proj[3][2], camera_pass->Proj[3][3]);
+
+			ImGui::Text("Matrix4x4 InvProj");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->InvProj[0][0], camera_pass->InvProj[0][1], camera_pass->InvProj[0][2], camera_pass->InvProj[0][3],
+				camera_pass->InvProj[1][0], camera_pass->InvProj[1][1], camera_pass->InvProj[1][2], camera_pass->InvProj[1][3],
+				camera_pass->InvProj[2][0], camera_pass->InvProj[2][1], camera_pass->InvProj[2][2], camera_pass->InvProj[2][3],
+				camera_pass->InvProj[3][0], camera_pass->InvProj[3][1], camera_pass->InvProj[3][2], camera_pass->InvProj[3][3]);
+
+			ImGui::Text("Matrix4x4 ViewProj");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->ViewProj[0][0], camera_pass->ViewProj[0][1], camera_pass->ViewProj[0][2], camera_pass->ViewProj[0][3],
+				camera_pass->ViewProj[1][0], camera_pass->ViewProj[1][1], camera_pass->ViewProj[1][2], camera_pass->ViewProj[1][3],
+				camera_pass->ViewProj[2][0], camera_pass->ViewProj[2][1], camera_pass->ViewProj[2][2], camera_pass->ViewProj[2][3],
+				camera_pass->ViewProj[3][0], camera_pass->ViewProj[3][1], camera_pass->ViewProj[3][2], camera_pass->ViewProj[3][3]);
+
+			ImGui::Text("Matrix4x4 InvViewProj");
+			ImGui::Text("\t[%f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f\n"
+				"\t %f, %f, %f, %f]\n",
+				camera_pass->InvViewProj[0][0], camera_pass->InvViewProj[0][1], camera_pass->InvViewProj[0][2], camera_pass->InvViewProj[0][3],
+				camera_pass->InvViewProj[1][0], camera_pass->InvViewProj[1][1], camera_pass->InvViewProj[1][2], camera_pass->InvViewProj[1][3],
+				camera_pass->InvViewProj[2][0], camera_pass->InvViewProj[2][1], camera_pass->InvViewProj[2][2], camera_pass->InvViewProj[2][3],
+				camera_pass->InvViewProj[3][0], camera_pass->InvViewProj[3][1], camera_pass->InvViewProj[3][2], camera_pass->InvViewProj[3][3]);
+
+			ImGui::Text("Vector3 EyePosW");
+			ImGui::Text("\t (%f, %f, %f)\n", camera_pass->EyePosW[0], camera_pass->EyePosW[1], camera_pass->EyePosW[2]);
+			ImGui::Text("Vector2 RenderTargetSize");
+			ImGui::Text("\t (%f, %f)\n", camera_pass->RenderTargetSize[0], camera_pass->RenderTargetSize[1]);
+			ImGui::Text("Vector2 InvRenderTargetSize");
+			ImGui::Text("\t (%f, %f)\n", camera_pass->InvRenderTargetSize[0], camera_pass->InvRenderTargetSize[1]);
+			ImGui::Text("float NearZ");
+			ImGui::Text("\t %f\n", camera_pass->NearZ);
+			ImGui::Text("float FarZ");
+			ImGui::Text("\t %f\n", camera_pass->FarZ);
+			ImGui::Text("float TotalTime");
+			ImGui::Text("\t %f\n", camera_pass->TotalTime);
+			ImGui::Text("float DeltaTime");
+			ImGui::Text("\t %f\n", camera_pass->DeltaTime);
 
 			ImGui::End();
 		}

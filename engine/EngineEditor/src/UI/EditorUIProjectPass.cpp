@@ -4,6 +4,8 @@
 #include <imgui/imgui_internal.h>
 #include "EngineEditor/include/UI/EditorUIProjectPass.h"
 #include "EngineEditor/include/EditorTools/AssetTool.h"
+#include "EngineEditor/include/Application/SubSystem/AssetsFileSystem.h"
+#include "EngineEditor/include/EditorTools/LuaScriptTemplate.h"
 #include "EngineEditor/include/UI/ImGuiExtensions/imgui_notify.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Function/Framework/World/WorldManager.h"
@@ -11,6 +13,7 @@
 #include "EngineRuntime/include/Core/Meta/Reflection.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Function/Framework/Level/Level.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/TextData.h"
 
 namespace Editor
 {
@@ -35,40 +38,19 @@ namespace Editor
 		mCreateOrderMap[CreateItem::emCreateScene] = [this] {CreateScene(); };
 	}
 
-	void EditorUIProjectPass::dfsFolder(AssetFile* root, const std::filesystem::path& currentPath)
-	{
-		for(const auto& file : std::filesystem::directory_iterator(currentPath))
-		{
-			std::shared_ptr<AssetFile> node = std::make_shared<AssetFile>();
-			node->mParent = root;
-			node->mName = file.path().filename().generic_string();
-			if(file.is_directory())
-			{
-				node->mIsFolder = true;
-				dfsFolder(node.get(), file);
-			}
-			root->next.push_back(node);
-		}
-	}
-
 	EditorUIProjectPass::~EditorUIProjectPass()
-	{
-		mRoot.reset();
-	}
+	{ }
 
-	void EditorUIProjectPass::Initialize(Engine::ImGuiDevice* device, EngineEditor* editor)
+	void EditorUIProjectPass::Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor)
 	{
-		EditorUIPassBase::Initialize(device, editor);
+		EditorUIPassBase::Initialize(messageBox, device, editor);
 
 		SetColor();
-		
-		mRoot = std::make_shared<AssetFile>();
-		mRoot->mIsFolder = true;
-		mRoot->mName = "Assets";
-		dfsFolder(mRoot.get(), Engine::ProjectFileSystem::GetInstance()->GetActualPath("Assets"));
 
-		mCurrentOpenFolder[0].push_back(mRoot.get());
-		mCurrentOpenFolder[1].push_back(mRoot.get());
+		mRoot = editor->GetFileSystem()->GetRootFile();
+
+		mCurrentOpenFolder[0].push_back(mRoot);
+		mCurrentOpenFolder[1].push_back(mRoot);
 
 		mIconFileTexture = mDevice->LoadTexture(mEditor->Config.editorResourceConfig.editorFileIcon);
 		mIconFolderTexture = mDevice->LoadTexture(mEditor->Config.editorResourceConfig.editorFolderIcon);
@@ -105,7 +87,7 @@ namespace Editor
 		ImGui::PushStyleColor(ImGuiCol_Header, mTreeNodeBackColor);
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, mTreeNodeHoveredColor);
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, mTreeNodeActiveColor);
-		ShowAssetsTree(mRoot.get());
+		ShowAssetsTree(mRoot);
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
@@ -140,7 +122,7 @@ namespace Editor
 		ImGui::PopStyleColor();
 
 		unsigned fileCount = (unsigned)currentFolder->next.size();
-		std::list<std::shared_ptr<AssetFile>>& folderChilds = currentFolder->next;
+		std::list<AssetFile*>& folderChilds = currentFolder->next;
 
 		if (ImGui::BeginTable("AssetsSplit", (int)(windowSize.x * 0.8f / size)))
 		{
@@ -150,7 +132,7 @@ namespace Editor
 			for (auto it = folderChilds.begin(); it != folderChilds.end(); ++it)
 			{
 				ImGui::TableNextColumn();
-				std::shared_ptr<AssetFile> file = *it;
+				AssetFile* file = *it;
 
 				ImVec4 hoveredColor;
 				ImVec4 selectedColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -197,7 +179,7 @@ namespace Editor
 					{
 						if (file->mIsFolder)
 						{
-							SwitchFolder(file.get());
+							SwitchFolder(file);
 							ImGui::PopStyleColor();
 							ImGui::PopStyleColor();
 							ImGui::PopStyleColor();
@@ -311,11 +293,11 @@ namespace Editor
 
 		if(isOpen)
 		{
-			for (std::shared_ptr<AssetFile> nextNode : node->next)
+			for (AssetFile* nextNode : node->next)
 			{
 				if (nextNode->mIsFolder)
 				{
-					ShowAssetsTree(nextNode.get());
+					ShowAssetsTree(nextNode);
 				}
 			}
 
@@ -362,7 +344,6 @@ namespace Editor
 
 	void EditorUIProjectPass::ShowPopupWindow()
 	{
-
 #pragma region 重命名
 		if (mIsOpenRenameWindow)
 		{
@@ -405,9 +386,7 @@ namespace Editor
 				}
 				std::string name = mRenameBuffer;
 
-				mEditor->RenameFileOrFolder(currentFolder / mRenameFile->mName, currentFolder / (name + extension));
-
-				mRenameFile->mName = name + extension;
+				mEditor->GetFileSystem()->AssetFileRename(mRenameFile, name + extension);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -496,7 +475,16 @@ namespace Editor
 	void EditorUIProjectPass::CreateFolder()
 	{
 		std::filesystem::path assetsFolder = GetCurrentFolder() / mCreateBuffer;
-		if (Engine::ProjectFileSystem::GetInstance()->FolderExists(assetsFolder))
+		AssetsFileSystem::CreateResult result = mEditor->GetFileSystem()->CreateFolder(mCurrentOpenFolder[mCurrentIndex].back(), mCreateBuffer);
+
+		if (result == AssetsFileSystem::CreateResult::emSuccess)
+		{
+			ImGuiToast toast(ImGuiToastType_Success);
+			toast.set_title("成功");
+			toast.set_content("新建文件夹成功");
+			ImGui::InsertNotification(toast);
+		}
+		else if (result == AssetsFileSystem::CreateResult::emFileExists)
 		{
 			LOG_ERROR("文件夹在当前路径已存在 {0}", mCreateBuffer);
 
@@ -504,11 +492,8 @@ namespace Editor
 			toast.set_title("错误");
 			toast.set_content("文件夹在当前路径已存在 %s", (const char*)mCreateBuffer);
 			ImGui::InsertNotification(toast);
-
-			return;
 		}
-
-		if (!std::filesystem::create_directory(Engine::ProjectFileSystem::GetInstance()->GetActualPath(assetsFolder)))
+		else if(result == AssetsFileSystem::CreateResult::emError)
 		{
 			LOG_ERROR("未知错误 创建文件失败");
 
@@ -516,15 +501,7 @@ namespace Editor
 			toast.set_title("未知错误");
 			toast.set_content("创建文件失败");
 			ImGui::InsertNotification(toast);
-
-			return;
 		}
-		
-		std::shared_ptr<AssetFile> file(new AssetFile());
-		file->mName = mCreateBuffer;
-		file->mIsFolder = true;
-		file->mParent = mCurrentOpenFolder[mCurrentIndex].back();
-		mCurrentOpenFolder[mCurrentIndex].back()->next.push_back(file);
 
 		return;
 	}
@@ -542,7 +519,22 @@ namespace Editor
 		std::string name(mCreateBuffer);
 		name += ".lua";
 
-		if (CheckCurrentFolderFileExists(name))
+		Engine::TextMeta meta;
+		meta.SetGuid(Engine::GUID::Get());
+
+		AssetsFileSystem::CreateResult result = mEditor->GetFileSystem()->CreateTextFile(mCurrentOpenFolder[mCurrentIndex].back(), name, luaScriptTemplate, meta);
+
+		if (result == AssetsFileSystem::CreateResult::emSuccess)
+		{
+			LOG_INFO("Lua脚本创建成功");
+
+			ImGuiToast toast(ImGuiToastType_Success);
+			toast.set_title("成功");
+			toast.set_content("Lua脚本创建成功");
+
+			ImGui::InsertNotification(toast);
+		}
+		else if(result == AssetsFileSystem::CreateResult::emFileExists)
 		{
 			LOG_ERROR("Lua脚本在当前路径已存在 {0}", mCreateBuffer);
 
@@ -551,19 +543,15 @@ namespace Editor
 			toast.set_content("Lua脚本在当前路径已存在 %s", (const char*)mCreateBuffer);
 
 			ImGui::InsertNotification(toast);
-
-			return;
 		}
+		else if(result == AssetsFileSystem::CreateResult::emError)
+		{
+			ImGuiToast toast(ImGuiToastType_Error);
+			toast.set_title("错误");
+			toast.set_content("未知错误");
 
-		mEditor->CreateLuaScript(GetCurrentFolder() / name);
-
-		std::shared_ptr<AssetFile> file(new AssetFile());
-		file->mName = name;
-		file->mIsFolder = false;
-		file->mParent = mCurrentOpenFolder[mCurrentIndex].back();
-		mCurrentOpenFolder[mCurrentIndex].back()->next.push_back(file);
-
-		return;
+			ImGui::InsertNotification(toast);
+		}
 	}
 
 	void EditorUIProjectPass::Ref_CreateScene()
@@ -580,34 +568,42 @@ namespace Editor
 		std::string name(mCreateBuffer);
 		name += ".scene";
 
-		if (CheckCurrentFolderFileExists(name))
+		AssetsFileSystem* fileSystem = mEditor->GetFileSystem();
+
+		Engine::SerializerDataFrame frame = Engine::WorldManager::GetInstance()->SpanEmptyScene(name);
+		Engine::SceneMeta meta;
+		meta.SetGuid(Engine::GUID::Get());
+		AssetsFileSystem::CreateResult result = fileSystem->CreateAssetFile(mCurrentOpenFolder[mCurrentIndex].back(), name, frame, meta);
+
+		if (result == AssetsFileSystem::CreateResult::emSuccess)
+		{
+			LOG_INFO("空场景创建成功");
+
+			ImGuiToast toast(ImGuiToastType_Success);
+			toast.set_title("成功");
+			toast.set_content("空场景创建成功");
+
+			ImGui::InsertNotification(toast);
+		}
+		else if (result == AssetsFileSystem::CreateResult::emFileExists)
 		{
 			LOG_ERROR("文件在当前路径已存在 {0}", mCreateBuffer);
-			
+
 			ImGuiToast toast(ImGuiToastType_Error);
 			toast.set_title("错误");
 			toast.set_content("文件在当前路径已存在 %s", (const char*)mCreateBuffer);
-			
+
 			ImGui::InsertNotification(toast);
-
-			return;
 		}
+		else if (result == AssetsFileSystem::CreateResult::emError)
+		{
+			ImGuiToast toast(ImGuiToastType_Error);
+			toast.set_title("错误");
+			toast.set_content("未知错误");
 
-		Engine::Level* newLevel = Engine::WorldManager::GetInstance()->SpanEmptyScene(name);
-
-		currentFolder /= name;
-
-		LOG_INFO("生成了一个场景, 路径为 {0}", currentFolder.generic_string().c_str());
-
-		AssetTool::SaveAsset(currentFolder, newLevel);
-
-		std::shared_ptr<AssetFile> file(new AssetFile());
-		file->mName = name;
-		file->mIsFolder = false;
-		file->mParent = mCurrentOpenFolder[mCurrentIndex].back();
-		mCurrentOpenFolder[mCurrentIndex].back()->next.push_back(file);
+			ImGui::InsertNotification(toast);
+		}
 	}
-
 
 	void EditorUIProjectPass::Ref_ShowFolderInExplorer()
 	{
@@ -628,11 +624,11 @@ namespace Editor
 	void EditorUIProjectPass::Ref_Delete()
 	{
 		LOG_INFO("删除");
+		AssetsFileSystem* fileSystem = mEditor->GetFileSystem();
 		for (auto it = mSelectItem.begin(); it != mSelectItem.end(); ++it)
 		{
-			mEditor->DeleteFileOrFolder(GetProjectPath((**it).get()));
 			LOG_INFO("删除了 {0}", (**it)->mName.c_str());
-			mCurrentOpenFolder[mNextIndex].back()->next.erase(*it);
+			fileSystem->DeleteAssetFile(**it);
 		}
 	}
 
@@ -641,7 +637,7 @@ namespace Editor
 		LOG_INFO("重命名");
 
 		mIsOpenRenameWindow = true;
-		mRenameFile = (*(mSelectItem.back())).get();
+		mRenameFile = (*(mSelectItem.back()));
 	}
 
 	void EditorUIProjectPass::Ref_ImportAsset()

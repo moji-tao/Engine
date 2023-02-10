@@ -1,11 +1,8 @@
 #pragma once
-#include <string>
-#include <boost/random.hpp>
+#include <random>
 
 namespace Engine
 {
-	using GUID = std::string;
-
 	class Random
 	{
 	public:
@@ -13,9 +10,9 @@ namespace Engine
 
 		static int GetRandom(int min, int max);
 
-		static GUID GetGUID();
-
 	private:
-		static boost::mt19937 mt;
+		static std::default_random_engine engine;
+		static std::uniform_real_distribution<float> ds_float;
+		static std::uniform_int_distribution<int> ds_int;
 	};
 }

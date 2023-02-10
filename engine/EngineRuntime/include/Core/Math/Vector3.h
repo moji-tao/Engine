@@ -1,10 +1,10 @@
 #pragma once
+#include "EngineRuntime/include/Core/Math/Vector2.h"
+#include "EngineRuntime/include/Core/Math/Angle.h"
+
 namespace Engine
 {
-	class Radian;
 	class Quaternion;
-
-	class Vector2;
 
 	class Vector3
 	{
@@ -44,7 +44,7 @@ namespace Engine
 
 		float DotProduct(const Vector3& vec) const;
 
-		void Normalise();
+		void Normalize();
 
 		Vector3 CrossProduct(const Vector3& rhs) const;
 

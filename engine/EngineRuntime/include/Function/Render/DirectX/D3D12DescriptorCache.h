@@ -22,10 +22,12 @@ namespace Engine
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE AppendCbvSrvUavDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& SrcDescriptor);
 
-		//void AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle);
+		void AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle);
+
 		CD3DX12_CPU_DESCRIPTOR_HANDLE AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors);
 
-		//void AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle);
+		void AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle);
+
 		CD3DX12_CPU_DESCRIPTOR_HANDLE AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor);
 
 		void Reset();

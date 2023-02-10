@@ -2,12 +2,17 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include "EngineRuntime/include/Core/Math/Angle.h"
+#include "EngineRuntime/include/Core/Math/Vector3.h"
+#include "EngineRuntime/include/Core/Math/Quaternion.h"
+#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
 
 namespace Engine
 {
 	static const float Math_POS_INFINITY = std::numeric_limits<float>::infinity();
 	static const float Math_NEG_INFINITY = -std::numeric_limits<float>::infinity();
 	static const float Math_PI = 3.14159265358979323846264338327950288f;
+	static const float Math_2PI = 3.14159265358979323846264338327950288f * Math_PI;
 	static const float Math_ONE_OVER_PI = 1.0f / Math_PI;
 	static const float Math_TWO_PI = 2.0f * Math_PI;
 	static const float Math_HALF_PI = 0.5f * Math_PI;
@@ -18,17 +23,6 @@ namespace Engine
 
 	static const float Float_EPSILON = FLT_EPSILON;
 	static const float Double_EPSILON = DBL_EPSILON;
-
-	class Radian;
-	class Angle;
-	class Degree;
-
-	class Vector2;
-	class Vector3;
-	class Vector4;
-	class Matrix3x3;
-	class Matrix4x4;
-	class Quaternion;
 
 	class Math
 	{
@@ -63,15 +57,21 @@ namespace Engine
 
 		static float Sin(const Radian& rad);
 
-		static float Sin(float value);
+		//static float Sin(float value);
+
+		static float Sin(const Degree& deg);
 
 		static float Cos(const Radian& rad);
 
-		static float Cos(float value);
+		//static float Cos(float value);
+
+		static float Cos(const Degree& deg);
 
 		static float Tan(const Radian& rad);
 
-		static float Tan(float value);
+		//static float Tan(float value);
+
+		static float Tan(const Degree& deg);
 
 		static Radian Acos(float value);
 
@@ -81,13 +81,26 @@ namespace Engine
 
 		static Radian Atan2(float y_v, float x_v);
 
-		static Matrix4x4 MakeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix = nullptr);
+		//static Matrix4x4 MakeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix = nullptr);
 
-		static Matrix4x4 MakeLookAtMatrix(const Vector3& eye_position, const Vector3& target_position, const Vector3& up_dir);
+		//static Matrix4x4 MakeLookAtMatrix(const Vector3& eye_position, const Vector3& target_position, const Vector3& up_dir);
+
+		//static Matrix4x4 MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
+
+		static Matrix4x4 MakeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar);
+
+		// new
+
+		static Matrix3x3 CreateRotationY(Radian radian);
+
+		static Matrix4x4 MakeLookAtMatrix(const Vector3& eyeposition, const Vector3& target, const Vector3& up);
+
+		static Matrix4x4 MakeLookAtMatrix(const Vector3& position, const Vector3& right, const Vector3& up, const Vector3& forward);
 
 		static Matrix4x4 MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
 
-		static Matrix4x4 MakeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar);
+		// new
+
 
 		template<class T>
 		static constexpr T Max(const T& A, const T& B)

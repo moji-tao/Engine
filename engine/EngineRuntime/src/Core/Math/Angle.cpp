@@ -1,5 +1,4 @@
 #include "EngineRuntime/include/Core/Math/Angle.h"
-
 #include "EngineRuntime/include/Core/Math/Math.h"
 
 namespace Engine

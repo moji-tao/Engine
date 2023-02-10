@@ -103,14 +103,14 @@ namespace Engine
 			return nullptr;
 		}
 
-		return D3DTexture->GetRTV();
+		return D3DTexture->GetRTV(Index);
 	}
 
 	D3D12DepthStencilView* RenderTargetCube::GetDSV(int Index) const
 	{
 		if (bRenderDepth)
 		{
-			return D3DTexture->GetDSV();
+			return D3DTexture->GetDSV(Index);
 		}
 
 		return nullptr;

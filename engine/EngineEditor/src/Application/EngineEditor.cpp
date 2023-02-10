@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <Windows.h>
 #include "EngineEditor/include/Application/EngineEditor.h"
-#include "EngineEditor/include/EditorTools/LuaScriptTemplate.h"
 #include "EngineRuntime/include/EngineRuntime.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
@@ -28,7 +27,11 @@ namespace Editor
 			return false;
 		}
 
-		mEditorUI = std::make_shared<EditorUI>(this);
+		mAssetsFileSystem = new AssetsFileSystem(config->workspacePath);
+		mEditorSceneSystem = new EditorSceneSystem(this);
+		mEditorInputSystem = new EditorInputSystem(this);
+
+		mEditorUI = new EditorUI(this);
 
 		Engine::WindowUIInitInfo info;
 		info.windowSystem = Engine::WindowSystem::GetInstance();
@@ -43,7 +46,18 @@ namespace Editor
 
 	void EngineEditor::Finalize()
 	{
+		delete mEditorSceneSystem;
+		mEditorSceneSystem = nullptr;
+
+		delete mEditorInputSystem;
+		mEditorInputSystem = nullptr;
+
+		delete mAssetsFileSystem;
+		mAssetsFileSystem = nullptr;
+
+		delete mEditorUI;
 		mEditorUI = nullptr;
+
 		Engine::EngineRuntime::GetInstance()->Finalize();
 		mIsQuit = true;
 	}
@@ -52,10 +66,28 @@ namespace Editor
 	{
 		while (!mIsQuit)
 		{
+			mEditorSceneSystem->Tick();
+			mEditorInputSystem->Tick();
+
 			float deltaTime = Engine::EngineRuntime::GetInstance()->GetDeltaTime();
-			mIsQuit = !Engine::EngineRuntime::GetInstance()->Tick(deltaTime);
+			mIsQuit = !Engine::EngineRuntime::GetInstance()->Tick(deltaTime, mIsEditorMode);
 		}
 
+	}
+
+	AssetsFileSystem* EngineEditor::GetFileSystem()
+	{
+		return mAssetsFileSystem;
+	}
+
+	EditorInputSystem* EngineEditor::GetInputSystem()
+	{
+		return mEditorInputSystem;
+	}
+
+	Engine::RenderCamera* EngineEditor::GetEditorCamera()
+	{
+		return mEditorSceneSystem->GetEditorRenderCamera();
 	}
 
 	void EngineEditor::FilesDrop(int fileCount, const char** filePath)
@@ -121,30 +153,5 @@ namespace Editor
 		ASSERT(std::filesystem::is_directory(pathses));
 		
 		ShellExecute(nullptr, L"open", L"explorer.exe", pathses.c_str(), nullptr, SW_SHOWNORMAL);
-	}
-
-	void EngineEditor::DeleteFileOrFolder(const std::filesystem::path& filePath) const
-	{
-		std::filesystem::path pathses = Engine::ProjectFileSystem::GetInstance()->GetActualPath(filePath);
-		if (std::filesystem::is_directory(pathses))
-		{
-			//Engine::AssetManager::GetInstance()->DeleteAssetFolder(filePath);
-			std::filesystem::remove_all(pathses);
-		}
-		else
-		{
-			//Engine::AssetManager::GetInstance()->DeleteAssetUrl(filePath);
-			std::filesystem::remove(pathses);
-		}
-	}
-
-	void EngineEditor::RenameFileOrFolder(const std::filesystem::path& oldPath, const std::filesystem::path& newPath)
-	{
-		std::filesystem::rename(Engine::ProjectFileSystem::GetInstance()->GetActualPath(oldPath), Engine::ProjectFileSystem::GetInstance()->GetActualPath(newPath));
-	}
-
-	void EngineEditor::CreateLuaScript(const std::filesystem::path& scriptPath)
-	{
-		Engine::ProjectFileSystem::GetInstance()->WriteFile(scriptPath, luaScriptTemplate);
 	}
 }

@@ -68,6 +68,8 @@ namespace Engine
 
 		bool SetParameter(const std::string& ParamName, const std::vector<D3D12UnorderedAccessView*>& UAVList);
 
+		void BindParameters();
+
 	private:
 		void Initialize();
 
@@ -81,7 +83,7 @@ namespace Engine
 
 		void CheckBindings();
 
-		void ClearBingings();
+		void ClearBindings();
 
 	public:
 		ShaderInfo mShaderInfo;

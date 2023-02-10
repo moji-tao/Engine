@@ -84,6 +84,91 @@ namespace Engine
 		return result;
 	}
 
+	void Shader::BindParameters()
+	{
+		auto CommandList = mD3D12RHI->GetDevice()->GetCommandList();
+		auto DescriptorCache = mD3D12RHI->GetDevice()->GetCommandContext()->GetDescriptorCache();
+
+		CheckBindings();
+
+		bool bComputeShader = mShaderInfo.mComputeShader != nullptr;
+		
+		// CBV binding
+		for (int i = 0; i < mCBVParams.size(); i++)
+		{
+			UINT RootParamIdx = mCBVSignatureBaseBindSlot + i;
+			D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress = mCBVParams[i].mConstantBufferRef->ResourceLocation.GPUVirtualAddress;
+
+			if (bComputeShader)
+			{
+				CommandList->SetComputeRootConstantBufferView(RootParamIdx, GPUVirtualAddress);
+			}
+			else
+			{
+				CommandList->SetGraphicsRootConstantBufferView(RootParamIdx, GPUVirtualAddress);
+			}
+		}
+
+
+		// SRV binding
+		if (mSRVCount > 0)
+		{
+			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SrcDescriptors;
+			SrcDescriptors.resize(mSRVCount);
+
+			for (const ShaderSRVParameter& Param : mSRVParams)
+			{
+				for (UINT i = 0; i < Param.mSRVList.size(); i++)
+				{
+					UINT Index = Param.mBindPoint + i;
+					SrcDescriptors[Index] = Param.mSRVList[i]->GetDescriptorHandle();
+				}
+			}
+
+			UINT RootParamIdx = mSRVSignatureBaseBindSlot;
+			auto GpuDescriptorHandle = DescriptorCache->AppendCbvSrvUavDescriptors(SrcDescriptors);
+
+			if (bComputeShader)
+			{
+				CommandList->SetComputeRootDescriptorTable(RootParamIdx, GpuDescriptorHandle);
+			}
+			else
+			{
+				CommandList->SetGraphicsRootDescriptorTable(RootParamIdx, GpuDescriptorHandle);
+			}
+		}
+
+		// UAV binding
+		if (mUAVCount > 0)
+		{
+			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> SrcDescriptors;
+			SrcDescriptors.resize(mUAVCount);
+
+			for (const ShaderUAVParameter& Param : mUAVParams)
+			{
+				for (UINT i = 0; i < Param.mUAVList.size(); i++)
+				{
+					UINT Index = Param.mBindPoint + i;
+					SrcDescriptors[Index] = Param.mUAVList[i]->GetDescriptorHandle();
+				}
+			}
+
+			UINT RootParamIdx = mUAVSignatureBaseBindSlot;
+			auto GpuDescriptorHandle = DescriptorCache->AppendCbvSrvUavDescriptors(SrcDescriptors);
+
+			if (bComputeShader)
+			{
+				CommandList->SetComputeRootDescriptorTable(RootParamIdx, GpuDescriptorHandle);
+			}
+			else
+			{
+				assert(0);
+			}
+		}
+
+		ClearBindings();
+	}
+
 	void Shader::Initialize()
 	{
 		if(mShaderInfo.mVertexShader != nullptr)
@@ -374,7 +459,7 @@ namespace Engine
 		}
 	}
 
-	void Shader::ClearBingings()
+	void Shader::ClearBindings()
 	{
 		for (ShaderCBVParameter& param : mCBVParams)
 		{

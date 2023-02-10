@@ -1,27 +1,14 @@
 #pragma once
 #include <cstdint>
+#include "EngineRuntime/include/Core/Math/Vector4.h"
+#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 
 namespace Engine
 {
-	class Radian;
-	class Angle;
-	class Degree;
-
-	class Vector2;
-	class Vector3;
-	class Vector4;
-	class Matrix3x3;
-	class Matrix4x4;
-	class Quaternion;
-
 	class Matrix4x4
 	{
 	public:
 		Matrix4x4();
-
-		//Matrix4x4(const Matrix4x4_& mat);
-
-		//Matrix4x4_ ToMatrix4x4_();
 
 		Matrix4x4(const float(&float_array)[16]);
 
@@ -37,6 +24,10 @@ namespace Engine
 		Matrix4x4(const Quaternion& rot);
 
 	public:
+		float* Ptr();
+
+		const float* Ptr() const;
+
 		void SetAllData(const float(&float_array)[16]);
 
 		void GetAllData(float(&float_array)[16]) const;
@@ -59,9 +50,9 @@ namespace Engine
 
 		static Matrix4x4 RotationMatrix(Vector3 normal);
 
-		void MakeTrans(const Vector3& v);
+		void MakeTrans(const Vector3& v); //
 
-		void MakeTrans(float tx, float ty, float tz);
+		void MakeTrans(float tx, float ty, float tz); //
 
 		static Matrix4x4 GetTrans(const Vector3& v);
 
@@ -93,10 +84,11 @@ namespace Engine
 
 		void Decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
 
-		void DecompositionWithoutScale(Vector3& position, Quaternion& rotation) const;
-
 		bool IsAffine(void) const;
 
+		Matrix4x4 Inverse() const;
+
+		/*
 		Matrix4x4 InverseAffine() const;
 
 		Matrix4x4 ConcatenateAffine(const Matrix4x4& m2) const;
@@ -108,6 +100,7 @@ namespace Engine
 		Matrix4x4 Inverse() const;
 
 		Vector3 TransformCoord(const Vector3& v);
+		*/
 
 	public:
 		float* operator[](size_t row_index);
@@ -118,7 +111,7 @@ namespace Engine
 
 		Vector3 operator*(const Vector3& v) const;
 
-		Vector4 operator*(const Vector4& v) const;
+		//Vector4 operator*(const Vector4& v) const;
 
 		Matrix4x4 operator*(float scalar) const;
 

@@ -1,267 +1,273 @@
 #include <fstream>
-#include <json/json.h>
+#include <yaml-cpp/yaml.h>
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 
 namespace Engine
 {
-	bool AssetManager::Initialize()
+	bool AssetManager::Initialize(const std::filesystem::path& projectPath)
 	{
-		//LoadAssertConfig();
+		path assetsDir = ProjectFileSystem::GetInstance()->GetActualPath(projectPath) / "Assets";
+
+		dfsFolder(assetsDir, ProjectFileSystem::GetInstance()->GetActualPath(projectPath));
+
+		LoadDefaultMesh();
 
 		return true;
 	}
 
 	void AssetManager::Finalize()
 	{
-		//SaveAssertConfig();
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		std::string extension = assetUrl.extension().generic_string();
-
-		if (extension == ".mesh")
+		for (auto asset : mCacheAsset)
 		{
-			AddMeshAssetUrl(assetUrl);
-		}
-		else if (extension == ".texture")
-		{
-			AddTextureAssetUrl(assetUrl);
-		}
-		else if (extension == ".material")
-		{
-			AddMaterialAssetUrl(assetUrl);
-		}
-		else if (extension == ".prefab")
-		{
-			AddPrefabAssetUrl(assetUrl);
-		}
-		else if (extension == ".scene")
-		{
-			AddSceneAssetUrl(assetUrl);
-		}
-		else if (extension == ".skeleton")
-		{
-			AddSkeletonAssetUrl(assetUrl);
-		}
-		else
-		{
-			ASSERT("未知类型");
+			if (asset.second != nullptr)
+			{
+				delete asset.second;
+			}
 		}
 	}
 
-	void AssetManager::AddMeshAssetUrl(const std::filesystem::path& assetUrl)
+	void AssetManager::AddAsset(const std::filesystem::path& assetPath, const GUID& guid)
 	{
-		ASSERT(mMeshAsset.find(assetUrl) == mMeshAsset.end());
+		ASSERT(mFilesGUID.find(assetPath) == mFilesGUID.end());
 
-		mMeshAsset.emplace(assetUrl, nullptr);
+		mFilesGUID[assetPath] = guid;
+
+		mFilesPath[guid] = assetPath;
+
+		LOG_INFO("添加资产, 路径: {0} ,GUID: {1}", assetPath.generic_string().c_str(), guid.Data());
 	}
 
-	void AssetManager::DeleteMeshAssetUrl(const std::filesystem::path& assetUrl)
+	void AssetManager::RemoveAsset(const std::filesystem::path& assetPath)
 	{
-		ASSERT(mMeshAsset.find(assetUrl) != mMeshAsset.end());
+		ASSERT(mFilesGUID.find(assetPath) != mFilesGUID.end());
 
-		mMeshAsset.erase(assetUrl);
+		mFilesPath.erase(mFilesGUID[assetPath]);
+		mFilesGUID.erase(assetPath);
+
+		LOG_INFO("移除资产, 路径: {0}", assetPath.generic_string().c_str());
 	}
 
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const MeshAssetTrait&)
+	void AssetManager::MoveAsset(const std::filesystem::path& oldPath, const std::filesystem::path& newPath)
 	{
-		AddMeshAssetUrl(assetUrl);
+		ASSERT(mFilesGUID.find(oldPath) != mFilesGUID.end());
+		ASSERT(mFilesGUID.find(newPath) == mFilesGUID.end());
+		GUID guid = mFilesGUID[oldPath];
+		mFilesGUID.erase(oldPath);
+		mFilesGUID[newPath] = guid;
+		mFilesPath[guid] = newPath;
+		LOG_INFO("移动资产, 从 {0} 移动到 {1}", oldPath.generic_string().c_str(), newPath.generic_string().c_str());
 	}
 
-	void AssetManager::AddTextureAssetUrl(const std::filesystem::path& assetUrl)
+	GUID AssetManager::GetAssetGuidFormAssetPath(const std::filesystem::path& assetPath)
 	{
-		ASSERT(mTextureAsset.find(assetUrl) == mTextureAsset.end());
-
-		mTextureAsset.emplace(assetUrl, nullptr);
-	}
-
-	void AssetManager::DeleteTextureAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mTextureAsset.find(assetUrl) != mTextureAsset.end());
-
-		mTextureAsset.erase(assetUrl);
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const TextureAssetTrait&)
-	{
-		AddTextureAssetUrl(assetUrl);
-	}
-
-	void AssetManager::AddMaterialAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mMaterialAsset.find(assetUrl) == mMaterialAsset.end());
-
-		mMaterialAsset.emplace(assetUrl, nullptr);
-	}
-
-	void AssetManager::DeleteMaterialAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mMaterialAsset.find(assetUrl) != mMaterialAsset.end());
-
-		mMaterialAsset.erase(assetUrl);
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const MaterialAssetTrait&)
-	{
-		AddMaterialAssetUrl(assetUrl);
-	}
-
-	void AssetManager::AddPrefabAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mPrefabAsset.find(assetUrl) == mPrefabAsset.end());
-
-		mPrefabAsset.emplace(assetUrl, nullptr);
-	}
-
-	void AssetManager::DeletePrefabAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mPrefabAsset.find(assetUrl) != mPrefabAsset.end());
-
-		mPrefabAsset.erase(assetUrl);
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const PrefabAssetTrait&)
-	{
-		AddPrefabAssetUrl(assetUrl);
-	}
-
-	void AssetManager::AddSceneAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mSceneAsset.find(assetUrl) == mSceneAsset.end());
-
-		mSceneAsset.emplace(assetUrl, nullptr);
-	}
-
-	void AssetManager::DeleteSceneAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mSceneAsset.find(assetUrl) != mSceneAsset.end());
-
-		mSceneAsset.erase(assetUrl);
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const SceneAssetTrait&)
-	{
-		AddSceneAssetUrl(assetUrl);
-	}
-
-	void AssetManager::AddSkeletonAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mSkeletonAsset.find(assetUrl) == mSkeletonAsset.end());
-
-		mSkeletonAsset.emplace(assetUrl, nullptr);
-	}
-
-	void AssetManager::DeleteSkeletonAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		ASSERT(mSkeletonAsset.find(assetUrl) != mSkeletonAsset.end());
-
-		mSkeletonAsset.erase(assetUrl);
-	}
-
-	void AssetManager::AddAssetUrl(const std::filesystem::path& assetUrl, const SkeletonAssetTrait&)
-	{
-		AddSkeletonAssetUrl(assetUrl);
-	}
-
-	void AssetManager::DeleteAssetUrl(const std::filesystem::path& assetUrl)
-	{
-		std::string extension = assetUrl.extension().generic_string();
-
-		if (extension == ".mesh")
+		auto it = mFilesGUID.find(assetPath);
+		if (it == mFilesGUID.end())
 		{
-			DeleteMeshAssetUrl(assetUrl);
+			return GUID();
 		}
-		else if (extension == ".texture")
-		{
-			DeleteTextureAssetUrl(assetUrl);
-		}
-		else if (extension == ".material")
-		{
-			DeleteMaterialAssetUrl(assetUrl);
-		}
-		else if (extension == ".prefab")
-		{
-			DeletePrefabAssetUrl(assetUrl);
-		}
-		else if (extension == ".scene")
-		{
-			DeleteSceneAssetUrl(assetUrl);
-		}
-		else if (extension == ".skeleton")
-		{
-			DeleteSkeletonAssetUrl(assetUrl);
-		}
-		else
-		{
-			ASSERT(0, "未知类型");
-		}
+
+		return it->second;
 	}
 
-	void AssetManager::DeleteAssetFolder(const std::filesystem::path& assetUrl)
+	std::filesystem::path AssetManager::GetAssetPathFormAssetGuid(const GUID& guid)
 	{
+		if (!guid.IsVaild())
+		{
+			LOG_ERROR("Guid 无效");
+			return path();
+		}
+
+		auto it = mFilesPath.find(guid);
+
+		if (it != mFilesPath.end())
+		{
+			return it->second;
+		}
+
+		LOG_ERROR("Guid {0} 没有找到对应路径", guid.Data());
+
+		return std::filesystem::path();
 	}
 
-	template<typename T>
-	void LoadJson(const Json::Value& value, std::unordered_map<std::filesystem::path, T*>& mp)
+	GUID AssetManager::GetDefaultAssetGuid(DefaultMesh _mesh)
 	{
-		for (unsigned i = 0; i < value.size(); ++i)
+		switch (_mesh)
 		{
-			mp.emplace(value[i].asString(), nullptr);
+		case DefaultMesh_Box:
+			return mDefaultBoxMeshGuid;
+			break;
+		case DefaultMesh_Cylinder:
+			return mDefaultCylinderMeshGuid;
+			break;
+		case DefaultMesh_Grid:
+			return mDefaultGridMeshGuid;
+			break;
+		case DefaultMesh_Quad:
+			return mDefaultQuadMeshGuid;
+			break;
+		case DefaultMesh_Sphere:
+			return mDefaultSphereMeshGuid;
+			break;
+		case DefaultMesh_ScreenQuad:
+			return mDefaultScreenQuadMeshGuid;
+			break;
+		default:
+			break;
+		}
+
+		return GUID();
+	}
+
+	Object* AssetManager::LoadResource(const GUID& guid)
+	{
+		auto it = mCacheAsset.find(guid);
+		if (it == mCacheAsset.end())
+		{
+			return nullptr;
+		}
+
+		return it->second;
+	}
+
+	Mesh* AssetManager::LoadDefaultMeshResource(DefaultMesh _mesh)
+	{
+		switch (_mesh)
+		{
+		case DefaultMesh_Box:
+			return LoadResource<Mesh>(mDefaultBoxMeshGuid);
+			break;
+		case DefaultMesh_Cylinder:
+			return LoadResource<Mesh>(mDefaultCylinderMeshGuid);
+			break;
+		case DefaultMesh_Grid:
+			return LoadResource<Mesh>(mDefaultGridMeshGuid);
+			break;
+		case DefaultMesh_Quad:
+			return LoadResource<Mesh>(mDefaultQuadMeshGuid);
+			break;
+		case DefaultMesh_ScreenQuad:
+			return LoadResource<Mesh>(mDefaultScreenQuadMeshGuid);
+			break;
+		case DefaultMesh_Sphere:	
+			return LoadResource<Mesh>(mDefaultSphereMeshGuid);
+			break;
+		}
+
+		return nullptr;
+	}
+
+	void AssetManager::UnLoadResource(const Object* resource)
+	{
+		// TODO: 资源卸载管理
+	}
+
+	void AssetManager::dfsFolder(const std::filesystem::path& currentPath, const std::filesystem::path& projectPath)
+	{
+		for (const auto& file : std::filesystem::directory_iterator(currentPath))
+		{
+			if (file.is_directory())
+			{
+				dfsFolder(file, projectPath);
+				continue;
+			}
+			auto filePath = file.path();
+			if (filePath.extension() == ".meta")
+			{
+				continue;
+			}
+
+			auto fileMetaPath = file.path();
+			fileMetaPath += ".meta";
+
+			ASSERT(ProjectFileSystem::GetInstance()->FileExists(fileMetaPath));
+			
+			YAML::Node node = YAML::LoadFile(fileMetaPath.generic_string());
+
+			filePath = filePath.lexically_relative(projectPath);
+
+			ASSERT(node["guid"].IsDefined());
+			ASSERT(mFilesGUID.find(filePath) == mFilesGUID.end());
+
+			mFilesGUID[filePath] = node["guid"].as<std::string>();
+			mFilesPath[mFilesGUID[filePath]] = filePath;
+		}
+
+	}
+
+	void AssetManager::LoadDefaultMesh()
+	{
+		{
+			Mesh* boxMesh = new Mesh;
+			Mesh::CreateBox(*boxMesh, 1.0f, 1.0f, 1.0f, 3);
+			mDefaultBoxMeshGuid = GUID::Get();
+			ASSERT(boxMesh->Meshes.size() == 1);
+			boxMesh->Meshes[0].mGuid = mDefaultBoxMeshGuid;
+			mCacheAsset.emplace(mDefaultBoxMeshGuid, boxMesh);
+		}
+
+		{
+			Mesh* cylinderMesh = new Mesh;
+			Mesh::CreateCylinder(*cylinderMesh, 0.5f, 0.3f, 3.0f, 20, 20);
+			mDefaultCylinderMeshGuid = GUID::Get();
+			ASSERT(cylinderMesh->Meshes.size() == 1);
+			cylinderMesh->Meshes[0].mGuid = mDefaultCylinderMeshGuid;
+			mCacheAsset.emplace(mDefaultCylinderMeshGuid, cylinderMesh);
+		}
+
+		{
+			Mesh* gridMesh = new Mesh;
+			Mesh::CreateGrid(*gridMesh, 20.0f, 30.0f, 60, 40);
+			mDefaultGridMeshGuid = GUID::Get();
+			ASSERT(gridMesh->Meshes.size() == 1);
+			gridMesh->Meshes[0].mGuid = mDefaultGridMeshGuid;
+			mCacheAsset.emplace(mDefaultGridMeshGuid, gridMesh);
+		}
+
+		{
+			Mesh* quadMesh = new Mesh;
+			Mesh::CreateQuad(*quadMesh, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f);
+			mDefaultQuadMeshGuid = GUID::Get();
+			ASSERT(quadMesh->Meshes.size() == 1);
+			quadMesh->Meshes[0].mGuid = mDefaultQuadMeshGuid;
+			mCacheAsset.emplace(mDefaultQuadMeshGuid, quadMesh);
+		}
+
+		{
+			Mesh* sphereMesh = new Mesh;
+			Mesh::CreateSphere(*sphereMesh, 0.5f, 20, 20);
+			mDefaultSphereMeshGuid = GUID::Get();
+			ASSERT(sphereMesh->Meshes.size() == 1);
+			sphereMesh->Meshes[0].mGuid = mDefaultSphereMeshGuid;
+			mCacheAsset.emplace(mDefaultSphereMeshGuid, sphereMesh);
+		}
+
+		{
+			Mesh* screenQuadMesh = new Mesh;
+			Mesh::CreateQuad(*screenQuadMesh, -1.0f, 1.0f, 2.0f, 2.0f, 0.0f);
+			mDefaultScreenQuadMeshGuid = GUID::Get();
+			ASSERT(screenQuadMesh->Meshes.size() == 1);
+			screenQuadMesh->Meshes[0].mGuid = mDefaultScreenQuadMeshGuid;
+			mCacheAsset.emplace(mDefaultScreenQuadMeshGuid, screenQuadMesh);
+
 		}
 	}
 
-	void AssetManager::LoadAssertConfig()
+	Object* AssetManager::FindCache(const std::filesystem::path& resourcePath)
 	{
-		std::shared_ptr<Blob> blob = ProjectFileSystem::GetInstance()->ReadFile("Library/AssetsConfig.json");
-		ASSERT(blob != nullptr);
+		auto itF = mFilesGUID.find(resourcePath);
 
-		Json::Reader reader;
-		Json::Value root;
+		ASSERT(itF != mFilesGUID.end());
 
-		if (reader.parse((char*)blob->GetData(), (char*)blob->GetData() + blob->GetSize(), root))
+		auto itG = mCacheAsset.find(itF->second);
+
+		if (itG == mCacheAsset.end())
 		{
-			LoadJson(root["MeshAsset"], mMeshAsset);
-			LoadJson(root["TextureAsset"], mTextureAsset);
-			LoadJson(root["MaterialAsset"], mMaterialAsset);
-			LoadJson(root["PrefabAsset"], mPrefabAsset);
-			LoadJson(root["SceneAsset"], mSceneAsset);
-			LoadJson(root["SkeletonAsset"], mSkeletonAsset);
+			return nullptr;
 		}
+
+		return itG->second;
 	}
 
-	template<typename T>
-	void SaveJson(const std::string& name, const std::unordered_map<std::filesystem::path, T*>& mp, Json::Value& root)
-	{
-		for (auto it = mp.begin(); it != mp.end(); ++it)
-		{
-			root[name].append(it->first.generic_string());
-		}
-	}
-
-	void AssetManager::SaveAssertConfig()
-	{
-		Json::Value root;
-		SaveJson("MeshAsset", mMeshAsset, root);
-		SaveJson("TextureAsset", mTextureAsset, root);
-		SaveJson("MaterialAsset", mMaterialAsset, root);
-		SaveJson("PrefabAsset", mPrefabAsset, root);
-		SaveJson("SceneAsset", mSceneAsset, root);
-		SaveJson("SkeletonAsset", mSkeletonAsset, root);
-
-		Json::Value def = []() {
-			Json::Value def;
-			Json::StreamWriterBuilder::setDefaults(&def);
-			def["emitUTF8"] = true;
-			return def;
-		}();
-
-		std::ofstream stream(ProjectFileSystem::GetInstance()->GetActualPath("Library/AssetsConfig.json"));
-		Json::StreamWriterBuilder stream_builder;
-		stream_builder.settings_ = def;//Config emitUTF8
-		std::unique_ptr<Json::StreamWriter> writer(stream_builder.newStreamWriter());
-		writer->write(root, &stream);
-	}
 }

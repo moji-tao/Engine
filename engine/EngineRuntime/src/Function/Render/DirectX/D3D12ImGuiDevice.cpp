@@ -1,5 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <imgui/backends/imgui_impl_dx12.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <stb/stb_image.h>
@@ -12,8 +10,6 @@
 
 namespace Engine
 {
-	std::shared_ptr<TextureData> GetTexture(const std::filesystem::path& assetUrl, bool isSRGB);
-
 	D3D12ImGuiDevice::D3D12ImGuiDevice(WindowUI* editorUI)
 		:ImGuiDevice(editorUI)
 	{ }
@@ -97,7 +93,7 @@ namespace Engine
 
 		auto textureHeapCPUHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mSRVHeap->GetCPUDescriptorHandleForHeapStart(), mUsingHeapCount, mCBV_SRV_UAVDescriptorSize);
 
-		std::shared_ptr<TextureData> texture = GetTexture(EngineFileSystem::GetInstance()->GetActualPath(ph), false);
+		std::shared_ptr<TextureData> texture = LoadTextureForFile(EngineFileSystem::GetInstance()->GetActualPath(ph), false);
 		if (texture == nullptr)
 		{
 			return ImGuiTextureInfo();
@@ -139,8 +135,6 @@ namespace Engine
 			
 			//为UploadTexture创建资源
 			unsigned uploadPitch = texture->Info.mRowPitch;
-			//unsigned uploadPitch = texture->Info.mWidth * 4;
-			//unsigned uploadSize = uploadPitch * texture->Info.mHeight;
 			unsigned uploadSize = texture->Info.mSlicePitch;
 			D3D12_RESOURCE_DESC uploadTexDesc;
 			memset(&uploadTexDesc, 0x00, sizeof(uploadTexDesc));
@@ -256,43 +250,5 @@ namespace Engine
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-	}
-
-	std::shared_ptr<TextureData> GetTexture(const std::filesystem::path& assetUrl, bool isSRGB)
-	{
-		std::shared_ptr<TextureData> texture = std::make_shared<TextureData>();
-
-		int iw, ih, n;
-		void* oldImage = stbi_load(assetUrl.generic_string().c_str(), &iw, &ih, &n, 4);
-		if (iw % 256 != 0)
-		{
-			int new_width = (int)((float)iw / 256 + 0.5) * 256;
-			int new_height = (int)(ih * ((float)new_width / iw) + 0.5);
-			texture->mPixels = malloc(new_width * 4 * new_height);
-			stbir_resize_uint8((const unsigned char*)oldImage, iw, ih, 0, (unsigned char*)texture->mPixels, new_width, new_height, 0, 4);
-			stbi_image_free(oldImage);
-			iw = new_width;
-			ih = new_height;
-		}
-		else
-		{
-			texture->mPixels = oldImage;
-		}
-		
-		if (!texture->mPixels)
-			return nullptr;
-
-		//texture->Info.mRowPitch = (iw * 4 * sizeof(uint8_t) + 256 - 1u) & ~(256 - 1u);
-		texture->Info.mRowPitch = iw * 4 * sizeof(uint8_t);
-		texture->Info.mSlicePitch = iw * ih * 4 * sizeof(uint8_t);
-		texture->Info.mWidth = iw;
-		texture->Info.mHeight = ih;
-		texture->Info.mFormat = (isSRGB) ? PIXEL_FORMAT::PIXEL_FORMAT_R8G8B8A8_SRGB : PIXEL_FORMAT::PIXEL_FORMAT_R8G8B8A8_UNORM;
-		texture->Info.mDepth = 1;
-		texture->Info.mArrayLayers = 1;
-		texture->Info.mMipLevels = 1;
-		texture->Info.mType = IMAGE_TYPE::IMAGE_TYPE_2D;
-
-		return texture;
 	}
 }

@@ -10,20 +10,20 @@
 
 namespace Engine
 {
-	class WindowSystem : public IRuntimeModule, public ISingleton<WindowSystem>
+	class WindowSystem : public ISingleton<WindowSystem>
 	{
 	public:
 		WindowSystem() = default;
-		virtual ~WindowSystem() override;
+		virtual ~WindowSystem();
 
 		typedef void* HANDLE;
 
 	public:
-		virtual bool Initialize(InitConfig* info) override;
+		virtual bool Initialize(InitConfig* info);
 
-		virtual bool Tick(float deltaTile) override;
+		virtual bool Tick(float deltaTile);
 
-		virtual void Finalize() override;
+		virtual void Finalize();
 
 	public:
 		bool ShouldClose() const;

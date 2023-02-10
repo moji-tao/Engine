@@ -16,11 +16,25 @@ namespace Engine
 		virtual void Tick(float deltaTime) override;
 
 	public:
-		Vector3 GetPosition() const;
+		void Init(const Vector3& position, const Vector3& scale, const Quaternion& quaternion);
 
-		Vector3 GetScale() const;
+		Vector3 GetLocalPosition() const;
 
-		Quaternion GetQuaternion() const;
+		Vector3 GetGlobalPosition() const;
+
+		Vector3 GetLocalScale() const;
+
+		Vector3 GetGlobalScale() const;
+
+		Quaternion GetLocalQuaternion() const;
+
+		Quaternion GetGlobalQuaternion() const;
+
+		Vector3& GetLocalPosition();
+
+		Vector3& GetLocalScale();
+
+		Quaternion& GetLocalQuaternion();
 
 		void SetPosition(const Vector3& position);
 
@@ -28,14 +42,46 @@ namespace Engine
 
 		void SetQuaternion(const Quaternion& quaternion);
 
-		Matrix4x4 GetMatrix() const;
+		void SetGlobalTransform(Matrix4x4 mat);
+
+		Matrix4x4 GetLocalMatrix() const;
+
+		Matrix4x4 GetGlobalMatrix() const;
+
+		Matrix4x4 GetLastGlobalMatrix() const;
+
+		void GetRenderMatrix(Matrix4x4& currentMat, Matrix4x4& lastMat);
+
+	private:
+		Vector3 GetLastLocalPosition() const;
+
+		Vector3 GetLastGlobalPosition() const;
+
+		Vector3 GetLastLocalScale() const;
+
+		Vector3 GetLastGlobalScale() const;
+
+		Quaternion GetLastLocalQuaternion() const;
+
+		Quaternion GetLastGlobalQuaternion() const;
+
+		Vector3& GetLastLocalPosition();
+
+		Vector3& GetLastLocalScale();
+
+		Quaternion& GetLastLocalQuaternion();
 
 	public:
 		virtual void Serialize(SerializerDataFrame& stream) const override;
 
 		virtual bool Deserialize(SerializerDataFrame& stream) override;
 
+		virtual void CloneData(GameObject* node) override;
+
 	protected:
-		Transform mTransform;
+		Transform mTransform[2];
+
+		short mCurrentTick = 0;
+		short mLastTick = 1;
 	};
 }

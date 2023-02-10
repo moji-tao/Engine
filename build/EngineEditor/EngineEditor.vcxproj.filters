@@ -7,6 +7,9 @@
     <Filter Include="include\Application">
       <UniqueIdentifier>{CC804ED1-38E2-2BDF-C14F-72912DB0629E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Application\SubSystem">
+      <UniqueIdentifier>{8A90E4A9-F6A8-CBD3-BF55-5B6D2B2D606D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include\EditorTools">
       <UniqueIdentifier>{F002D7D8-5C64-B4E6-E5D1-FA985132EBA5}</UniqueIdentifier>
     </Filter>
@@ -25,25 +28,37 @@
     <Filter Include="src\Application">
       <UniqueIdentifier>{701253C7-DC9D-C08B-E5AE-438051B91C8C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Application\SubSystem">
+      <UniqueIdentifier>{2E7FF6E6-9A41-2A71-E3F1-B8FD4FF3024F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\EditorTools">
       <UniqueIdentifier>{9494DBCE-0020-4993-0931-CC87753BA593}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\UI">
       <UniqueIdentifier>{3A4B661C-26ED-90F2-0FA8-A446FBE81743}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\UI\ImGuiExtensions">
+      <UniqueIdentifier>{1467BE86-0061-E7D8-E9CD-7DE9D5664D45}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\UI\SubFrame">
       <UniqueIdentifier>{FE836A86-6A0F-D84A-7320-5B3FDF2A344B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\engine\EngineEditor\include\Application\AssetFIle.h">
-      <Filter>include\Application</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\EditorConfig.h">
       <Filter>include\Application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\EngineEditor.h">
       <Filter>include\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\Application\SubSystem\AssetsFileSystem.h">
+      <Filter>include\Application\SubSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\Application\SubSystem\EditorInputSystem.h">
+      <Filter>include\Application\SubSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\Application\SubSystem\EditorSceneSystem.h">
+      <Filter>include\Application\SubSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\AssetTool.h">
       <Filter>include\EditorTools</Filter>
@@ -66,6 +81,9 @@
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIInspectorPass.h">
       <Filter>include\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIMessage.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIPassBase.h">
       <Filter>include\UI</Filter>
     </ClInclude>
@@ -74,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIScenePass.h">
       <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\ImGuizmo.h">
+      <Filter>include\UI\ImGuiExtensions</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\ImGuiExtensions\fa_solid_900.h">
       <Filter>include\UI\ImGuiExtensions</Filter>
@@ -92,11 +113,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\engine\EngineEditor\src\Application\AssetFile.cpp">
-      <Filter>src\Application</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\Application\EngineEditor.cpp">
       <Filter>src\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\Application\SubSystem\AssetsFileSystem.cpp">
+      <Filter>src\Application\SubSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\Application\SubSystem\EditorInputSystem.cpp">
+      <Filter>src\Application\SubSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\Application\SubSystem\EditorSceneSystem.cpp">
+      <Filter>src\Application\SubSystem</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\AssetTool.cpp">
       <Filter>src\EditorTools</Filter>
@@ -116,6 +143,9 @@
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIInspectorPass.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIMessage.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIPassBase.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
@@ -124,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIScenePass.cpp">
       <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\ImGuiExtensions\ImGuizmo.cpp">
+      <Filter>src\UI\ImGuiExtensions</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\SubFrame\EditorRightMenu.cpp">
       <Filter>src\UI\SubFrame</Filter>

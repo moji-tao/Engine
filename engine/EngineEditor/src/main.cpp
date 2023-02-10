@@ -35,18 +35,16 @@ int main(int argc, char** argv)
 	{
 		Editor::EditorConfig config = Initialize(argc, argv);
 		
-		Editor::EngineEditor editor;
+		Editor::EngineEditor::GetInstance()->Initialize(&config);
 
-		editor.Initialize(&config);
+		Editor::EngineEditor::GetInstance()->Run();
 
-		editor.Run();
-
-		editor.Finalize();
+		Editor::EngineEditor::GetInstance()->Finalize();
 	}
 	catch (std::string& e)
 	{
 		std::cout << e << std::endl;
-	} 
-
+	}
+	
 	return 0;
 }

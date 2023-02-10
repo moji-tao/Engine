@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui/imgui.h>
 #include "EngineEditor/include/UI/EditorUIPassBase.h"
+#include "EngineRuntime/include/Function/Render/RenderResource.h"
 
 namespace Editor
 {
@@ -11,7 +12,7 @@ namespace Editor
 
 		virtual ~EditorUIScenePass() override;
 
-		virtual void Initialize(Engine::ImGuiDevice* device, EngineEditor* editor) override;
+		virtual void Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor) override;
 
 	public:
 		virtual void ShowUI() override;
@@ -22,5 +23,14 @@ namespace Editor
 		ImTextureID mSceneRender;
 
 		Engine::ImGuiTextureInfo mIconFileTexture;
+
+		EditorInputSystem* inputSystem = nullptr;
+
+	private:
+		Engine::Matrix4x4 mActorMat;
+
+		const Engine::CameraPassConstants* mEditorConstants = nullptr;
+
+		Engine::Actor* mSelectActor = nullptr;
 	};
 }

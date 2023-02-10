@@ -1,7 +1,4 @@
 #include "EngineRuntime/include/Core/Math/Math.h"
-#include "EngineRuntime/include/Core/Math/Angle.h"
-#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
-#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
 
@@ -96,9 +93,16 @@ namespace Engine
 		return std::sin(rad.ValueRadians());
 	}
 
+	/*
 	float Math::Sin(float value)
 	{
 		return std::sin(value);
+	}
+	*/
+
+	float Math::Sin(const Degree& deg)
+	{
+		return std::sin(DegreesToRadians(deg.ValueDegrees()));
 	}
 
 	float Math::Cos(const Radian& rad)
@@ -106,9 +110,16 @@ namespace Engine
 		return std::cos(rad.ValueRadians());
 	}
 
+	/*
 	float Math::Cos(float value)
 	{
 		return std::cos(value);
+	}
+	*/
+
+	float Math::Cos(const Degree& deg)
+	{
+		return std::cos(DegreesToRadians(deg.ValueDegrees()));
 	}
 
 	float Math::Tan(const Radian& rad)
@@ -116,9 +127,16 @@ namespace Engine
 		return std::tan(rad.ValueRadians());
 	}
 
+	/*
 	float Math::Tan(float value)
 	{
 		return std::tan(value);
+	}
+	*/
+
+	float Math::Tan(const Degree& deg)
+	{
+		return std::tan(DegreesToRadians(deg.ValueDegrees()));
 	}
 
 	Radian Math::Acos(float value)
@@ -157,6 +175,7 @@ namespace Engine
 		return Radian(std::atan2(y_v, x_v));
 	}
 
+	/*
 	Matrix4x4 Math::MakeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix)
 	{
 		Matrix4x4 viewMatrix;
@@ -193,73 +212,37 @@ namespace Engine
 
 		return viewMatrix;
 	}
-
+	*/
+	/*
 	Matrix4x4 Math::MakeLookAtMatrix(const Vector3& eye_position, const Vector3& target_position, const Vector3& up_dir)
 	{
-		/*
-		const Vector3& up = up_dir.GetNormalised();
-
-		Vector3 w = (target_position - eye_position).GetNormalised();
-		Vector3 s = w.CrossProduct(up).GetNormalised();
-		Vector3 u = s.CrossProduct(w);
-
-		Matrix4x4 view_mat = Matrix4x4::IDENTITY;
-
-		view_mat[0][0] = s[0];
-		view_mat[0][1] = s[1];
-		view_mat[0][2] = s[2];
-		view_mat[0][3] = -s.DotProduct(eye_position);
-		view_mat[1][0] = u[0];
-		view_mat[1][1] = u[1];
-		view_mat[1][2] = u[2];
-		view_mat[1][3] = -u.DotProduct(eye_position);
-		view_mat[2][0] = w[0];
-		view_mat[2][1] = w[1];
-		view_mat[2][2] = w[2];
-		view_mat[2][3] = w.DotProduct(eye_position);
-		return view_mat;
-		*/
-
 		Vector3 w = (target_position - eye_position).GetNormalised();
 		Vector3 u = up_dir.CrossProduct(w).GetNormalised();
-		//Vector3 u = w.CrossProduct(up_dir).GetNormalised();
 		Vector3 v = w.CrossProduct(u);
-		//Vector3 v = u.CrossProduct(w);
 
 		Matrix4x4 view_mat = Matrix4x4::IDENTITY;
 
 		view_mat[0][0] = u[0];
 		view_mat[0][1] = u[1];
 		view_mat[0][2] = u[2];
-		view_mat[0][3] = -eye_position.DotProduct(u);
+		view_mat[0][3] = eye_position.DotProduct(u);
 
 		view_mat[1][0] = v[0];
 		view_mat[1][1] = v[1];
 		view_mat[1][2] = v[2];
 		view_mat[1][3] = -eye_position.DotProduct(v);
-
+			
 		view_mat[2][0] = w[0];
 		view_mat[2][1] = w[1];
 		view_mat[2][2] = w[2];
 		view_mat[2][3] = -eye_position.DotProduct(w);
-
 		return view_mat;
-
 	}
-
+	*/
+	/*
 	Matrix4x4 Math::MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar)
 	{
-		/*
-		float tan_half_fovy = Math::Tan(0.5f * fovy);
-
-		Matrix4x4 ret = Matrix4x4::ZERO;
-		ret[0][0] = 1.f / (aspect * tan_half_fovy);
-		ret[1][1] = 1.f / tan_half_fovy;
-		ret[2][2] = -zfar / (znear - zfar);
-		ret[3][2] = -1.f;
-		ret[2][3] = -(zfar * znear) / (zfar - znear);
-		*/
-
+		
 		Matrix4x4 ret = Matrix4x4::ZERO;
 		float tan_half_fovy = Math::Tan(0.5f * fovy);
 		ret[0][0] = 1.0f / (aspect * tan_half_fovy);
@@ -270,6 +253,7 @@ namespace Engine
 
 		return ret;
 	}
+	*/
 
 	Matrix4x4 Math::MakeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar)
 	{
@@ -309,6 +293,168 @@ namespace Engine
 		proj_matrix[3][3] = 1;
 
 		return proj_matrix;
+	}
+
+	Matrix3x3 Math::CreateRotationY(Radian radian)
+	{
+		Matrix3x3 mat(Matrix3x3::IDENTITY);
+
+		mat[0][0] = Cos(radian);
+		mat[0][2] = -Sin(radian);
+		mat[2][0] = Sin(radian);
+		mat[2][2] = Cos(radian);
+
+		return mat;
+	}
+
+	Matrix4x4 Math::MakeLookAtMatrix(const Vector3& eyeposition, const Vector3& target, const Vector3& up)
+	{
+		/*
+		Vector3 Look = target - eyeposition;
+		Look.Normalize();
+		Vector3 Right = Look.CrossProduct(up);
+		Vector3 Up = Look.CrossProduct(Right);
+		Up.Normalize();
+		Right = Up.CrossProduct(Look);
+
+		// Fill in the view matrix entries.
+		float x = -eyeposition.DotProduct(Right);
+		float y = -eyeposition.DotProduct(Up);
+		float z = -eyeposition.DotProduct(Look);
+
+		Matrix4x4 View;
+
+		View[0][0] = Right.x;
+		View[1][0] = Right.y;
+		View[2][0] = Right.z;
+		View[3][0] = x;
+
+		View[0][1] = Up.x;
+		View[1][1] = Up.y;
+		View[2][1] = Up.z;
+		View[3][1] = y;
+
+		View[0][2] = Look.x;
+		View[1][2] = Look.y;
+		View[2][2] = Look.z;
+		View[3][2] = z;
+
+		View[0][3] = 0.0f;
+		View[1][3] = 0.0f;
+		View[2][3] = 0.0f;
+		View[3][3] = 1.0f;
+
+		return View;
+		*/
+		Vector3 R2 = target - eyeposition;
+		R2.Normalize();
+		Vector3 R0 = up.CrossProduct(R2);
+		R0.Normalize();
+		Vector3 R1 = R2.CrossProduct(R0);
+
+		Vector3 negEyePosition = -eyeposition;
+
+		// Fill in the view matrix entries.
+		float d0 = R0.DotProduct(negEyePosition);
+		float d1 = R1.DotProduct(negEyePosition);
+		float d2 = R2.DotProduct(negEyePosition);
+
+		Matrix4x4 View;
+
+		View[0][0] = R0.x;
+		View[1][0] = R0.y;
+		View[2][0] = R0.z;
+		View[3][0] = d0;
+
+		View[0][1] = R1.x;
+		View[1][1] = R1.y;
+		View[2][1] = R1.z;
+		View[3][1] = d1;
+
+		View[0][2] = R2.x;
+		View[1][2] = R2.y;
+		View[2][2] = R2.z;
+		View[3][2] = d2;
+
+		View[0][3] = 0.0f;
+		View[1][3] = 0.0f;
+		View[2][3] = 0.0f;
+		View[3][3] = 1.0f;
+
+		return View;
+	}
+
+	Matrix4x4 Math::MakeLookAtMatrix(const Vector3& position, const Vector3& right, const Vector3& up, const Vector3& forward)
+	{
+		Matrix4x4 View;
+		Vector3 Look = forward;
+		Vector3 Right = right;
+		Vector3 Up = up;
+
+		// Keep camera's axes orthogonal to each other and of unit length.
+		Look.Normalize();
+		Up = Look.CrossProduct(Right);
+		Up.Normalize();
+		
+		// Up, Look already ortho-normal, so no need to normalize cross product.
+		Right = Up.CrossProduct(Look);
+
+		// Fill in the view matrix entries.
+		float x = -position.DotProduct(Right);
+		float y = -position.DotProduct(Up);
+		float z = -position.DotProduct(Look);
+
+		View[0][0] = Right.x;
+		View[1][0] = Right.y;
+		View[2][0] = Right.z;
+		View[3][0] = x;
+
+		View[0][1] = Up.x;
+		View[1][1] = Up.y;
+		View[2][1] = Up.z;
+		View[3][1] = y;
+
+		View[0][2] = Look.x;
+		View[1][2] = Look.y;
+		View[2][2] = Look.z;
+		View[3][2] = z;
+
+		View[0][3] = 0.0f;
+		View[1][3] = 0.0f;
+		View[2][3] = 0.0f;
+		View[3][3] = 1.0f;
+
+		return View;
+	}
+
+	Matrix4x4 Math::MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar)
+	{
+		float Height = Cos(fovy / 2) / Sin(fovy / 2);
+		float Width = Height / aspect;
+		float fRange = zfar / (zfar - znear);
+
+		Matrix4x4 M;
+		M[0][0] = Width;
+		M[0][1] = 0.0f;
+		M[0][2] = 0.0f;
+		M[0][3] = 0.0f;
+
+		M[1][0] = 0.0f;
+		M[1][1] = Height;
+		M[1][2] = 0.0f;
+		M[1][3] = 0.0f;
+
+		M[2][0] = 0.0f;
+		M[2][1] = 0.0f;
+		M[2][2] = fRange;
+		M[2][3] = 1.0f;
+
+		M[3][0] = 0.0f;
+		M[3][1] = 0.0f;
+		M[3][2] = -fRange * znear;
+		M[3][3] = 0.0f;
+
+		return M;
 	}
 }
 

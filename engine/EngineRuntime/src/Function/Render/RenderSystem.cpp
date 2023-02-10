@@ -13,6 +13,10 @@ namespace Engine
 
 	bool RenderSystem::Initialize(InitConfig* info)
 	{
+		mEnableTAA = true;
+
+		mRenderCamera = std::make_unique<RenderCamera>();
+
 		mRHI = std::make_unique<D3D12RHI>(WindowSystem::GetInstance());
 
 		mRHI->ResizeViewport(WindowSystem::GetInstance()->GetWindowWidth(), WindowSystem::GetInstance()->GetWindowHeight());
@@ -26,25 +30,42 @@ namespace Engine
 				this->mRHI->ResizeViewport(NewWidth, NewHeight);
 			});
 
-		mRHI->InitializeRenderPipeline(mRenderPipeline);
+		mRHI->InitializeRenderPipeline(mRenderPipeline, mRenderResource);
 
 		return true;
 	}
 
-	bool RenderSystem::Tick(float deltaTile)
+	bool RenderSystem::Tick(float deltaTile, bool isEditorMode)
 	{
-		mRenderPipeline->DeferredRender();
+		if (isEditorMode)
+		{
+			mRenderResource->PerFrameBuffer(mEditorRenderCamera, deltaTile);
+		}
+		else
+		{
+			mRenderResource->PerFrameBuffer(mRenderCamera.get(), deltaTile);
+		}
+
+		//mRenderPipeline->UploadResource();
+
+		mRenderPipeline->Render();
+
+		mRenderResource->EndFrameBuffer();
+
+		++mFrameCount;
 
 		return true;
 	}
 
 	void RenderSystem::Finalize()
 	{
-		mRenderPipeline.reset();
+		mRenderResource.release();
 
-		mImGuiDevice.reset();
+		mRenderPipeline.release();
 
-		mRHI.reset();
+		mImGuiDevice.release();
+
+		mRHI.release();
 	}
 
 	ImGuiDevice* RenderSystem::InitializeUIRenderBackend(WindowUI* windowUI)
@@ -58,6 +79,11 @@ namespace Engine
 		mRHI->ResetCommandList();
 
 		return mImGuiDevice.get();
+	}
+
+	RenderResource* RenderSystem::GetRenderResource()
+	{
+		return mRenderResource.get();
 	}
 
 	void RenderSystem::InitializeUIRenderBackendEnd()
@@ -76,6 +102,26 @@ namespace Engine
 	{
 		ASSERT(mRenderPipeline != nullptr);
 
-		mRenderPipeline->RenderTargetResize(width, height);
+		mRenderView.x = width;
+		mRenderView.y = height;
+
+		mRenderCamera->SetRenderSize(width, height);
+
+		mRenderPipeline->OnResize(width, height);
+	}
+
+	void RenderSystem::SetEditorRenderCamera(const RenderCamera& camera)
+	{
+		mEditorRenderCamera = &camera;
+	}
+
+	Vector2 RenderSystem::GetRenderViewSize()
+	{
+		return mRenderView;
+	}
+
+	RenderCamera* RenderSystem::GetRenderCamera()
+	{
+		return mRenderCamera.get();
 	}
 }

@@ -1,0 +1,75 @@
+{
+	"OutPathRoot": "../../../bin/Shaders/",
+	"DefaultDebug" : true,
+	"ShaderInfo": [{
+			"ShaderName": "BasePass",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "BasePass",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "BasePassSky",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "BasePassSky",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "DeferredLighting",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "DeferredLighting",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "IBLEnvironment",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "IBLEnvironment",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "PostProcess",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "PostProcess",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "TAA",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "TAA",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "Z-PrePass",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "Z-PrePass",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		}
+	]
+}

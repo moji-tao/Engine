@@ -198,6 +198,9 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Serializer.h">
       <Filter>include\Core\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Random\GUID.h">
+      <Filter>include\Core\Random</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Random\Random.h">
       <Filter>include\Core\Random</Filter>
     </ClInclude>
@@ -216,6 +219,12 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\Component.h">
       <Filter>include\Function\Framework\Component</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\DirectionalLightComponent.h">
+      <Filter>include\Function\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\LightComponent.h">
+      <Filter>include\Function\Framework\Component</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\MeshRendererComponent.h">
       <Filter>include\Function\Framework\Component</Filter>
     </ClInclude>
@@ -228,6 +237,9 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\Actor.h">
       <Filter>include\Function\Framework\Object</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\GameObject.h">
+      <Filter>include\Function\Framework\Object</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\World\WorldManager.h">
       <Filter>include\Function\Framework\World</Filter>
     </ClInclude>
@@ -235,6 +247,9 @@
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12CommandContext.h">
+      <Filter>include\Function\Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12DeferredRenderPipeline.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12DescriptorCache.h">
@@ -261,7 +276,7 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RHI.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RenderPipeline.h">
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RenderResource.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Resource.h">
@@ -288,6 +303,9 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderTarget.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\SceneCaptureCube.h">
+      <Filter>include\Function\Render\DirectX</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\d3dx12.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
@@ -303,19 +321,16 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderCamera.h">
       <Filter>include\Function\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPass.h">
-      <Filter>include\Function\Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPipeline.h">
       <Filter>include\Function\Render</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResource.h">
       <Filter>include\Function\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResourceBase.h">
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderSystem.h">
       <Filter>include\Function\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderSystem.h">
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\TAASampler.h">
       <Filter>include\Function\Render</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Window\WindowSystem.h">
@@ -345,8 +360,14 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\SkeletonData.h">
       <Filter>include\Resource\ResourceType\Data</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\TextData.h">
+      <Filter>include\Resource\ResourceType\Data</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\TextureData.h">
       <Filter>include\Resource\ResourceType\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\renderdoc_app.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +378,9 @@
       <Filter>src\Core\Log</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Angle.cpp">
+      <Filter>src\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Color.cpp">
       <Filter>src\Core\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Math.cpp">
@@ -392,6 +416,9 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Serializer.cpp">
       <Filter>src\Core\Meta</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Random\GUID.cpp">
+      <Filter>src\Core\Random</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Random\Random.cpp">
       <Filter>src\Core\Random</Filter>
     </ClCompile>
@@ -399,6 +426,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\Component.cpp">
+      <Filter>src\Function\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\DirectionalLightComponent.cpp">
+      <Filter>src\Function\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\LightComponent.cpp">
       <Filter>src\Function\Framework\Component</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\MeshRendererComponent.cpp">
@@ -413,6 +446,9 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\Actor.cpp">
       <Filter>src\Function\Framework\Object</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\GameObject.cpp">
+      <Filter>src\Function\Framework\Object</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\World\WorldManager.cpp">
       <Filter>src\Function\Framework\World</Filter>
     </ClCompile>
@@ -420,6 +456,9 @@
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12CommandContext.cpp">
+      <Filter>src\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12DeferredRenderPipeline.cpp">
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12DescriptorCache.cpp">
@@ -446,7 +485,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RHI.cpp">
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RenderPipeline.cpp">
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RenderResource.cpp">
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Resource.cpp">
@@ -468,6 +507,9 @@
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\RenderTarget.cpp">
+      <Filter>src\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\SceneCaptureCube.cpp">
       <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\ImGuiDevice.cpp">
@@ -504,6 +546,12 @@
       <Filter>src\Resource\ResourceType\Data</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\MeshData.cpp">
+      <Filter>src\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\SkeletonData.cpp">
+      <Filter>src\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextData.cpp">
       <Filter>src\Resource\ResourceType\Data</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextureData.cpp">

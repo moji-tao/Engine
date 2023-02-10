@@ -2,6 +2,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+
+#include "EngineRuntime/include/Core/Meta/Serializer.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 
 namespace Engine
@@ -30,8 +32,8 @@ namespace Engine
 		Level* GetCurrentActiveLevel() const;
 
 	public:
-		Level* SpanEmptyScene(const std::string& sceneName);
-
+		SerializerDataFrame SpanEmptyScene(const std::string& sceneName);
+		
 	private:
 		bool LoadWorld(const std::string& worldUrl);
 

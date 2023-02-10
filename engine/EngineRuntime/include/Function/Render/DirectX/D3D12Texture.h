@@ -12,6 +12,8 @@ namespace Engine
 	class D3D12Texture
 	{
 	public:
+		static DXGI_FORMAT TransformationToD3DFormat(PIXEL_FORMAT format);
+
 		D3D12Resource* GetResource();
 
 		ID3D12Resource* GetD3DResource();
@@ -73,16 +75,6 @@ namespace Engine
 		DXGI_FORMAT RTVFormat = DXGI_FORMAT_UNKNOWN;
 		DXGI_FORMAT DSVFormat = DXGI_FORMAT_UNKNOWN;
 		DXGI_FORMAT UAVFormat = DXGI_FORMAT_UNKNOWN;
-	};
-
-	class D3D12TextureResource : public TextureData
-	{
-	public:
-		void CreateTexture(D3D12RHI* rhi);
-
-		DXGI_FORMAT TransformationToD3DFormat(PIXEL_FORMAT format);
-
-		D3D12TextureRef D3DTexture;
 	};
 
 	enum TextureCreateFlags

@@ -19,11 +19,40 @@ namespace Engine
 		mPosition = s * (-viewMatrix[0][3]) + u * (-viewMatrix[1][3]) + f * viewMatrix[2][3];
 	}
 
-	void RenderCamera::Move(const Vector3& delta)
+	void RenderCamera::MoveForward(float dist)
 	{
-		mPosition += delta;
+		mPosition += mForward * dist;
 	}
 
+	void RenderCamera::MoveUp(float dist)
+	{
+		mPosition += mUp * dist;
+	}
+
+	void RenderCamera::MoveRight(float dist)
+	{
+		mPosition += mRight * dist;
+	}
+
+	void RenderCamera::Pitch(Degree degrees)
+	{
+		Matrix3x3 v;
+		v.FromAngleAxis(mRight, Radian(degrees));
+
+		mUp = mUp * v;
+		mForward = mForward * v;
+	}
+
+	void RenderCamera::Yaw(Degree degrees)
+	{
+		Matrix3x3 v = Math::CreateRotationY(Radian(degrees));
+
+		mUp = mUp * v;
+		mForward = mForward * v;
+		mRight = mRight * v;
+	}
+
+	/*
 	void RenderCamera::Rotate(Vector2 delta)
 	{
 		delta = Vector2(Radian(Degree(delta[0])).ValueRadians(), Radian(Degree(delta[1])).ValueRadians());
@@ -35,12 +64,13 @@ namespace Engine
 
 		Quaternion pitch, yaw;
 		pitch.SetDataFromAngleAxis(Radian(delta[0]), Vector3::UNIT_X);
-		yaw.SetDataFromAngleAxis(Radian(delta[0]), Vector3::UNIT_Z);
+		yaw.SetDataFromAngleAxis(Radian(delta[1]), Vector3::UNIT_Z);
 
 		mRotation = pitch * mRotation * yaw;
 
 		mInvRotation = mRotation.Conjugate();
 	}
+	*/
 
 	void RenderCamera::Zoom(float offset)
 	{
@@ -49,6 +79,7 @@ namespace Engine
 
 	void RenderCamera::LookAt(const Vector3& position, const Vector3& target, const Vector3& up)
 	{
+		/*
 		mPosition = position;
 
 		Vector3 forward = (target - position).GetNormalised();
@@ -62,12 +93,28 @@ namespace Engine
 		mRotation = Quaternion(upRotation) * mRotation;
 
 		mInvRotation = mRotation.Conjugate();
+		*/
+
+		mPosition = position;
+		mForward = (position - target);
+		mForward.Normalize();
+		mRight = up.CrossProduct(mForward);
+		mRight.Normalize();
+		mUp = mForward.CrossProduct(mRight);
+		mUp.Normalize();
+	}
+
+	void RenderCamera::SetRenderSize(int width, int height)
+	{
+		mRenderWidth = width;
+		mRenderHeight = height;
+		SetAspect((float)width / height);
 	}
 
 	void RenderCamera::SetAspect(float aspect)
 	{
 		mAspect = aspect;
-		mFOVy = Radian(Math::Atan(Math::Tan(Radian(Degree(mFOVx) * 0.5f)) / mAspect) * 2.0f).ValueDegrees();
+		mFOVy = Degree(Math::Atan(Math::Tan(Radian(Degree(mFOVx) * 0.5f)) / mAspect) * 2.0f).ValueDegrees();
 	}
 
 	void RenderCamera::SetFOVx(float fovx)
@@ -75,29 +122,36 @@ namespace Engine
 		mFOVx = fovx;
 	}
 
+	Vector2 RenderCamera::GetRenderSize() const
+	{
+		return Vector2(mRenderWidth, mRenderHeight);
+	}
+
 	Vector3 RenderCamera::GetPosition() const
 	{
 		return mPosition;
 	}
 
+	/*
 	Quaternion RenderCamera::GetRotation() const
 	{
 		return mRotation;
 	}
+	*/
 
 	Vector3 RenderCamera::Forward() const
 	{
-		return mInvRotation * Vector3::UNIT_Y;
+		return mForward;
 	}
 
 	Vector3 RenderCamera::Up() const
 	{
-		return mInvRotation * Vector3::UNIT_Z;
+		return mUp;
 	}
 
 	Vector3 RenderCamera::Right() const
 	{
-		return mInvRotation * Vector3::UNIT_X;
+		return mRight;
 	}
 
 	Vector2 RenderCamera::GetFOV() const
@@ -105,13 +159,14 @@ namespace Engine
 		return Vector2(mFOVx, mFOVy);
 	}
 
-	Matrix4x4 RenderCamera::GetViewMatrix()
+	Matrix4x4 RenderCamera::GetViewMatrix() const
 	{
 		Matrix4x4 viewMatrix = Matrix4x4::IDENTITY;
 		switch (mCurrentCameraType)
 		{
 		case RenderCameraType::Editor:
 			viewMatrix = Math::MakeLookAtMatrix(mPosition, mPosition + Forward(), Up());
+			//viewMatrix = Math::MakeLookAtMatrix(mPosition, mRight, mUp, mForward);
 			break;
 		case RenderCameraType::Motor:
 			viewMatrix = mViewMatrices[MAIN_VIEW_MATRIX_INDEX];
@@ -129,11 +184,13 @@ namespace Engine
 
 	Matrix4x4 RenderCamera::GetLookAtMatrix() const
 	{
-		return Math::MakeLookAtMatrix(mPosition, mPosition + Forward(), Up());
+		//return Math::MakeLookAtMatrix(mPosition, mPosition + Forward(), Up());
+		return Math::MakeLookAtMatrix(mPosition, mRight, mUp, mForward);
 	}
 
 	float RenderCamera::GetFOVyDeprecated() const
 	{
 		return mFOVy;
 	}
+
 }

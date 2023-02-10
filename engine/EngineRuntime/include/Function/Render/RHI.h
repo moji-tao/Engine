@@ -3,6 +3,7 @@
 #include "EngineRuntime/include/Function/Render/RenderPipeline.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
 #include "EngineRuntime/include/Function/Render/ImGuiDevice.h"
+#include "EngineRuntime/include/Function/Render/RenderResource.h"
 
 namespace Engine
 {
@@ -14,7 +15,7 @@ namespace Engine
 		virtual ~RHI() = default;
 
 	public:
-		virtual void InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline) = 0;
+		virtual void InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline, std::unique_ptr<RenderResource>& renderResource) = 0;
 
 		virtual void InitEditorUI(std::unique_ptr<ImGuiDevice>& editorUI, WindowUI* windowUI) = 0;
 

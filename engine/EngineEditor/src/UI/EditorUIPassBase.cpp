@@ -7,10 +7,11 @@ namespace Editor
 	EditorUIPassBase::EditorUIPassBase()
 	{ }
 
-	void EditorUIPassBase::Initialize(Engine::ImGuiDevice* device, EngineEditor* editor)
+	void EditorUIPassBase::Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor)
 	{
 		mDevice = device;
 		mEditor = editor;
+		mMessageBox = messageBox;
 	}
 }
 

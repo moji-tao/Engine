@@ -35,6 +35,7 @@ project "EngineEditor"
         "%{IncludeDir.assimp}",
         "%{IncludeDir.Boost}",
         "%{IncludeDir.jsoncpp}",
+        "%{IncludeDir.yamlcpp}",
         "%{IncludeDir.spdlog}",
         g_WorkSpaceRootFolder .. "engine/"
     }
@@ -46,13 +47,13 @@ project "EngineEditor"
 
     prebuildcommands
 	{
-		("{COPY} " .. g_WorkSpaceRootFolder .. "engine/3rd/assimp/lib/assimp-mt.lib " .. g_WorkSpaceRootFolder .. "lib/")
+		("{COPYFILE} " .. g_WorkSpaceRootFolder .. "engine/3rd/assimp/lib/assimp-mt.lib " .. g_WorkSpaceRootFolder .. "lib/")
 	}
 
 	postbuildcommands
 	{
-        ("{COPY} " .. g_WorkSpaceRootFolder .. "engine/bin/ " .. g_WorkSpaceRootFolder .. "./bin"),
-		("{COPY} " .. g_WorkSpaceRootFolder .. "engine/3rd/assimp/bin/assimp-mt.dll " .. g_WorkSpaceRootFolder .. "bin/")
+        ("{COPYDIR} " .. g_WorkSpaceRootFolder .. "engine/bin/ " .. g_WorkSpaceRootFolder .. "./bin"),
+		("{COPYFILE} " .. g_WorkSpaceRootFolder .. "engine/3rd/assimp/bin/assimp-mt.dll " .. g_WorkSpaceRootFolder .. "bin/")
 	}
 
     debugdir "$(SolutionDir)bin/"

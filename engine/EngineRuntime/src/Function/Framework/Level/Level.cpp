@@ -1,5 +1,8 @@
+#include <fstream>
+#include <yaml-cpp/yaml.h>
 #include "EngineRuntime/include/Function/Framework/Level/Level.h"
 #include "EngineRuntime/include/Core/Meta/Reflection.h"
+#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
 namespace Engine
 {
@@ -39,8 +42,18 @@ namespace Engine
 	void Level::Unload()
 	{
 	}
+
 	bool Level::Save()
 	{
+		auto pathses = AssetManager::GetInstance()->GetAssetPathFormAssetGuid(mGuid);
+		LOG_INFO("保存关卡 guid:{0} 路径:{1}", mGuid.Data(), pathses.generic_string().c_str());
+
+		SerializerDataFrame frame;
+
+		frame << *this;
+
+		frame.Save(pathses);
+
 		return false;
 	}
 
@@ -53,6 +66,23 @@ namespace Engine
 	{
 		mRootGameObject.push_back(actor);
 		actor->SetParent(nullptr);
+	}
+
+	void Level::RemoveActor(Actor* actor)
+	{
+		std::erase(mRootGameObject, actor);
+	}
+
+	Actor* Level::CreateEmptyActor(const std::string& actorName)
+	{
+		Actor* actor = new Actor();
+		actor->SetActorName(actorName);
+
+		mRootGameObject.emplace_back(actor);
+
+		actor->AddComponent<TransformComponent>();
+
+		return actor;
 	}
 
 	std::list<Actor*>& Level::GetSceneActors()
@@ -95,5 +125,30 @@ namespace Engine
 			mRootGameObject.push_back(actor);
 		}
 		return true;
+	}
+
+	void SceneMeta::Load(const std::filesystem::path& metaPath)
+	{
+		YAML::Node node = YAML::LoadFile(ProjectFileSystem::GetInstance()->GetActualPath(metaPath).generic_string());
+
+		ASSERT(node["guid"].IsDefined());
+
+		if (mGuid != nullptr)
+		{
+			delete mGuid;
+		}
+
+		mGuid = new GUID(node["guid"].as<std::string>());
+	}
+
+	void SceneMeta::Save(const std::filesystem::path& metaPath)
+	{
+		ASSERT(mGuid != nullptr);
+
+		YAML::Node node;
+		node["guid"] = mGuid->Data();
+
+		std::ofstream fout(ProjectFileSystem::GetInstance()->GetActualPath(metaPath));
+		fout << node;
 	}
 }

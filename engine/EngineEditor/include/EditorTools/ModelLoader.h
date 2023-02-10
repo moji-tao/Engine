@@ -4,6 +4,7 @@
 #include "EngineEditor/include/EditorTools/AssetTool.h"
 #include "EngineRuntime/include/Resource/ResourceType/Data/MeshData.h"
 #include "EngineRuntime/include/Function/Framework/Object/Actor.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/MaterialData.h"
 
 namespace Editor
 {
@@ -20,8 +21,8 @@ namespace Editor
 	private:
 		void LoadMesh(const aiScene* scene, Engine::Mesh& mesh);
 
-		void LoadMaterial(const aiScene* scene);
+		void LoadMaterial(const aiScene* scene, std::vector<Engine::MaterialData>& materials, const std::filesystem::path& outDir, AssetFile* folder);
 
-		void LoadActor(aiNode* node, Engine::Actor* actorNode);
+		void LoadActor(aiNode* node, Engine::Actor* actorNode, const Engine::Mesh& mesh, std::vector<Engine::MaterialData>& materials);
 	};
 }

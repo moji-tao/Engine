@@ -1,10 +1,10 @@
 .vs/
 .git/
 FodyWeavers.xsd
-/bin-int
-/bin
-/lib
-/build
+/bin-int/*
+/bin/*
+/lib/*
+/build/*
 /bin/*.dll
 /bin/*.exe
 /bin/*.pdb

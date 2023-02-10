@@ -14,9 +14,9 @@ namespace Editor
 		
 	}
 
-	void EditorUIConsolePass::Initialize(Engine::ImGuiDevice* device, EngineEditor* editor)
+	void EditorUIConsolePass::Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor)
 	{
-		EditorUIPassBase::Initialize(device, editor);
+		EditorUIPassBase::Initialize(messageBox, device, editor);
 		mOldcout = std::cout.rdbuf(fo.rdbuf());
 	}
 

@@ -5,8 +5,8 @@
         <Item Name="粘贴" Enable="true" Method="Ref_PasteGameObject"/>
         <Item Name="粘贴为子对象" Enable="true" Method="Ref_PasteGameObjectForChild"/>
         <Separator/>
-        <Item Name="重命名" Enable="$mIsHoveredGameObject" Method="Ref_GameObjectReName"/>
-        <Item Name="删除" Enable="$mIsHoveredGameObject" Method="Ref_GameObjectDelete"/>
+        <Item Name="重命名" Enable="$mIsSelectedNode" Method="Ref_GameObjectReName"/>
+        <Item Name="删除" Enable="$mIsSelectedNodeNum" Method="Ref_GameObjectDelete"/>
         <Separator/>
         <Item Name="创建空对象" Enable="true" Method="Ref_CreateEmptyGameObject"/>
         <SubMenu Name="3D对象" Enable="true">

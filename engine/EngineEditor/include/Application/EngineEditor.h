@@ -1,10 +1,13 @@
 #pragma once
 #include "EngineEditor/include/Application/EditorConfig.h"
+#include "EngineEditor/include/Application/SubSystem/AssetsFileSystem.h"
+#include "EngineEditor/include/Application/SubSystem/EditorInputSystem.h"
+#include "EngineEditor/include/Application/SubSystem/EditorSceneSystem.h"
 #include "EngineEditor/include/UI/EditorUI.h"
 
 namespace Editor
 {
-	class EngineEditor
+	class EngineEditor : public Engine::ISingleton<EngineEditor>
 	{
 	public:
 		EngineEditor() = default;
@@ -18,17 +21,17 @@ namespace Editor
 
 		void Run();
 
+		AssetsFileSystem* GetFileSystem();
+
+		EditorInputSystem* GetInputSystem();
+
+		Engine::RenderCamera* GetEditorCamera();
+
 		bool OpenFileSelector(std::filesystem::path& filePath) const;
 
 		void OpenExplorer(const std::filesystem::path& folderPath) const;
 
-		void DeleteFileOrFolder(const std::filesystem::path& filePath) const;
-
-		void RenameFileOrFolder(const std::filesystem::path& oldPath, const std::filesystem::path& newPath);
-
-		void CreateLuaScript(const std::filesystem::path& scriptPath);
-
-	private:
+		bool mIsEditorMode = true;
 
 	private:
 		static void FilesDrop(int fileCount, const char** filePath);
@@ -39,9 +42,19 @@ namespace Editor
 		std::filesystem::path mEnginePath;
 		std::filesystem::path mWorkSpacePath;
 
-		std::shared_ptr<EditorUI> mEditorUI;
+		EditorUI* mEditorUI;
 
 	public:
 		EditorConfig Config;
+
+	private:
+		AssetsFileSystem* mAssetsFileSystem = nullptr;
+
+		EditorSceneSystem* mEditorSceneSystem = nullptr;
+
+		EditorInputSystem* mEditorInputSystem = nullptr;
+
+	private:
+		
 	};
 }

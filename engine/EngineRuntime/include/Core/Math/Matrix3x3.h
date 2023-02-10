@@ -1,18 +1,9 @@
 #pragma once
+#include "EngineRuntime/include/Core/Math/Vector3.h"
+#include "EngineRuntime/include/Core/Math/Angle.h"
 
 namespace Engine
 {
-	class Radian;
-	class Angle;
-	class Degree;
-
-	class Vector2;
-	class Vector3;
-	class Vector4;
-	class Matrix3x3;
-	class Matrix4x4;
-	class Quaternion;
-
 	class Matrix3x3
 	{
 	public:
@@ -28,7 +19,7 @@ namespace Engine
 
 		Matrix3x3(const Vector3& row0, const Vector3& row1, const Vector3& row2);
 
-		Matrix3x3(const Quaternion& q);
+		Matrix3x3(const Quaternion& q); //
 
 	public:
 		void SetAllData(const float(&float_array)[9]);
@@ -49,13 +40,11 @@ namespace Engine
 
 		float Determinant() const;
 
-		void CalculateQDUDecomposition(Matrix3x3& out_Q, Vector3& out_D, Vector3& out_U) const;
-
 		void ToAngleAxis(Vector3& axis, Radian& angle) const;
 
 		void ToAngleAxis(Vector3& axis, Degree& angle) const;
 
-		void FromAngleAxis(const Vector3& axis, const Radian& radian);
+		void FromAngleAxis(const Vector3& axis, const Radian& radian); //
 
 		static Matrix3x3 Scale(const Vector3& scale);
 
@@ -76,7 +65,7 @@ namespace Engine
 
 		Matrix3x3 operator*(const Matrix3x3& rhs) const;
 
-		Vector3 operator*(const Vector3& rhs) const;
+		//Vector3 operator*(const Vector3& rhs) const;
 
 		friend Vector3 operator*(const Vector3& point, const Matrix3x3& rhs);
 

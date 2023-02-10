@@ -6,6 +6,11 @@ namespace Engine
 	class ISerializable
 	{
 	public:
+		ISerializable() = default;
+
+		virtual ~ISerializable() = default;
+
+	public:
 		// 将Object序列化到Frame中
 		virtual void Serialize(SerializerDataFrame& stream) const = 0;
 

@@ -27,4 +27,5 @@ workspace "GameEngine"
     include(g_WorkSpaceRootFolder .. "engine/3rd/premake5.lua")
     include(g_WorkSpaceRootFolder .. "engine/EngineEditor/premake5.lua")
     include(g_WorkSpaceRootFolder .. "engine/EngineRuntime/premake5.lua")
+    include(g_WorkSpaceRootFolder .. "engine/HLSLCompiler/premake5.lua")
     

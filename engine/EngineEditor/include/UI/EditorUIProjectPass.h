@@ -4,7 +4,6 @@
 #include <string>
 #include <array>
 #include "EngineEditor/include/UI/EditorUIPassBase.h"
-#include "EngineEditor/include/Application/AssetFIle.h"
 #include "EngineEditor/include/UI/SubFrame/EditorRightMenu.h"
 
 namespace Editor
@@ -17,7 +16,7 @@ namespace Editor
 
 		virtual ~EditorUIProjectPass() override;
 
-		virtual void Initialize(Engine::ImGuiDevice* device, EngineEditor* editor) override;
+		virtual void Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor) override;
 
 	public:
 		virtual void ShowUI() override;
@@ -25,11 +24,7 @@ namespace Editor
 	private:
 		void SetColor();
 
-		void dfsFolder(AssetFile* root, const std::filesystem::path& currentPath);
-
 		void ShowAssetsTree(AssetFile* node);
-
-		//void CreateRightMenu();
 
 		void SwitchFolder(AssetFile* newNode);
 
@@ -57,15 +52,15 @@ namespace Editor
 		bool mIsSelectedFile = false;
 
 	private:
-		std::shared_ptr<AssetFile> mRoot;
+		AssetFile* mRoot;
 		std::array<std::vector<AssetFile*>, 2> mCurrentOpenFolder;
 		unsigned short mCurrentIndex = 0;
 		unsigned short mNextIndex = 1;
 		bool mIsClickFile = false;
-		std::list<std::shared_ptr<AssetFile>>::iterator mMouseCurrentHoveredItem;
+		std::list<AssetFile*>::iterator mMouseCurrentHoveredItem;
 
 		std::vector<char> mSelectButton;
-		std::list<std::list<std::shared_ptr<AssetFile>>::iterator> mSelectItem;
+		std::list<std::list<AssetFile*>::iterator> mSelectItem;
 
 		std::shared_ptr<RightMenuUI> mRightMenu;
 

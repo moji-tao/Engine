@@ -1,7 +1,8 @@
 #include <dxgidebug.h>
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12ImGuiDevice.h"
-#include "EngineRuntime/include/Function/Render/DirectX/D3D12RenderPipeline.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12DeferredRenderPipeline.h"
+#include "EngineRuntime/include/Function/Render/DirectX/D3D12RenderResource.h"
 #include "EngineRuntime/include/Function/Render/DirectX/DirectXUtil.h"
 
 namespace Engine
@@ -72,9 +73,11 @@ namespace Engine
 		Device.reset();
 	}
 
-	void D3D12RHI::InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline)
+	void D3D12RHI::InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline, std::unique_ptr<RenderResource>& renderResource)
 	{
-		renderPipeline = std::make_unique<D3D12RenderPipeline>(this);
+		renderResource = std::make_unique<D3D12RenderResource>(this);
+		
+		renderPipeline = std::make_unique<D3D12DeferredRenderPipeline>(this, dynamic_cast<D3D12RenderResource*>(renderResource.get()));
 	}
 
 	D3D12Device* D3D12RHI::GetDevice()
@@ -317,6 +320,69 @@ namespace Engine
 		return TextureRef;
 	}
 
+	void D3D12RHI::UploadCubeTextureData(D3D12TextureRef Texture, const std::array<const TextureData*, 6>& textureData)
+	{
+		std::array<D3D12_SUBRESOURCE_DATA, 6> InitData;
+
+		for (int i = 0; i < 6; ++i)
+		{
+			InitData[i].pData = textureData[i]->mPixels;
+			InitData[i].RowPitch = textureData[i]->Info.mRowPitch;
+			InitData[i].SlicePitch = textureData[i]->Info.mSlicePitch;
+		}
+
+		auto TextureResource = Texture->GetResource();
+		D3D12_RESOURCE_DESC TexDesc = TextureResource->D3DResource->GetDesc();
+
+		//GetCopyableFootprints
+		const UINT NumSubresources = (UINT)InitData.size();
+		std::vector<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> Layouts(NumSubresources);
+		std::vector<uint32_t> NumRows(NumSubresources);
+		std::vector<uint64_t> RowSizesInBytes(NumSubresources);
+
+		uint64_t RequiredSize = 0;
+		Device->GetNativeDevice()->GetCopyableFootprints(&TexDesc, 0, NumSubresources, 0, &Layouts[0], &NumRows[0], &RowSizesInBytes[0], &RequiredSize);
+
+		//Create upload resource
+		D3D12ResourceLocation UploadResourceLocation;
+		auto UploadBufferAllocator = GetDevice()->GetUploadBufferAllocator();
+		void* MappedData = UploadBufferAllocator->AllocUploadResource((uint32_t)RequiredSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT, UploadResourceLocation);
+		ID3D12Resource* UploadBuffer = UploadResourceLocation.UnderlyingResource->D3DResource.Get();
+
+		//Copy contents to upload resource
+		for (uint32_t i = 0; i < NumSubresources; ++i)
+		{
+			if (RowSizesInBytes[i] > SIZE_T(-1))
+			{
+				assert(0);
+			}
+			D3D12_MEMCPY_DEST DestData = { (BYTE*)MappedData + Layouts[i].Offset, Layouts[i].Footprint.RowPitch, SIZE_T(Layouts[i].Footprint.RowPitch) * SIZE_T(NumRows[i]) };
+			MemcpySubresource(&DestData, &(InitData[i]), static_cast<SIZE_T>(RowSizesInBytes[i]), NumRows[i], Layouts[i].Footprint.Depth);
+		}
+
+		//Copy data from upload resource to default resource
+		TransitionResource(TextureResource, D3D12_RESOURCE_STATE_COPY_DEST);
+
+		for (UINT i = 0; i < NumSubresources; ++i)
+		{
+			Layouts[i].Offset += UploadResourceLocation.OffsetFromBaseOfResource;
+
+			CD3DX12_TEXTURE_COPY_LOCATION Src;
+			Src.pResource = UploadBuffer;
+			Src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+			Src.PlacedFootprint = Layouts[i];
+
+			CD3DX12_TEXTURE_COPY_LOCATION Dst;
+			Dst.pResource = TextureResource->D3DResource.Get();
+			Dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+			Dst.SubresourceIndex = i;
+
+			CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
+		}
+
+		TransitionResource(TextureResource, D3D12_RESOURCE_STATE_COMMON);
+	}
+
 	void D3D12RHI::UploadTextureData(D3D12TextureRef Texture, const TextureData* textureData)
 	{
 		D3D12_SUBRESOURCE_DATA data = { textureData->mPixels, textureData->Info.mRowPitch, textureData->Info.mSlicePitch };
@@ -439,11 +505,18 @@ namespace Engine
 		D3D12_RESOURCE_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 		
-		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		texDesc.Dimension = TextureInfo.Dimension;
 		texDesc.Alignment = 0;
 		texDesc.Width = TextureInfo.Width;
 		texDesc.Height = (uint32_t)TextureInfo.Height;
-		texDesc.DepthOrArraySize = (TextureInfo.Depth > 1) ? (uint16_t)TextureInfo.Depth : (uint16_t)TextureInfo.ArraySize;
+		if (TextureInfo.Type == IMAGE_TYPE::IMAGE_TYPE_CUBE)
+		{
+			texDesc.DepthOrArraySize = 6;
+		}
+		else
+		{
+			texDesc.DepthOrArraySize = (TextureInfo.Depth > 1) ? (uint16_t)TextureInfo.Depth : (uint16_t)TextureInfo.ArraySize;
+		}
 		texDesc.MipLevels = (uint16_t)TextureInfo.MipCount;
 		texDesc.Format = TextureInfo.Format;
 		texDesc.SampleDesc.Count = 1;

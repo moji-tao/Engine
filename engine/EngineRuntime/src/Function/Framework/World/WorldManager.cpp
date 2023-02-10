@@ -19,7 +19,7 @@ namespace Engine
 	bool WorldManager::Initialize()
 	{
 		std::filesystem::path defaultScenePath = ConfigManager::GetInstance()->GetDefaultScenePath();
-		mCurrentActiveLevel = ResourceSerializer::LoadResourceFromFile<Level>(defaultScenePath);
+		mCurrentActiveLevel = AssetManager::GetInstance()->LoadResource<Level>(defaultScenePath);
 		
 		return true;
 	}
@@ -37,7 +37,7 @@ namespace Engine
 		//ConfigManager::GetInstance()->SetDefaultScenePath();
 		if (mCurrentActiveLevel != nullptr)
 		{
-			delete mCurrentActiveLevel;
+			AssetManager::GetInstance()->UnLoadResource(mCurrentActiveLevel);
 		}
 	}
 
@@ -48,7 +48,14 @@ namespace Engine
 
 	void WorldManager::SaveCurrentLevel()
 	{
+		LOG_INFO("正在保存场景...");
+		if (mCurrentActiveLevel == nullptr)
+		{
+			LOG_ERROR("当前没有打开任何场景");
+			return;
+		}
 
+		mCurrentActiveLevel->Save();
 	}
 
 	Level* WorldManager::GetCurrentActiveLevel() const
@@ -58,12 +65,15 @@ namespace Engine
 		return mCurrentActiveLevel;
 	}
 
-	Level* WorldManager::SpanEmptyScene(const std::string& sceneName)
+	SerializerDataFrame WorldManager::SpanEmptyScene(const std::string& sceneName)
 	{
-		Level* level = new Level();
-		level->mSceneName = sceneName;
+		Level level;
+		level.mSceneName = sceneName;
 
-		return level;
+		SerializerDataFrame frame;
+		frame << level;
+
+		return frame;
 	}
 
 	bool WorldManager::LoadWorld(const std::string& worldUrl)

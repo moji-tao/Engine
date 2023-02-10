@@ -4,7 +4,7 @@
 
 #ifdef _DEBUG
 #define ASSERT(...) assert(__VA_ARGS__)
-#elif 
+#else 
 #define ASSERT(...)
 #endif
 

@@ -24,7 +24,7 @@ namespace Engine
 		void Destroy();
 
 	public:
-		virtual void InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline) override;
+		virtual void InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline, std::unique_ptr<RenderResource>& renderResource) override;
 
 		D3D12Device* GetDevice();
 
@@ -76,6 +76,8 @@ namespace Engine
 		// Use D3DResource to create texture, texture will manage this D3DResource
 		D3D12TextureRef CreateTexture(Microsoft::WRL::ComPtr<ID3D12Resource> D3DResource, D3D12TextureInfo& TextureInfo, uint32_t CreateFlags);
 
+		void UploadCubeTextureData(D3D12TextureRef Texture, const std::array<const TextureData*, 6>& textureData);
+		
 		void UploadTextureData(D3D12TextureRef Texture, const TextureData* textureData);
 
 		void SetVertexBuffer(const D3D12VertexBufferRef& VertexBuffer, UINT Offset, UINT Stride, UINT Size);

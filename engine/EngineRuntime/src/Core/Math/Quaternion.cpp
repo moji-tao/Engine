@@ -1,10 +1,7 @@
-#include "EngineRuntime/include/Core/Math/Quaternion.h"
-#include "EngineRuntime/include/Core/Math/Vector3.h"
-#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
-#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
-#include "EngineRuntime/include/Core/Math/Angle.h"
-#include "EngineRuntime/include/Core/Math/Math.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
+#include "EngineRuntime/include/Core/Math/Quaternion.h"
+#include "EngineRuntime/include/Core/Math/Math.h"
+
 
 namespace Engine
 {
@@ -15,6 +12,64 @@ namespace Engine
 	const float Quaternion::k_epsilon = 1e-03f;
 
 	Quaternion::Quaternion(float w_, float x_, float y_, float z_) : w(w_), x(x_), y(y_), z(z_) { }
+
+	Quaternion::Quaternion(Degree roll, Degree pitch, Degree yaw)
+	{
+		/*
+		w = Math::Cos(roll / 2) * Math::Cos(pitch / 2) * Math::Cos(yaw / 2) -
+			Math::Sin(roll / 2) * Math::Sin(pitch / 2) * Math::Sin(yaw / 2);
+
+		x = Math::Sin(roll / 2) * Math::Cos(pitch / 2) * Math::Cos(yaw / 2) +
+			Math::Cos(roll / 2) * Math::Sin(pitch / 2) * Math::Sin(yaw / 2);
+
+		y = Math::Cos(roll / 2) * Math::Sin(pitch / 2) * Math::Cos(yaw / 2) -
+			Math::Sin(roll / 2) * Math::Cos(pitch / 2) * Math::Sin(yaw / 2);
+
+		z = Math::Cos(roll / 2) * Math::Cos(pitch / 2) * Math::Sin(yaw / 2) +
+			Math::Sin(roll / 2) * Math::Sin(pitch / 2) * Math::Cos(yaw / 2);
+		*/
+		roll /= 2;
+		pitch /= 2;
+		yaw /= 2;
+		
+		x = Math::Cos(yaw) * Math::Sin(pitch) * Math::Cos(roll) +
+			Math::Sin(yaw) * Math::Cos(pitch) * Math::Sin(roll);
+		y = Math::Sin(yaw) * Math::Cos(pitch) * Math::Cos(roll) -
+			Math::Cos(yaw) * Math::Sin(pitch) * Math::Sin(roll);
+		z = Math::Cos(yaw) * Math::Cos(pitch) * Math::Sin(roll) -
+			Math::Sin(yaw) * Math::Sin(pitch) * Math::Cos(roll);
+		w = Math::Cos(yaw) * Math::Cos(pitch) * Math::Cos(roll) +
+			Math::Sin(yaw) * Math::Sin(pitch) * Math::Sin(roll);
+	}
+
+	Quaternion::Quaternion(Radian roll, Radian pitch, Radian yaw)
+	{
+		/*
+		w = Math::Cos(roll / 2) * Math::Cos(pitch / 2) * Math::Cos(yaw / 2) -
+			Math::Sin(roll / 2) * Math::Sin(pitch / 2) * Math::Sin(yaw / 2);
+
+		x = Math::Sin(roll / 2) * Math::Cos(pitch / 2) * Math::Cos(yaw / 2) +
+			Math::Cos(roll / 2) * Math::Sin(pitch / 2) * Math::Sin(yaw / 2);
+
+		y = Math::Cos(roll / 2) * Math::Sin(pitch / 2) * Math::Cos(yaw / 2) -
+			Math::Sin(roll / 2) * Math::Cos(pitch / 2) * Math::Sin(yaw / 2);
+
+		z = Math::Cos(roll / 2) * Math::Cos(pitch / 2) * Math::Sin(yaw / 2) +
+			Math::Sin(roll / 2) * Math::Sin(pitch / 2) * Math::Cos(yaw / 2);
+		*/
+		roll /= 2;
+		pitch /= 2;
+		yaw /= 2;
+		x = Math::Cos(yaw) * Math::Sin(roll) * Math::Cos(pitch) +
+			Math::Sin(yaw) * Math::Cos(roll) * Math::Sin(pitch);
+		y = Math::Sin(yaw) * Math::Cos(roll) * Math::Cos(pitch) -
+			Math::Cos(yaw) * Math::Sin(roll) * Math::Sin(pitch);
+		z = Math::Cos(yaw) * Math::Cos(roll) * Math::Sin(pitch) -
+			Math::Sin(yaw) * Math::Sin(roll) * Math::Cos(pitch);
+		w = Math::Cos(yaw) * Math::Cos(roll) * Math::Cos(pitch) +
+			Math::Sin(yaw) * Math::Sin(roll) * Math::Sin(pitch);
+
+	}
 
 	Quaternion::Quaternion(const Matrix3x3& rot)
 	{
@@ -43,6 +98,7 @@ namespace Engine
 
 	void Quaternion::SetDataFromRotationMatrix(const Matrix3x3& rotation)
 	{
+		/*
 		float trace = rotation[0][0] + rotation[1][1] + rotation[2][2];
 		float root;
 
@@ -76,11 +132,45 @@ namespace Engine
 			*apkQuat[j] = (rotation[j][i] + rotation[i][j]) * root;
 			*apkQuat[k] = (rotation[k][i] + rotation[i][k]) * root;
 		}
+		*/
 
+		w = Math::Sqrt((rotation[0][0] + rotation[1][1] + rotation[2][2]) + 1) * 0.5f;
+
+		if (w != 0.0f)
+		{
+			x = (rotation[1][2] - rotation[2][1]) / (4.0f * w);
+			y = (rotation[2][0] - rotation[0][2]) / (4.0f * w);
+			z = (rotation[0][1] - rotation[1][0]) / (4.0f * w);
+		}
+		else
+		{
+			if (rotation[0][0] >= rotation[1][1] && rotation[0][0] >= rotation[2][2])
+			{
+				x = Math::Sqrt(rotation[0][0] - rotation[1][1] - rotation[2][2] + 1) / 2;
+				y = (rotation[0][1] + rotation[1][0]) / (4.0f * x);
+				z = (rotation[0][2] + rotation[2][0]) / (4.0f * y);
+				w = (rotation[1][2] - rotation[2][1]) / (4.0f * x);
+			}
+			else if (rotation[1][1] >= rotation[0][0] && rotation[1][1] >= rotation[2][2])
+			{
+				y = Math::Sqrt(rotation[1][1] - rotation[0][0] - rotation[2][2] + 1) / 2;
+				x = (rotation[0][1] + rotation[1][0]) / (4.0f * y);
+				z = (rotation[1][2] + rotation[2][1]) / (4.0f * y);
+				w = (rotation[1][2] - rotation[2][1]) / (4.0f * x);
+			}
+			else
+			{
+				z = Math::Sqrt(rotation[2][2] - rotation[0][0] - rotation[1][1] + 1) / 2;
+				y = (rotation[1][2] + rotation[2][1]) / (4.0f * z);
+				x = (rotation[0][1] + rotation[1][0]) / (4.0f * y);
+				w = (rotation[1][2] - rotation[2][1]) / (4.0f * x);
+			}
+		}
 	}
 
 	void Quaternion::GetRotationMatrix(Matrix3x3& rotation) const
 	{
+		/*
 		float fTx = x + x;   // 2x
 		float fTy = y + y;   // 2y
 		float fTz = z + z;   // 2z
@@ -103,10 +193,23 @@ namespace Engine
 		rotation[2][0] = fTxz - fTwy;          // 2xz - 2wy
 		rotation[2][1] = fTyz + fTwx;          // 2yz + 2wx
 		rotation[2][2] = 1.0f - (fTxx + fTyy); // 1 - 2x^2 - 2y^2
+		*/
+
+		rotation[0][0] = 1.0f - 2 * y * y - 2 * z * z;		// 1 - 2y^2 - 2z^2
+		rotation[0][1] = 2 * x * y + 2 * z * w;				// 2xy + 2zw
+		rotation[0][2] = 2 * x * z + 2 * y * w;				// 2xz + 2yw
+		rotation[1][0] = 2 * x * y - 2 * z * w;				// 2xy - 2zw
+		rotation[1][1] = 1.0f - 2 * x * x - 2 * z * z;		// 1 - 2x^2 - 2z^2
+		rotation[1][2] = 2 * y * z + 2 * x * w;				// 2yz + 2xw
+		rotation[2][0] = 2 * x * z + 2 * y * w;				// 2xz + 2yw
+		rotation[2][1] = 2 * y * z - 2 * x * w;				// 2yz - 2xw
+		rotation[2][2] = 1.0f - 2 * x * x - 2 * y * y;		// 1 - 2x^2 - 2y^2
+
 	}
 
 	void Quaternion::GetRotationMatrix(Matrix4x4& rotation) const
 	{
+		/*
 		float fTx = x + x;   // 2x
 		float fTy = y + y;   // 2y
 		float fTz = z + z;   // 2z
@@ -136,6 +239,24 @@ namespace Engine
 		rotation[3][1] = 0;
 		rotation[3][2] = 0;
 		rotation[3][3] = 1;
+		*/
+
+		rotation[0][0] = 1.0f - 2 * y * y - 2 * z * z;		// 1 - 2y^2 - 2z^2
+		rotation[0][1] = 2 * x * y + 2 * z * w;				// 2xy + 2zw
+		rotation[0][2] = 2 * x * z + 2 * y * w;				// 2xz + 2yw
+		rotation[0][3] = 0.0f;
+		rotation[1][0] = 2 * x * y - 2 * z * w;				// 2xy - 2zw
+		rotation[1][1] = 1.0f - 2 * x * x - 2 * z * z;		// 1 - 2x^2 - 2z^2
+		rotation[1][2] = 2 * y * z + 2 * x * w;				// 2yz + 2xw
+		rotation[1][3] = 0.0f;
+		rotation[2][0] = 2 * x * z + 2 * y * w;				// 2xz + 2yw
+		rotation[2][1] = 2 * y * z - 2 * x * w;				// 2yz - 2xw
+		rotation[2][2] = 1.0f - 2 * x * x - 2 * y * y;		// 1 - 2x^2 - 2y^2
+		rotation[2][3] = 0.0f;
+		rotation[3][0] = 0.0f;
+		rotation[3][1] = 0.0f;
+		rotation[3][2] = 0.0f;
+		rotation[3][3] = 1.0f;
 	}
 
 	void Quaternion::SetDataFromAngleAxis(const Radian& angle, const Vector3& axis)
@@ -162,13 +283,13 @@ namespace Engine
 	void Quaternion::SetDataFromDirection(const Vector3& direction, const Vector3& up_direction)
 	{
 		Vector3 forward_direction = direction;
-		forward_direction.SetZ(0.0f);
-		forward_direction.Normalise();
+		//forward_direction.SetZ(0.0f);
+		forward_direction.Normalize();
 
-		Vector3 left_direction = up_direction.CrossProduct(forward_direction);
+		Vector3 right_direction = forward_direction.CrossProduct(up_direction);
 
-		SetDataFromAxis(left_direction, -forward_direction, up_direction);
-		Normalise();
+		SetDataFromAxis(right_direction, up_direction, forward_direction);
+		Normalize();
 	}
 
 	Quaternion Quaternion::GetQuaternionFromDirection(const Vector3& direction, const Vector3& up_direction)
@@ -176,30 +297,25 @@ namespace Engine
 		Quaternion object_orientation;
 		object_orientation.SetDataFromDirection(direction, up_direction);
 		return object_orientation;
-
 	}
 
 	void Quaternion::GetAngleAxis(Radian& angle, Vector3& axis) const
 	{
-		// The quaternion representing the rotation is
-		//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
+		// (x,y,z,w) = (axis*sin(angle/2), cos(angle/2))
 
-		float sqr_len = x * x + y * y + z * z;
-		if (sqr_len > 0.0)
+		float len = x * x + y * y + z * z;
+		if (len != 0.0f)
 		{
-			angle = 2.0 * Math::Acos(w);
-			float inv_len = Math::InvSqrt(sqr_len);
-			axis.SetX(x * inv_len);
-			axis.SetY(y * inv_len);
-			axis.SetZ(z * inv_len);
+			angle = Math::Acos(w) * 2.0f;
+			axis.x = x / Math::Sin(angle / 2);
+			axis.y = y / Math::Sin(angle / 2);
+			axis.z = z / Math::Sin(angle / 2);
 		}
 		else
 		{
-			// angle is 0 (mod 2*pi), so any axis will do
-			angle = Radian(0.0);
-			axis.SetX(1.0f);
-			axis.SetY(0.0f);
-			axis.SetZ(0.0f);
+			angle = 0;
+			axis.x = axis.y = 0;
+			axis.z = 1;
 		}
 	}
 
@@ -208,15 +324,15 @@ namespace Engine
 		Matrix3x3 rot;
 
 		rot[0][0] = xaxis.GetX();
-		rot[1][0] = xaxis.GetY();
-		rot[2][0] = xaxis.GetZ();
+		rot[0][1] = xaxis.GetY();
+		rot[0][2] = xaxis.GetZ();
 
-		rot[0][1] = yaxis.GetX();
+		rot[1][0] = yaxis.GetX();
 		rot[1][1] = yaxis.GetY();
-		rot[2][1] = yaxis.GetZ();
+		rot[1][2] = yaxis.GetZ();
 
-		rot[0][2] = zaxis.GetX();
-		rot[1][2] = zaxis.GetY();
+		rot[2][0] = zaxis.GetX();
+		rot[2][1] = zaxis.GetY();
 		rot[2][2] = zaxis.GetZ();
 
 		SetDataFromRotationMatrix(rot);
@@ -229,61 +345,31 @@ namespace Engine
 		GetRotationMatrix(rot);
 
 		xaxis.SetX(rot[0][0]);
-		xaxis.SetY(rot[1][0]);
-		xaxis.SetZ(rot[2][0]);
+		xaxis.SetY(rot[0][1]);
+		xaxis.SetZ(rot[0][2]);
 
-		yaxis.SetX(rot[0][1]);
+		yaxis.SetX(rot[1][0]);
 		yaxis.SetY(rot[1][1]);
-		yaxis.SetZ(rot[2][1]);
+		yaxis.SetZ(rot[1][2]);
 
-		zaxis.SetX(rot[0][2]);
-		zaxis.SetY(rot[1][2]);
+		zaxis.SetX(rot[2][0]);
+		zaxis.SetY(rot[2][1]);
 		zaxis.SetZ(rot[2][2]);
 	}
 
 	Vector3 Quaternion::GetxAxis() const
 	{
-		// float tx  = 2.0*x;
-		float ty = 2.0f * y;
-		float tz = 2.0f * z;
-		float twy = ty * w;
-		float twz = tz * w;
-		float txy = ty * x;
-		float txz = tz * x;
-		float tyy = ty * y;
-		float tzz = tz * z;
-
-		return Vector3(1.0f - (tyy + tzz), txy + twz, txz - twy);
+		return Vector3(1.0f - 2 * y * y - 2 * z * z, 2 * x * y + 2 * z * w, 2 * x * z + 2 * y * w);
 	}
 
 	Vector3 Quaternion::GetyAxis() const
 	{
-		float tx = 2.0f * x;
-		float ty = 2.0f * y;
-		float tz = 2.0f * z;
-		float twx = tx * w;
-		float twz = tz * w;
-		float txx = tx * x;
-		float txy = ty * x;
-		float tyz = tz * y;
-		float tzz = tz * z;
-
-		return Vector3(txy - twz, 1.0f - (txx + tzz), tyz + twx);
+		return Vector3(2 * x * y - 2 * z * w, 1.0f - 2 * x * x - 2 * z * z, 2 * y * z + 2 * x * w);
 	}
 
 	Vector3 Quaternion::GetzAxis() const
 	{
-		float tx = 2.0f * x;
-		float ty = 2.0f * y;
-		float tz = 2.0f * z;
-		float twx = tx * w;
-		float twy = ty * w;
-		float txx = tx * x;
-		float txz = tz * x;
-		float tyy = ty * y;
-		float tyz = tz * y;
-
-		return Vector3(txz + twy, tyz - twx, 1.0f - (txx + tyy));
+		return Vector3(2 * x * z + 2 * y * w, 2 * y * z - 2 * x * w, 1.0f - 2 * x * x - 2 * y * y);
 	}
 
 	bool Quaternion::IsNaN() const
@@ -341,7 +427,7 @@ namespace Engine
 		return Math::Sqrt(w * w + x * x + y * y + z * z);
 	}
 
-	void Quaternion::Normalise()
+	void Quaternion::Normalize()
 	{
 		float factor = 1.0f / Length();
 		*this = *this * factor;
@@ -367,6 +453,7 @@ namespace Engine
 		}
 	}
 
+	/*
 	Radian Quaternion::GetRoll(bool reproject_axis) const
 	{
 		if (reproject_axis)
@@ -386,10 +473,26 @@ namespace Engine
 		else
 		{
 			// internal version
-			return Radian(Math::Asin(-2 * (x * z - w * y)));
+			//return Radian(Math::Asin(-2 * (x * z - w * y)));
+
+			if (Math::Abs(2 * (x * z + w * y)) < 0.99999)
+			{
+				return Math::Atan2((w * x - y * z) * 2, 1 - (2 * (y * y + x * x)));
+			}
+			else
+			{
+				return Math::Atan2(2 * (y * z + w * x), 1 - (2 * (x * x + z * z)));
+			}
 		}
 	}
+	*/
 
+	Radian Quaternion::GetRoll() const
+	{
+		return Math::Atan2(2 * (x * y + w * z), w * w - x * x + y * y - z * z);
+	}
+
+	/*
 	Radian Quaternion::GetPitch(bool reproject_axis) const
 	{
 		if (reproject_axis)
@@ -409,10 +512,18 @@ namespace Engine
 		else
 		{
 			// internal version
-			return Radian(Math::Atan2(2 * (y * z + w * x), w * w - x * x - y * y + z * z));
+			//return Radian(Math::Atan2(2 * (y * z + w * x), w * w - x * x - y * y + z * z));
+			return Math::Asin(Math::Clamp(2 * (x * z + w * y), -1.0f, 1.0f));
 		}
 	}
+	*/
 
+	Radian Quaternion::GetPitch() const
+	{
+		return Math::Asin(-2 * (y * z - w * x));
+	}
+
+	/*
 	Radian Quaternion::GetYaw(bool reproject_axis) const
 	{
 		if (reproject_axis)
@@ -431,9 +542,23 @@ namespace Engine
 		}
 		else
 		{
-			return Radian(Math::Atan2(2 * (x * y + w * z), w * w + x * x - y * y - z * z));
+			//return Radian(Math::Atan2(2 * (x * y + w * z), w * w + x * x - y * y - z * z));
+			if (Math::Abs(2 * (x * z + w * y)) < 0.99999)
+			{
+				return Math::Atan2(2 * (w * z - x * y), 1 - (2 * (y * y + z * z)));
+			}
+			else
+			{
+				return Radian(0.0f);
+			}
 		}
 
+	}
+	*/
+
+	Radian Quaternion::GetYaw() const
+	{
+		return Math::Atan2(2 * (x * z + w * y), w * w - x * x - y * y + z * z);
 	}
 
 	Quaternion Quaternion::sLerp(float t, const Quaternion& kp, const Quaternion& kq, bool shortest_path)
@@ -472,7 +597,7 @@ namespace Engine
 			//    have method to fix this case, so just use linear interpolation here.
 			Quaternion r = (1.0f - t) * kp + t * kt;
 			// taking the complement requires renormalization
-			r.Normalise();
+			r.Normalize();
 			return r;
 		}
 	}
@@ -489,7 +614,7 @@ namespace Engine
 		{
 			result = kp + t * (kq - kp);
 		}
-		result.Normalise();
+		result.Normalize();
 		return result;
 	}
 
@@ -503,9 +628,27 @@ namespace Engine
 		return Quaternion(w + rhs.w, x + rhs.x, y + rhs.y, z + rhs.z);
 	}
 
+	Quaternion& Quaternion::operator+=(const Quaternion& rhs)
+	{
+		w += rhs.w;
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		return *this;
+	}
+
 	Quaternion Quaternion::operator-(const Quaternion& rhs) const
 	{
 		return Quaternion(w - rhs.w, x - rhs.x, y - rhs.y, z - rhs.z);
+	}
+
+	Quaternion& Quaternion::operator-=(const Quaternion& rhs)
+	{
+		w -= rhs.w;
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		return *this;
 	}
 
 	Quaternion Quaternion::operator*(const Quaternion& rhs) const
@@ -516,28 +659,50 @@ namespace Engine
 			w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x);
 	}
 
+	Quaternion& Quaternion::operator*=(const Quaternion& rhs)
+	{
+		*this = *this * rhs;
+		//w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
+		//x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
+		//y = w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z;
+		//z = w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x;
+		return *this;
+	}
+
 	Quaternion Quaternion::operator*(float scalar) const
 	{
 		return Quaternion(w * scalar, x * scalar, y * scalar, z * scalar);
 	}
 
+	Quaternion& Quaternion::operator*=(float scalar)
+	{
+		w *= scalar;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return *this;
+	}
+
 	Vector3 Quaternion::operator*(const Vector3& rhs) const
 	{
-		// nVidia SDK implementation
-		Vector3 uv, uuv;
-		Vector3 qvec(x, y, z);
-		uv = qvec.CrossProduct(rhs);
-		uuv = qvec.CrossProduct(uv);
-		uv *= (2.0f * w);
-		uuv *= 2.0f;
-
-		return rhs + uv + uuv;
+		Quaternion result = *this * Quaternion(0, rhs.x, rhs.y, rhs.z) * (*this).Conjugate();
+		return Vector3(result.x, result.y, result.z);
 	}
 
 	Quaternion Quaternion::operator/(float scalar) const
 	{
 		ASSERT(scalar != 0.0f);
 		return Quaternion(w / scalar, x / scalar, y / scalar, z / scalar);
+	}
+
+	Quaternion& Quaternion::operator/=(float scalar)
+	{
+		ASSERT(scalar != 0.0f);
+		w /= scalar;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
+		return *this;
 	}
 
 	Quaternion Quaternion::operator-() const

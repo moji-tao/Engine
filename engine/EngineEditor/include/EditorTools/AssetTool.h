@@ -1,7 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <unordered_map>
-#include "EngineEditor/include/Application/AssetFIle.h"
+#include "EngineEditor/include/Application/SubSystem/AssetsFileSystem.h"
 #include "EngineRuntime/include/Framework/Interface/ISerializable.h"
 
 namespace Editor
@@ -24,7 +24,7 @@ namespace Editor
 
 		bool static LoadAsset(const std::filesystem::path& oldPath, const std::filesystem::path& loadFolder, AssetFile* folder);
 
-		void static SaveAsset(const std::filesystem::path& saveProjectPath, Engine::ISerializable* asset);
+		//void static SaveAsset(const std::filesystem::path& saveProjectPath, Engine::ISerializable* asset);
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Loader>> mExtensionMap;

@@ -21,6 +21,23 @@ namespace Engine
 
 		LOG_INFO("日志系统初始化完成");
 
+		if (false)
+		{
+			{
+				if (HMODULE mod = LoadLibraryA("renderdoc.dll"))
+				{
+					pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(mod, "RENDERDOC_GetAPI");
+					int ret = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_1_2, (void**)&rdoc_api);
+					assert(ret == 1);
+					LOG_INFO("注入RenderDoc成功");
+				}
+				else
+				{
+					LOG_ERROR("注入RenderDoc失败 {0}", GetLastError());
+				}
+			}
+		}
+		
 		if (!NativeFileSystem::GetInstance()->Initialize(info))
 		{
 			LOG_ERROR("文件系统初始化失败");
@@ -28,6 +45,14 @@ namespace Engine
 		}
 
 		LOG_INFO("文件系统初始化完成");
+
+		if (rdoc_api != nullptr)
+		{
+			std::string generic_string = EngineFileSystem::GetInstance()->GetActualPath("RenderDoc/").generic_string();
+
+			rdoc_api->SetCaptureFilePathTemplate(generic_string.c_str());
+			LOG_INFO("设置截帧保存模板 {0}", generic_string.c_str());
+		}
 
 		if (!ConfigManager::GetInstance()->Initialize(info->enginePath))
 		{
@@ -37,13 +62,12 @@ namespace Engine
 
 		LOG_INFO("配置系统初始化完成");
 
-		if(!AssetManager::GetInstance()->Initialize())
+		if(!AssetManager::GetInstance()->Initialize(info->workspacePath))
 		{
 			LOG_ERROR("资源系统初始化失败");
 		}
-
+		
 		LOG_INFO("资源系统初始化完成");
-
 
 		if (!WindowSystem::GetInstance()->Initialize(info))
 		{
@@ -87,10 +111,16 @@ namespace Engine
 		LogSystem::GetInstance()->Finalize();
 	}
 
-	bool EngineRuntime::Tick(float deltaTime)
+	bool EngineRuntime::Tick(float deltaTime, bool isEditorMode)
 	{
+		/*
+		if (!isEditorMode)
+		{
+			
+		}
+		*/
 		WorldManager::GetInstance()->Tick(deltaTime);
-		RenderSystem::GetInstance()->Tick(deltaTime);
+		RenderSystem::GetInstance()->Tick(deltaTime, isEditorMode);
 		WindowSystem::GetInstance()->Tick(deltaTime);
 
 		return !WindowSystem::GetInstance()->ShouldClose();

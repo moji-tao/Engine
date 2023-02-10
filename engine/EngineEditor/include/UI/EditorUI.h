@@ -2,6 +2,7 @@
 #include <memory>
 #include <filesystem>
 #include <imgui/imgui.h>
+#include "EngineEditor/include/UI/EditorUIMessage.h"
 #include "EngineRuntime/include/Function/Render/ImGuiDevice.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
 
@@ -32,11 +33,11 @@ namespace Editor
 		void ConfigStyleColor();
 
 	private:
-		std::shared_ptr<EditorUIPassBase> mProjectUI;
-		std::shared_ptr<EditorUIPassBase> mConsoleUI;
-		std::shared_ptr<EditorUIPassBase> mHierarchyUI;
-		std::shared_ptr<EditorUIPassBase> mSceneUI;
-		std::shared_ptr<EditorUIPassBase> mInspectorUI;
+		EditorUIPassBase* mProjectUI;
+		EditorUIPassBase* mConsoleUI;
+		EditorUIPassBase* mHierarchyUI;
+		EditorUIPassBase* mSceneUI;
+		EditorUIPassBase* mInspectorUI;
 
 	private:
 		Engine::ImGuiDevice* mDevice = nullptr;
@@ -44,6 +45,8 @@ namespace Editor
 		ImFont* mFontsSimhei = nullptr;
 
 		EngineEditor* mEditor = nullptr;
+
+		EditorUIMessage* mUIMessage = nullptr;
 
 	//test
 	private:

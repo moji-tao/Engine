@@ -5,14 +5,6 @@
 
 namespace Editor
 {
-	/*
-	struct DragNode {
-		std::string name;
-		DragNode* parent;
-		std::vector<DragNode*> children;
-	};
-	*/
-
 	class EditorUIHierarchyPass : public EditorUIPassBase
 	{
 		DECLARE_RTTI;
@@ -21,7 +13,7 @@ namespace Editor
 
 		virtual ~EditorUIHierarchyPass() override;
 
-		virtual void Initialize(Engine::ImGuiDevice* device, EngineEditor* editor) override;
+		virtual void Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor) override;
 
 	public:
 		virtual void ShowUI() override;
@@ -44,16 +36,21 @@ namespace Editor
 		void Ref_CreateEmptyGameObject();
 		void Ref_Create3DCube();
 
-		bool mIsHoveredGameObject = false;
+		bool mIsSelectedNode = false;
+		int mIsSelectedNodeNum = true;
 
 		void ShowPopupWindow();
 
 	private:
-		Engine::Actor* mCurrentHoveringGameObject = nullptr;
-		//DragNode* mCurrentHoveringGameObject = nullptr;
+		std::unordered_set<Engine::Actor*> mSelectedNodes;
+		Engine::Actor* mCurrentSelectedNode = nullptr;
+		Engine::Actor* mLastChooseNode = nullptr;
+
+	private:
 		Engine::Level* mCurrentScene = nullptr;
 
 		bool mIsPopupRightMenu = false;
+		bool mIsPopupModalWindow = false;
 
 		std::shared_ptr<RightMenuUI> mRightMenu;
 
@@ -61,8 +58,9 @@ namespace Editor
 
 	//重命名
 	private:
-		bool mIsOpenRenameWindow = false;
-		Engine::Actor* mSeleteActor = nullptr;
+		bool mIsRenameNodeModel = false;
+		bool mIsMouseHoveredRenameInputText = false;
+		Engine::Actor* mRenameActor = nullptr;
 		char mRenameBuffer[256];
 
 	//删除

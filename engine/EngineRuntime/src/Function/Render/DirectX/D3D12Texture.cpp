@@ -78,7 +78,7 @@ namespace Engine
         UAVs.emplace_back(std::move(UAV));
     }
 
-    DXGI_FORMAT D3D12TextureResource::TransformationToD3DFormat(PIXEL_FORMAT format)
+    DXGI_FORMAT D3D12Texture::TransformationToD3DFormat(PIXEL_FORMAT format)
     {
         static std::unordered_map<PIXEL_FORMAT, DXGI_FORMAT> mp =
         {
@@ -91,23 +91,5 @@ namespace Engine
         };
 
         return mp.at(format);
-    }
-
-    void D3D12TextureResource::CreateTexture(D3D12RHI* rhi)
-    {
-        D3D12TextureInfo info;
-        info.Type = Info.mType;
-        info.Format = TransformationToD3DFormat(Info.mFormat);
-        info.Width = Info.mWidth;
-        info.Height = Info.mHeight;
-        // TODO:纹理类型记得扩展
-        info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        info.Depth = Info.mDepth;
-        info.ArraySize = Info.mArrayLayers;
-        info.MipCount = Info.mMipLevels;
-
-        D3DTexture = rhi->CreateTexture(info, TexCreate_SRV);
-
-        rhi->UploadTextureData(D3DTexture, this);
     }
 }

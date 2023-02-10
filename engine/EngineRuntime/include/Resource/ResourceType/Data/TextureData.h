@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include "EngineRuntime/include/Core/Meta/Object.h"
+#include "EngineRuntime/include/Framework/Interface/ISerializable.h"
 
 namespace Engine
 {
@@ -42,8 +44,9 @@ namespace Engine
 		IMAGE_TYPE mType = IMAGE_TYPE::IMAGE_TYPE_UNKNOWM;
 	};
 
-	class TextureData
+	class TextureData : public Object, public ISerializable
 	{
+		DECLARE_RTTI;
 	public:
 		TextureInfo Info;
 
@@ -54,5 +57,29 @@ namespace Engine
 		~TextureData();
 
 		bool IsValid();
+
+		void Serialize(SerializerDataFrame& stream) const override;
+
+		bool Deserialize(SerializerDataFrame& stream) override;
 	};
+
+	class TextureMeta : public MetaFrame
+	{
+	public:
+		TextureMeta() = default;
+		virtual ~TextureMeta() override = default;
+
+	public:
+		void Load(const std::filesystem::path& metaPath);
+
+		virtual void Save(const std::filesystem::path& metaPath) override;
+	};
+
+
+	std::shared_ptr<TextureData> LoadTextureForFile(const std::filesystem::path& assetUrl, bool isSRGB);
+
+	std::shared_ptr<TextureData> LoadHDRTextureForFile(const std::filesystem::path& assetUrl);
+
+	std::shared_ptr<TextureData> LoadTextureForMemory(const void* data, size_t length, bool isSRGB);
+
 }

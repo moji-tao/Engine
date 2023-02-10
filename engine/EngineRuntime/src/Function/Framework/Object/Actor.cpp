@@ -1,3 +1,5 @@
+#include <fstream>
+#include <yaml-cpp/yaml.h>
 #include "EngineRuntime/include/Function/Framework/Object/Actor.h"
 #include "EngineRuntime/include/Function/Framework/World/WorldManager.h"
 #include "EngineRuntime/include/Function/Framework/Level/Level.h"
@@ -6,7 +8,7 @@
 
 namespace Engine
 {
-	IMPLEMENT_RTTI(Actor, Object);
+	IMPLEMENT_RTTI(Actor, GameObject);
 	REGISTER_CLASS(Actor);
 
 	Actor::Actor(Actor* parent)
@@ -19,17 +21,20 @@ namespace Engine
 		{
 			delete actor;
 		}
-		for (Component* componet : mComponents)
+		for (auto it: mComponents)
 		{
-			delete componet;
+			if (it != nullptr)
+			{
+				delete it;
+			}
 		}
 	}
 
 	void Actor::Tick(float deltaTime)
 	{
-		for (int i = 0; i < mComponents.size(); ++i)
+		if (!mIsEnable)
 		{
-			mComponents[i]->Tick(deltaTime);
+			return;
 		}
 
 		for (auto child : mChildrens)
@@ -37,6 +42,11 @@ namespace Engine
 			child->Tick(deltaTime);
 		}
 
+		for (auto it : mComponents)
+		{
+			ASSERT(it != nullptr);
+			it->Tick(deltaTime);
+		}
 	}
 
 	std::string Actor::GetActorName()
@@ -47,19 +57,6 @@ namespace Engine
 	void Actor::SetActorName(const std::string& name)
 	{
 		mObjectName = name;
-	}
-
-	TransformComponent* Actor::GetTransform()
-	{
-		TransformComponent* transform = nullptr;
-
-		ASSERT(mComponents.size() > 0 && mComponents.front()->GetType().mName == "TransformComponent");
-
-		transform = dynamic_cast<TransformComponent*>(mComponents.front());
-
-		ASSERT(transform != nullptr);
-
-		return transform;
 	}
 
 	void Actor::SetParent(Actor* newParent)
@@ -154,15 +151,137 @@ namespace Engine
 		return mChildrens;
 	}
 
+	void Actor::SetEnable(bool enable)
+	{
+		mIsEnable = enable;
+	}
+
+	bool Actor::GetEnable()
+	{
+		return mIsEnable;
+	}
+
+	std::vector<Component*>& Actor::GetAllComponent()
+	{
+		return mComponents;
+	}
+
+	Component* Actor::AddComponent(const std::string& componentName)
+	{
+		auto it = mComponentsMap.find(componentName);
+
+		if (it != mComponentsMap.end())
+		{
+			LOG_ERROR("{0} 组件已经添加到 {1} 游戏对象上了", componentName.c_str(), mObjectName.c_str());
+			return it->second;
+		}
+
+		Class* for_name = Class::ForName(componentName);
+		Component* component = (Component*)for_name->SpanClass();
+		mComponentsMap.emplace(componentName, component);
+		mComponents.push_back(component);
+
+		component->SetParent(this);
+
+		std::sort(mComponents.begin(), mComponents.end(), [](Component* left, Component* right)
+			{
+				return left->mOrder < right->mOrder;
+			});
+
+		return component;
+	}
+
+	Component* Actor::GetComponent(const std::string& componentName)
+	{
+		auto it = mComponentsMap.find(componentName);
+
+		if (it == mComponentsMap.end())
+		{
+			LOG_ERROR("{0} 游戏对象没有 {1} 组件", mObjectName.c_str(), componentName.c_str());
+			return nullptr;
+		}
+
+		return it->second;
+	}
+
+	Actor* Actor::Instantiate(Actor* prefab)
+	{
+		Actor* result = BuildActor(prefab);
+
+		result->CloneData(prefab);
+
+		return result;
+	}
+
+	void Actor::Destory(Actor* actor)
+	{
+		if (actor == nullptr)
+		{
+			return;
+		}
+
+		if (actor->mParent)
+		{
+			std::erase(actor->mParent->mChildrens, actor);
+		}
+		else
+		{
+			WorldManager::GetInstance()->GetCurrentActiveLevel()->RemoveActor(actor);
+		}
+		delete actor;
+	}
+
+	Actor* Actor::BuildActor(Actor* node)
+	{
+		Actor* cloneActor = (Actor*)Class::ForName(node->GetType().GetName())->SpanClass();
+
+		for (Actor* child : node->mChildrens)
+		{
+			Actor* cloneChild = BuildActor(child);
+			cloneChild->SetParent(cloneActor);
+		}
+
+		for (auto it : node->mComponents)
+		{
+			const auto& className = it->GetType().mName;
+			Component* cloneComponent = (Component*)Class::ForName(className)->SpanClass();
+			cloneActor->mComponents.push_back(cloneComponent);
+			cloneActor->mComponentsMap[className] = cloneComponent;
+		}
+
+		return cloneActor;
+	}
+
+	void Actor::CloneData(GameObject* node)
+	{
+		Actor* bluePrint = DynamicCast<Actor>(node);
+		mObjectName = bluePrint->mObjectName;
+
+		for (auto itF = bluePrint->mChildrens.begin(), itT = mChildrens.begin(); itT != mChildrens.end(); ++itF, ++itT)
+		{
+			(*itT)->CloneData(*itF);
+		}
+
+		for (auto it : mComponents)
+		{
+			const auto& className = it->GetType().mName;
+			ASSERT(bluePrint->mComponentsMap.count(className) != 0);
+
+			it->CloneData(bluePrint->mComponentsMap[className]);
+
+			it->SetParent(this);
+		}
+	}
+
 	void Actor::Serialize(SerializerDataFrame& stream) const
 	{
 		stream << mObjectName;
 
 		stream << (uint32_t)mComponents.size();
-		for (uint32_t i = 0; i < mComponents.size(); ++i)
+		for (auto it : mComponents)
 		{
-			stream << mComponents[i]->GetType().mName;
-			stream << *mComponents[i];
+			stream << it->GetType().mName;
+			stream << *it;
 		}
 
 		stream << (uint32_t)mChildrens.size();
@@ -188,8 +307,9 @@ namespace Engine
 			Class* for_name = Class::ForName(componentClassName);
 			Component* component = (Component*)for_name->SpanClass();
 			mComponents.push_back(component);
+			mComponentsMap[componentClassName] = component;
+			component->SetParent(this);
 			stream >> *component;
-			//component->Deserialize(stream);
 		}
 
 		uint32_t childrenSize;
@@ -202,7 +322,6 @@ namespace Engine
 			Actor* actor = (Actor*)for_name->SpanClass();
 			mChildrens.push_back(actor);
 			actor->mParent = this;
-			//actor->Deserialize(stream);
 			stream >> *actor;
 		}
 
@@ -216,4 +335,28 @@ namespace Engine
 		actor->mParent = this;
 	}
 
+	void PrefabMeta::Load(const std::filesystem::path& metaPath)
+	{
+		YAML::Node node = YAML::LoadFile(ProjectFileSystem::GetInstance()->GetActualPath(metaPath).generic_string());
+
+		ASSERT(node["guid"].IsDefined());
+
+		if (mGuid != nullptr)
+		{
+			delete mGuid;
+		}
+
+		mGuid = new GUID(node["guid"].as<std::string>());
+	}
+
+	void PrefabMeta::Save(const std::filesystem::path& metaPath)
+	{
+		ASSERT(mGuid != nullptr);
+
+		YAML::Node node;
+		node["guid"] = mGuid->Data();
+
+		std::ofstream fout(ProjectFileSystem::GetInstance()->GetActualPath(metaPath));
+		fout << node;
+	}
 }

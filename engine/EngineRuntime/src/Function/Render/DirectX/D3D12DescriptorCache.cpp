@@ -55,7 +55,7 @@ namespace Engine
 		return GpuDescriptorHandle;
 
 	}
-	/*
+	
 	void D3D12DescriptorCache::AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle)
 	{
 		// Append to heap
@@ -72,7 +72,7 @@ namespace Engine
 		// Increase descriptor offset
 		RtvDescriptorOffset += SlotsNeeded;
 	}
-	*/
+
 	CD3DX12_CPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendRtvDescriptors(const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>& RtvDescriptors)
 	{
 		// Append to heap
@@ -89,7 +89,7 @@ namespace Engine
 
 		return OutCpuHandle;
 	}
-	/*
+	
 	void D3D12DescriptorCache::AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor, CD3DX12_GPU_DESCRIPTOR_HANDLE& OutGpuHandle, CD3DX12_CPU_DESCRIPTOR_HANDLE& OutCpuHandle)
 	{
 		// Append to heap
@@ -107,7 +107,7 @@ namespace Engine
 		RtvDescriptorOffset += SlotsNeeded;
 
 	}
-	*/
+	
 	CD3DX12_CPU_DESCRIPTOR_HANDLE D3D12DescriptorCache::AppendRtvDescriptor(const D3D12_CPU_DESCRIPTOR_HANDLE& RtvDescriptor)
 	{
 		// Append to heap
@@ -124,7 +124,7 @@ namespace Engine
 
 		return OutCpuHandle;
 	}
-
+	
 	void D3D12DescriptorCache::Reset()
 	{
 		ResetCacheCbvSrvUavDescriptorHeap();

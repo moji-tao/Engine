@@ -31,16 +31,6 @@ namespace Editor
 
 		return true;
 	}
-
-	void AssetTool::SaveAsset(const std::filesystem::path& saveProjectPath, Engine::ISerializable* asset)
-	{
-		Engine::SerializerDataFrame frame;
-		//asset->Serialize(frame);
-		frame << *asset;
-		frame.Save(saveProjectPath);
-
-		//Engine::AssetManager::GetInstance()->AddAssetUrl(saveProjectPath);
-	}
 }
 
 

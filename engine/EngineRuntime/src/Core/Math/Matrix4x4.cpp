@@ -1,10 +1,7 @@
-#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
-#include "EngineRuntime/include/Core/Math/Math.h"
-#include "EngineRuntime/include/Core/Math/Matrix3x3.h"
-#include "EngineRuntime/include/Core/Math/Vector3.h"
-#include "EngineRuntime/include/Core/Math/Vector4.h"
+#include "EngineRuntime/include/Core/Math/Matrix4x4.h"
 #include "EngineRuntime/include/Core/Math/Quaternion.h"
+#include "EngineRuntime/include/Core/Math/Math.h"
 
 namespace Engine
 {
@@ -79,6 +76,16 @@ namespace Engine
 		rot.GetRotationMatrix(m3x3);
 		operator=(IDENTITY);
 		SetData(m3x3);
+	}
+
+	float* Matrix4x4::Ptr()
+	{
+		return &m_Value[0][0];
+	}
+
+	const float* Matrix4x4::Ptr() const
+	{
+		return &m_Value[0][0];
 	}
 
 	void Matrix4x4::SetAllData(const float(&float_array)[16])
@@ -214,8 +221,8 @@ namespace Engine
 		Vector3 left = up.CrossProduct(normal);
 		up = normal.CrossProduct(left);
 
-		left.Normalise();
-		up.Normalise();
+		left.Normalize();
+		up.Normalize();
 
 		Matrix4x4 result = Matrix4x4::IDENTITY;
 		result.SetData(Matrix3x3(left, up, normal));
@@ -225,88 +232,62 @@ namespace Engine
 
 	void Matrix4x4::MakeTrans(const Vector3& v)
 	{
-		m_Value[0][0] = 1.0;
-		m_Value[0][1] = 0.0;
-		m_Value[0][2] = 0.0;
-		m_Value[0][3] = v[0];
-		m_Value[1][0] = 0.0;
-		m_Value[1][1] = 1.0;
-		m_Value[1][2] = 0.0;
-		m_Value[1][3] = v[1];
-		m_Value[2][0] = 0.0;
-		m_Value[2][1] = 0.0;
-		m_Value[2][2] = 1.0;
-		m_Value[2][3] = v[2];
-		m_Value[3][0] = 0.0;
-		m_Value[3][1] = 0.0;
-		m_Value[3][2] = 0.0;
-		m_Value[3][3] = 1.0;
+		m_Value[0][0] = 1.0f;
+		m_Value[0][1] = 0.0f;
+		m_Value[0][2] = 0.0f;
+		m_Value[0][3] = 0.0f;
+		m_Value[1][0] = 0.0f;
+		m_Value[1][1] = 1.0f;
+		m_Value[1][2] = 0.0f;
+		m_Value[1][3] = 0.0f;
+		m_Value[2][0] = v[0];
+		m_Value[2][1] = v[1];
+		m_Value[2][2] = v[2];
+		m_Value[2][3] = 0.0f;
+		m_Value[3][0] = 0.0f;
+		m_Value[3][1] = 0.0f;
+		m_Value[3][2] = 0.0f;
+		m_Value[3][3] = 1.0f;
 	}
 
 	void Matrix4x4::MakeTrans(float tx, float ty, float tz)
 	{
-		m_Value[0][0] = 1.0;
-		m_Value[0][1] = 0.0;
-		m_Value[0][2] = 0.0;
-		m_Value[0][3] = tx;
-		m_Value[1][0] = 0.0;
-		m_Value[1][1] = 1.0;
-		m_Value[1][2] = 0.0;
-		m_Value[1][3] = ty;
-		m_Value[2][0] = 0.0;
-		m_Value[2][1] = 0.0;
-		m_Value[2][2] = 1.0;
-		m_Value[2][3] = tz;
-		m_Value[3][0] = 0.0;
-		m_Value[3][1] = 0.0;
-		m_Value[3][2] = 0.0;
-		m_Value[3][3] = 1.0;
+		m_Value[0][0] = 1.0f;
+		m_Value[0][1] = 0.0f;
+		m_Value[0][2] = 0.0f;
+		m_Value[0][3] = 0.0f;
+		m_Value[1][0] = 0.0f;
+		m_Value[1][1] = 1.0f;
+		m_Value[1][2] = 0.0f;
+		m_Value[1][3] = 0.0f;
+		m_Value[2][0] = tx;
+		m_Value[2][1] = ty;
+		m_Value[2][2] = tz;
+		m_Value[2][3] = 0.0f;
+		m_Value[3][0] = 0.0f;
+		m_Value[3][1] = 0.0f;
+		m_Value[3][2] = 0.0f;
+		m_Value[3][3] = 1.0f;
 	}
 
 	Matrix4x4 Matrix4x4::GetTrans(const Vector3& v)
 	{
-		Matrix4x4 r;
+		Matrix4x4 r = Matrix4x4::IDENTITY;
 
-		r.m_Value[0][0] = 1.0;
-		r.m_Value[0][1] = 0.0;
-		r.m_Value[0][2] = 0.0;
-		r.m_Value[0][3] = v[0];
-		r.m_Value[1][0] = 0.0;
-		r.m_Value[1][1] = 1.0;
-		r.m_Value[1][2] = 0.0;
-		r.m_Value[1][3] = v[1];
-		r.m_Value[2][0] = 0.0;
-		r.m_Value[2][1] = 0.0;
-		r.m_Value[2][2] = 1.0;
-		r.m_Value[2][3] = v[2];
-		r.m_Value[3][0] = 0.0;
-		r.m_Value[3][1] = 0.0;
-		r.m_Value[3][2] = 0.0;
-		r.m_Value[3][3] = 1.0;
+		r.m_Value[2][0] = v[0];
+		r.m_Value[2][1] = v[1];
+		r.m_Value[2][2] = v[2];
 
 		return r;
 	}
 
 	Matrix4x4 Matrix4x4::GetTrans(float t_x, float t_y, float t_z)
 	{
-		Matrix4x4 r;
+		Matrix4x4 r = Matrix4x4::IDENTITY;
 
-		r.m_Value[0][0] = 1.0;
-		r.m_Value[0][1] = 0.0;
-		r.m_Value[0][2] = 0.0;
-		r.m_Value[0][3] = t_x;
-		r.m_Value[1][0] = 0.0;
-		r.m_Value[1][1] = 1.0;
-		r.m_Value[1][2] = 0.0;
-		r.m_Value[1][3] = t_y;
-		r.m_Value[2][0] = 0.0;
-		r.m_Value[2][1] = 0.0;
-		r.m_Value[2][2] = 1.0;
-		r.m_Value[2][3] = t_z;
-		r.m_Value[3][0] = 0.0;
-		r.m_Value[3][1] = 0.0;
-		r.m_Value[3][2] = 0.0;
-		r.m_Value[3][3] = 1.0;
+		r.m_Value[2][0] = t_x;
+		r.m_Value[2][1] = t_y;
+		r.m_Value[2][2] = t_z;
 
 		return r;
 	}
@@ -320,46 +301,22 @@ namespace Engine
 
 	Matrix4x4 Matrix4x4::GetScale(const Vector3& v)
 	{
-		Matrix4x4 r;
+		Matrix4x4 r = Matrix4x4::IDENTITY;
+
 		r.m_Value[0][0] = v[0];
-		r.m_Value[0][1] = 0.0;
-		r.m_Value[0][2] = 0.0;
-		r.m_Value[0][3] = 0.0;
-		r.m_Value[1][0] = 0.0;
 		r.m_Value[1][1] = v[1];
-		r.m_Value[1][2] = 0.0;
-		r.m_Value[1][3] = 0.0;
-		r.m_Value[2][0] = 0.0;
-		r.m_Value[2][1] = 0.0;
 		r.m_Value[2][2] = v[2];
-		r.m_Value[2][3] = 0.0;
-		r.m_Value[3][0] = 0.0;
-		r.m_Value[3][1] = 0.0;
-		r.m_Value[3][2] = 0.0;
-		r.m_Value[3][3] = 1.0;
 
 		return r;
 	}
 
 	Matrix4x4 Matrix4x4::BuildScaleMatrix(float s_x, float s_y, float s_z)
 	{
-		Matrix4x4 r;
+		Matrix4x4 r = Matrix4x4::IDENTITY;
+
 		r.m_Value[0][0] = s_x;
-		r.m_Value[0][1] = 0.0;
-		r.m_Value[0][2] = 0.0;
-		r.m_Value[0][3] = 0.0;
-		r.m_Value[1][0] = 0.0;
 		r.m_Value[1][1] = s_y;
-		r.m_Value[1][2] = 0.0;
-		r.m_Value[1][3] = 0.0;
-		r.m_Value[2][0] = 0.0;
-		r.m_Value[2][1] = 0.0;
 		r.m_Value[2][2] = s_z;
-		r.m_Value[2][3] = 0.0;
-		r.m_Value[3][0] = 0.0;
-		r.m_Value[3][1] = 0.0;
-		r.m_Value[3][2] = 0.0;
-		r.m_Value[3][3] = 1.0;
 
 		return r;
 	}
@@ -380,11 +337,11 @@ namespace Engine
 	void Matrix4x4::ExtractAxes(Vector3& out_x, Vector3& out_y, Vector3& out_z) const
 	{
 		out_x = Vector3(m_Value[0][0], m_Value[1][0], m_Value[2][0]);
-		out_x.Normalise();
+		out_x.Normalize();
 		out_y = Vector3(m_Value[0][1], m_Value[1][1], m_Value[2][1]);
-		out_y.Normalise();
+		out_y.Normalize();
 		out_z = Vector3(m_Value[0][2], m_Value[1][2], m_Value[2][2]);
-		out_z.Normalise();
+		out_z.Normalize();
 	}
 
 	bool Matrix4x4::HasScale() const
@@ -455,22 +412,24 @@ namespace Engine
 
 		// Set up final matrix with scale, rotation and translation
 		m_Value[0][0] = scale[0] * rot3x3[0][0];
-		m_Value[0][1] = scale[1] * rot3x3[0][1];
-		m_Value[0][2] = scale[2] * rot3x3[0][2];
-		m_Value[0][3] = position[0];
-		m_Value[1][0] = scale[0] * rot3x3[1][0];
+		m_Value[0][1] = scale[0] * rot3x3[0][1];
+		m_Value[0][2] = scale[0] * rot3x3[0][2];
+		m_Value[0][3] = 0;
+
+		m_Value[1][0] = scale[1] * rot3x3[1][0];
 		m_Value[1][1] = scale[1] * rot3x3[1][1];
-		m_Value[1][2] = scale[2] * rot3x3[1][2];
-		m_Value[1][3] = position[1];
-		m_Value[2][0] = scale[0] * rot3x3[2][0];
-		m_Value[2][1] = scale[1] * rot3x3[2][1];
+		m_Value[1][2] = scale[1] * rot3x3[1][2];
+		m_Value[1][3] = 0;
+
+		m_Value[2][0] = scale[2] * rot3x3[2][0];
+		m_Value[2][1] = scale[2] * rot3x3[2][1];
 		m_Value[2][2] = scale[2] * rot3x3[2][2];
-		m_Value[2][3] = position[2];
+		m_Value[2][3] = 0;
 
 		// No projection term
-		m_Value[3][0] = 0;
-		m_Value[3][1] = 0;
-		m_Value[3][2] = 0;
+		m_Value[3][0] = position[0];
+		m_Value[3][1] = position[1];
+		m_Value[3][2] = position[2];
 		m_Value[3][3] = 1;
 	}
 
@@ -492,58 +451,108 @@ namespace Engine
 
 		// Set up final matrix with scale, rotation and translation
 		m_Value[0][0] = inv_scale[0] * rot3x3[0][0];
-		m_Value[0][1] = inv_scale[0] * rot3x3[0][1];
-		m_Value[0][2] = inv_scale[0] * rot3x3[0][2];
-		m_Value[0][3] = inv_translate[0];
-		m_Value[1][0] = inv_scale[1] * rot3x3[1][0];
-		m_Value[1][1] = inv_scale[1] * rot3x3[1][1];
-		m_Value[1][2] = inv_scale[1] * rot3x3[1][2];
-		m_Value[1][3] = inv_translate[1];
-		m_Value[2][0] = inv_scale[2] * rot3x3[2][0];
-		m_Value[2][1] = inv_scale[2] * rot3x3[2][1];
-		m_Value[2][2] = inv_scale[2] * rot3x3[2][2];
-		m_Value[2][3] = inv_translate[2];
+		m_Value[0][1] = inv_scale[1] * rot3x3[0][1];
+		m_Value[0][2] = inv_scale[2] * rot3x3[0][2];
+		m_Value[0][3] = 0;
 
-		// No projection term
-		m_Value[3][0] = 0;
-		m_Value[3][1] = 0;
-		m_Value[3][2] = 0;
+		m_Value[1][0] = inv_scale[0] * rot3x3[1][0];
+		m_Value[1][1] = inv_scale[1] * rot3x3[1][1];
+		m_Value[1][2] = inv_scale[2] * rot3x3[1][2];
+		m_Value[1][3] = 0;
+
+		m_Value[2][0] = inv_scale[0] * rot3x3[2][0];
+		m_Value[2][1] = inv_scale[1] * rot3x3[2][1];
+		m_Value[2][2] = inv_scale[2] * rot3x3[2][2];
+		m_Value[2][3] = 0;
+
+		m_Value[3][0] = inv_translate[0];
+		m_Value[3][1] = inv_translate[1];
+		m_Value[3][2] = inv_translate[2];
 		m_Value[3][3] = 1;
 	}
 
 	void Matrix4x4::Decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
 	{
+		position = Vector3(m_Value[3][0], m_Value[3][1], m_Value[3][2]);
+
 		Matrix3x3 m3x3;
 		Extract3x3Matrix(m3x3);
 
-		Matrix3x3 mat_q;
-		Vector3   vec_u;
-		m3x3.CalculateQDUDecomposition(mat_q, scale, vec_u);
+		Matrix3x3 scale_2 = m3x3.Transpose() * m3x3;
+		scale[0] = Math::Sqrt(scale_2[0][0]);
+		scale[1] = Math::Sqrt(scale_2[1][1]);
+		scale[2] = Math::Sqrt(scale_2[2][2]);
+		scale_2[0][0] = 1.0f / scale[0];
+		scale_2[1][1] = 1.0f / scale[1];
+		scale_2[2][2] = 1.0f / scale[2];
 
-		orientation = Quaternion(mat_q);
-		position = Vector3(m_Value[0][3], m_Value[1][3], m_Value[2][3]);
-
-	}
-
-	void Matrix4x4::DecompositionWithoutScale(Vector3& position, Quaternion& rotation) const
-	{
-		Matrix3x3 m3x3;
-		Extract3x3Matrix(m3x3);
-
-		Matrix3x3 mat_q;
-		Vector3   vec_u;
-		Vector3   scale;
-		m3x3.CalculateQDUDecomposition(mat_q, scale, vec_u);
-
-		rotation = Quaternion(mat_q);
-		position = Vector3(m_Value[0][3], m_Value[1][3], m_Value[2][3]);
+		orientation = Quaternion(m3x3 * scale_2);
 	}
 
 	bool Matrix4x4::IsAffine(void) const
 	{
-		return m_Value[3][0] == 0 && m_Value[3][1] == 0 && m_Value[3][2] == 0 && m_Value[3][3] == 1;
+		return m_Value[0][3] == 0 && m_Value[1][3] == 0 && m_Value[2][3] == 0 && m_Value[3][3] == 1;
 	}
 
+	Matrix4x4 Matrix4x4::Inverse() const
+	{
+		float m00 = m_Value[0][0], m01 = m_Value[0][1], m02 = m_Value[0][2], m03 = m_Value[0][3];
+		float m10 = m_Value[1][0], m11 = m_Value[1][1], m12 = m_Value[1][2], m13 = m_Value[1][3];
+		float m20 = m_Value[2][0], m21 = m_Value[2][1], m22 = m_Value[2][2], m23 = m_Value[2][3];
+		float m30 = m_Value[3][0], m31 = m_Value[3][1], m32 = m_Value[3][2], m33 = m_Value[3][3];
+
+		float v0 = m20 * m31 - m21 * m30;
+		float v1 = m20 * m32 - m22 * m30;
+		float v2 = m20 * m33 - m23 * m30;
+		float v3 = m21 * m32 - m22 * m31;
+		float v4 = m21 * m33 - m23 * m31;
+		float v5 = m22 * m33 - m23 * m32;
+
+		float t00 = +(v5 * m11 - v4 * m12 + v3 * m13);
+		float t10 = -(v5 * m10 - v2 * m12 + v1 * m13);
+		float t20 = +(v4 * m10 - v2 * m11 + v0 * m13);
+		float t30 = -(v3 * m10 - v1 * m11 + v0 * m12);
+
+		float invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
+
+		float d00 = t00 * invDet;
+		float d10 = t10 * invDet;
+		float d20 = t20 * invDet;
+		float d30 = t30 * invDet;
+
+		float d01 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		float d11 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		float d21 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		float d31 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+		v0 = m10 * m31 - m11 * m30;
+		v1 = m10 * m32 - m12 * m30;
+		v2 = m10 * m33 - m13 * m30;
+		v3 = m11 * m32 - m12 * m31;
+		v4 = m11 * m33 - m13 * m31;
+		v5 = m12 * m33 - m13 * m32;
+
+		float d02 = +(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		float d12 = -(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		float d22 = +(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		float d32 = -(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+		v0 = m21 * m10 - m20 * m11;
+		v1 = m22 * m10 - m20 * m12;
+		v2 = m23 * m10 - m20 * m13;
+		v3 = m22 * m11 - m21 * m12;
+		v4 = m23 * m11 - m21 * m13;
+		v5 = m23 * m12 - m22 * m13;
+
+		float d03 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+		float d13 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+		float d23 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+		float d33 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+		return Matrix4x4(d00, d01, d02, d03, d10, d11, d12, d13, d20, d21, d22, d23, d30, d31, d32, d33);
+	}
+
+	/*
 	Matrix4x4 Matrix4x4::InverseAffine() const
 	{
 		ASSERT(IsAffine());
@@ -637,68 +646,10 @@ namespace Engine
 			v[3]);
 	}
 
-	Matrix4x4 Matrix4x4::Inverse() const
-	{
-		float m00 = m_Value[0][0], m01 = m_Value[0][1], m02 = m_Value[0][2], m03 = m_Value[0][3];
-		float m10 = m_Value[1][0], m11 = m_Value[1][1], m12 = m_Value[1][2], m13 = m_Value[1][3];
-		float m20 = m_Value[2][0], m21 = m_Value[2][1], m22 = m_Value[2][2], m23 = m_Value[2][3];
-		float m30 = m_Value[3][0], m31 = m_Value[3][1], m32 = m_Value[3][2], m33 = m_Value[3][3];
-
-		float v0 = m20 * m31 - m21 * m30;
-		float v1 = m20 * m32 - m22 * m30;
-		float v2 = m20 * m33 - m23 * m30;
-		float v3 = m21 * m32 - m22 * m31;
-		float v4 = m21 * m33 - m23 * m31;
-		float v5 = m22 * m33 - m23 * m32;
-
-		float t00 = +(v5 * m11 - v4 * m12 + v3 * m13);
-		float t10 = -(v5 * m10 - v2 * m12 + v1 * m13);
-		float t20 = +(v4 * m10 - v2 * m11 + v0 * m13);
-		float t30 = -(v3 * m10 - v1 * m11 + v0 * m12);
-
-		float invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
-
-		float d00 = t00 * invDet;
-		float d10 = t10 * invDet;
-		float d20 = t20 * invDet;
-		float d30 = t30 * invDet;
-
-		float d01 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-		float d11 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-		float d21 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-		float d31 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-		v0 = m10 * m31 - m11 * m30;
-		v1 = m10 * m32 - m12 * m30;
-		v2 = m10 * m33 - m13 * m30;
-		v3 = m11 * m32 - m12 * m31;
-		v4 = m11 * m33 - m13 * m31;
-		v5 = m12 * m33 - m13 * m32;
-
-		float d02 = +(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-		float d12 = -(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-		float d22 = +(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-		float d32 = -(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-		v0 = m21 * m10 - m20 * m11;
-		v1 = m22 * m10 - m20 * m12;
-		v2 = m23 * m10 - m20 * m13;
-		v3 = m22 * m11 - m21 * m12;
-		v4 = m23 * m11 - m21 * m13;
-		v5 = m23 * m12 - m22 * m13;
-
-		float d03 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-		float d13 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-		float d23 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-		float d33 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-		return Matrix4x4(d00, d01, d02, d03, d10, d11, d12, d13, d20, d21, d22, d23, d30, d31, d32, d33);
-	}
-
 	Vector3 Matrix4x4::TransformCoord(const Vector3& v)
 	{
 		Vector4 temp(v, 1.0f);
-		Vector4 ret = (*this) * temp;
+		Vector4 ret = temp * (*this);
 		if (ret[3] == 0.0f)
 		{
 			return Vector3::ZERO;
@@ -711,6 +662,7 @@ namespace Engine
 
 		return Vector3::ZERO;
 	}
+	*/
 
 	float* Matrix4x4::operator[](size_t row_index)
 	{
@@ -822,7 +774,7 @@ namespace Engine
 
 		return r;
 	}
-
+	/*
 	Vector4 Matrix4x4::operator*(const Vector4& v) const
 	{
 		return Vector4(
@@ -831,7 +783,7 @@ namespace Engine
 			m_Value[2][0] * v[0] + m_Value[2][1] * v[1] + m_Value[2][2] * v[2] + m_Value[2][3] * v[3],
 			m_Value[3][0] * v[0] + m_Value[3][1] * v[1] + m_Value[3][2] * v[2] + m_Value[3][3] * v[3]);
 	}
-
+	*/
 	Matrix4x4 Matrix4x4::operator*(float scalar) const
 	{
 		return Matrix4x4(

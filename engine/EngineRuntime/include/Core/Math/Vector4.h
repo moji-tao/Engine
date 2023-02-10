@@ -1,8 +1,8 @@
 #pragma once
+#include "EngineRuntime/include/Core/Math/Vector3.h"
+
 namespace Engine
 {
-	class Vector3;
-
 	class Vector4
 	{
 	public:

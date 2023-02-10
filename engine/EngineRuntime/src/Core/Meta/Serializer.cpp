@@ -19,7 +19,7 @@ namespace Engine
     SerializerDataFrame::~SerializerDataFrame()
     { }
 
-    void SerializerDataFrame::Save(const std::filesystem::path& savePath)
+    void SerializerDataFrame::Save(const std::filesystem::path& savePath, MetaFrame* meta)
     {
         if (!ProjectFileSystem::GetInstance()->WriteFile(savePath, mBuffer.data(), mBuffer.size()))
         {
@@ -27,6 +27,13 @@ namespace Engine
         }
 
         mOffset = 0;
+
+        if (meta != nullptr)
+        {
+            std::filesystem::path metaSavePath = savePath;
+            metaSavePath += ".meta";
+            meta->Save(metaSavePath);
+        }
     }
 
     void SerializerDataFrame::Load(const std::filesystem::path& loadPath)
@@ -129,6 +136,21 @@ namespace Engine
         if (value.size() > 0)
         {
             Write((char*)value.data(), (uint64_t)value.size());
+        }
+    }
+
+    void SerializerDataFrame::Write(const GUID& value)
+    {
+        DataType type = DataType::GUID;
+        Write((char*)&type, sizeof(type));
+        if (value.IsVaild())
+        {
+            Write(true);
+            Write(value.Data(), value.Size());
+        }
+        else
+        {
+            Write(false);
         }
     }
 
@@ -284,6 +306,22 @@ namespace Engine
         return true;
     }
 
+    bool SerializerDataFrame::Read(GUID& value)
+    {
+        ASSERT((DataType)mBuffer[mOffset] == DataType::GUID);
+        ++mOffset;
+
+        bool flag;
+        Read(flag);
+        if (flag)
+        {
+            value.mD.resize(value.Size());
+            return Read((char*)value.Data(), value.Size());
+        }
+
+        return true;
+    }
+
     bool SerializerDataFrame::Read(Vector2& value)
     {
         ASSERT((DataType)mBuffer[mOffset] == DataType::VECTOR2);
@@ -431,6 +469,12 @@ namespace Engine
         return *this;
     }
 
+    SerializerDataFrame& SerializerDataFrame::operator<<(const GUID& value)
+    {
+        Write(value);
+        return *this;
+    }
+
     SerializerDataFrame& SerializerDataFrame::operator<<(const Vector2& value)
     {
         Write(value);
@@ -545,6 +589,12 @@ namespace Engine
         return *this;
     }
 
+    SerializerDataFrame& SerializerDataFrame::operator>>(GUID& value)
+    {
+        Read(value);
+        return *this;
+    }
+
     SerializerDataFrame& SerializerDataFrame::operator>>(Vector2& value)
     {
         Read(value);
@@ -597,5 +647,30 @@ namespace Engine
     {
         Read(value);
         return *this;
+    }
+
+    MetaFrame::~MetaFrame()
+    {
+        if (mGuid != nullptr)
+        {
+            delete mGuid;
+        }
+    }
+
+    const GUID& MetaFrame::GetGuid() const
+    {
+        ASSERT(mGuid != nullptr);
+
+        return *mGuid;
+    }
+
+    void MetaFrame::SetGuid(const GUID& guid)
+    {
+        if (mGuid != nullptr)
+        {
+            delete mGuid;
+        }
+
+        mGuid = new GUID(guid);
     }
 }

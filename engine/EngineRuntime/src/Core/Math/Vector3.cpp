@@ -1,8 +1,5 @@
-#include "EngineRuntime/include/Core/Math/Vector3.h"
-#include "EngineRuntime/include/Core/Math/Vector2.h"
-#include "EngineRuntime/include/Core/Math/Quaternion.h"
-#include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
+#include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Meta/Reflection.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 
@@ -95,7 +92,7 @@ namespace Engine
 		return x * vec.x + y * vec.y + z * vec.z;
 	}
 
-	void Vector3::Normalise()
+	void Vector3::Normalize()
 	{
 		float length = std::hypot(x, y, z);
 		if (length > 0.0f)
@@ -156,8 +153,8 @@ namespace Engine
 		// Copy, since cannot modify local
 		Vector3 v0 = *this;
 		Vector3 v1 = dest;
-		v0.Normalise();
-		v1.Normalise();
+		v0.Normalize();
+		v1.Normalize();
 
 		float d = v0.DotProduct(v1);
 		// If dot == 1, vectors are the same
@@ -178,7 +175,7 @@ namespace Engine
 				Vector3 axis = Vector3::UNIT_X.CrossProduct(*this);
 				if (axis.IsZeroLength()) // pick another if collinear
 					axis = Vector3::UNIT_Y.CrossProduct(*this);
-				axis.Normalise();
+				axis.Normalize();
 				q.SetDataFromAngleAxis(Radian(Math_PI), axis);
 			}
 		}
@@ -194,7 +191,7 @@ namespace Engine
 			q.SetZ(c.GetZ() * invs);
 			q.SetW(s * 0.5f);
 
-			q.Normalise();
+			q.Normalize();
 		}
 		return q;
 
@@ -214,7 +211,7 @@ namespace Engine
 	Vector3 Vector3::GetNormalised() const
 	{
 		Vector3 ans = *this;
-		ans.Normalise();
+		ans.Normalize();
 		return ans;
 	}
 

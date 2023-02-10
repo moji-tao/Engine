@@ -5,6 +5,7 @@ namespace Engine
 	class Degree;
 	class Angle;
 
+	// 弧度
 	class Radian
 	{
 	public:
@@ -76,6 +77,7 @@ namespace Engine
 		float m_Value;
 	};
 
+	// 角度
 	class Degree
 	{
 	public:

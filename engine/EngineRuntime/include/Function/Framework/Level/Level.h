@@ -14,7 +14,7 @@ namespace Engine
 	public:
 		Level();
 
-		~Level();
+		virtual ~Level() override;
 
 	public:
 		bool Initialize();
@@ -34,6 +34,10 @@ namespace Engine
 
 		void AddActor(Actor* actor);
 
+		void RemoveActor(Actor* actor);
+
+		Actor* CreateEmptyActor(const std::string& actorName);
+
 		std::list<Actor*>& GetSceneActors();
 
 	public:
@@ -49,5 +53,17 @@ namespace Engine
 		friend Actor;
 
 		friend WorldManager;
+	};
+
+	class SceneMeta : public MetaFrame
+	{
+	public:
+		SceneMeta() = default;
+		virtual ~SceneMeta() override = default;
+
+	public:
+		void Load(const std::filesystem::path& metaPath);
+
+		virtual void Save(const std::filesystem::path& metaPath) override;
 	};
 }

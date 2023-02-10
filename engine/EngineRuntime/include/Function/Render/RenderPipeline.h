@@ -16,11 +16,11 @@ namespace Engine
 		void InitEditorUI(ImGuiDevice* imguiDevice);
 
 	public:
-		virtual void RenderTargetResize(int width, int height) = 0;
+		virtual void OnResize(int width, int height) = 0;
 
-		virtual void ForwardRender() = 0;
+		virtual void Render() = 0;
 
-		virtual void DeferredRender() = 0;
+		virtual void UploadResource() = 0;
 
 	protected:
 		ImGuiDevice* mImGuiDevice = nullptr;

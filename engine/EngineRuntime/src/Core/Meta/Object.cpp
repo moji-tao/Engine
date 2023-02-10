@@ -47,4 +47,16 @@ namespace Engine
 	}
 
 	const Rtti Object::mType("Object", nullptr);
+
+	void Object::SetGuid(const GUID& guid)
+	{
+		mGuid = guid;
+	}
+
+	GUID Object::GetGuid() const
+	{
+		return mGuid;
+	}
+
+
 }

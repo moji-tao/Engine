@@ -56,8 +56,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>DEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\engine\3rd\glfw\include;..\..\engine\3rd\ImGui\include;..\..\engine\3rd\stb\include;..\..\engine\3rd\assimp\include;..\..\engine\3rd\Boost;..\..\engine\3rd\jsoncpp\include;..\..\engine\3rd\spdlog\include;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\engine\3rd\glfw\include;..\..\engine\3rd\ImGui\include;..\..\engine\3rd\stb\include;..\..\engine\3rd\assimp\include;..\..\engine\3rd\Boost;..\..\engine\3rd\jsoncpp\include;..\..\engine\3rd\yamlcpp\include;..\..\engine\3rd\spdlog\include;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <AdditionalOptions>/permissive %(AdditionalOptions)</AdditionalOptions>
@@ -76,8 +76,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\engine\3rd\glfw\include;..\..\engine\3rd\ImGui\include;..\..\engine\3rd\stb\include;..\..\engine\3rd\assimp\include;..\..\engine\3rd\Boost;..\..\engine\3rd\jsoncpp\include;..\..\engine\3rd\spdlog\include;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\engine\3rd\glfw\include;..\..\engine\3rd\ImGui\include;..\..\engine\3rd\stb\include;..\..\engine\3rd\assimp\include;..\..\engine\3rd\Boost;..\..\engine\3rd\jsoncpp\include;..\..\engine\3rd\yamlcpp\include;..\..\engine\3rd\spdlog\include;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -113,19 +113,24 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Object.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Reflection.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Meta\Serializer.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Random\GUID.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Random\Random.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\EngineRuntime.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\IRuntimeModule.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\ISerializable.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Framework\Interface\ISingleton.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\Component.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\DirectionalLightComponent.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\LightComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\MeshRendererComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\TransformComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Level\Level.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\Actor.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\GameObject.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\World\WorldManager.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Buffer.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12CommandContext.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12DeferredRenderPipeline.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12DescriptorCache.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Device.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12HeapSlotAllocator.h" />
@@ -134,7 +139,7 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12MemoryAllocator.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12PiplineState.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RHI.h" />
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RenderPipeline.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12RenderResource.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Resource.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Shader.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\D3D12Texture.h" />
@@ -143,16 +148,16 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\DirectXUtil.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderInfo.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderTarget.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\SceneCaptureCube.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\d3dx12.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\ImGuiDevice.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RHI.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RHIResource.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderCamera.h" />
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPass.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderPipeline.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResource.h" />
-    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderResourceBase.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\RenderSystem.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\TAASampler.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Window\WindowSystem.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Window\WindowUI.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Platform\CharSet.h" />
@@ -162,12 +167,15 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MaterialData.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\MeshData.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\SkeletonData.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\TextData.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Resource\ResourceType\Data\TextureData.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\renderdoc_app.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Alloter\MemoryPool.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Log\LogSystem.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Angle.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Color.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Math.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Matrix3x3.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Matrix4x4.cpp" />
@@ -179,16 +187,21 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Object.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Reflection.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Meta\Serializer.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Random\GUID.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Random\Random.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\EngineRuntime.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\Component.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\DirectionalLightComponent.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\LightComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\MeshRendererComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\TransformComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Level\Level.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\Actor.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\GameObject.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\World\WorldManager.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Buffer.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12CommandContext.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12DeferredRenderPipeline.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12DescriptorCache.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Device.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12HeapSlotAllocator.cpp" />
@@ -197,7 +210,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12MemoryAllocator.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12PiplineState.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RHI.cpp" />
-    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RenderPipeline.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12RenderResource.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Resource.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Shader.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Texture.cpp" />
@@ -205,6 +218,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Viewport.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\DirectXUtil.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\RenderTarget.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\SceneCaptureCube.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\ImGuiDevice.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderCamera.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderPipeline.cpp" />
@@ -217,6 +231,8 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ConfigManager\ConfigManager.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\MaterialData.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\MeshData.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\SkeletonData.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextData.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextureData.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +247,9 @@
     </ProjectReference>
     <ProjectReference Include="..\3rd\jsoncpp\jsoncpp.vcxproj">
       <Project>{42ABB4F7-AE8A-3393-B7A2-BE6923019AF4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\yamlcpp\yamlcpp.vcxproj">
+      <Project>{7B153C50-E7F4-BAEB-F00C-46C25C6B214D}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

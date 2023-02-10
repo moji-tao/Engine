@@ -23,7 +23,8 @@ project "EngineRuntime"
         "ImGui",
         "jsoncpp",
         "spdlog",
-        "jsoncpp"
+        "jsoncpp",
+        "yamlcpp"
     }
 
     includedirs
@@ -34,13 +35,15 @@ project "EngineRuntime"
         "%{IncludeDir.assimp}",
         "%{IncludeDir.Boost}",
         "%{IncludeDir.jsoncpp}",
+        "%{IncludeDir.yamlcpp}",
         "%{IncludeDir.spdlog}",
         g_WorkSpaceRootFolder .. "engine/"
     }
 
     defines
     {
-        "NOMINMAX"
+        "NOMINMAX",
+        "_CRT_SECURE_NO_WARNINGS"
     }
 
     filter "system:windows"

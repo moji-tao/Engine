@@ -1,11 +1,8 @@
 #include <cstring>
 #include <cmath>
+#include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Core/Math/Matrix3x3.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
-#include "EngineRuntime/include/Core/Math/Quaternion.h"
-#include "EngineRuntime/include/Core/Math/Vector3.h"
-#include "EngineRuntime/include/Core/Math/Angle.h"
-#include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
@@ -56,27 +53,7 @@ namespace Engine
 
 	Matrix3x3::Matrix3x3(const Quaternion& q)
 	{
-		float yy = q.GetY() * q.GetY();
-		float zz = q.GetZ() * q.GetZ();
-		float xy = q.GetX() * q.GetY();
-		float zw = q.GetZ() * q.GetW();
-		float xz = q.GetX() * q.GetZ();
-		float yw = q.GetY() * q.GetW();
-		float xx = q.GetX() * q.GetX();
-		float yz = q.GetY() * q.GetZ();
-		float xw = q.GetX() * q.GetW();
-
-		m_Value[0][0] = 1 - 2 * yy - 2 * zz;
-		m_Value[0][1] = 2 * xy + 2 * zw;
-		m_Value[0][2] = 2 * xz - 2 * yw;
-
-		m_Value[1][0] = 2 * xy - 2 * zw;
-		m_Value[1][1] = 1 - 2 * xx - 2 * zz;
-		m_Value[1][2] = 2 * yz + 2 * xw;
-
-		m_Value[2][0] = 2 * xz + 2 * yw;
-		m_Value[2][1] = 2 * yz - 2 * xw;
-		m_Value[2][2] = 1 - 2 * xx - 2 * yy;
+		q.GetRotationMatrix(*this);
 	}
 
 	void Matrix3x3::SetAllData(const float(&float_array)[9])
@@ -166,107 +143,7 @@ namespace Engine
 
 		return det;
 	}
-
-	void Matrix3x3::CalculateQDUDecomposition(Matrix3x3& out_Q, Vector3& out_D, Vector3& out_U) const
-	{
-		// Factor M = QR = QDU where Q is orthogonal, D is diagonal,
-		// and U is upper triangular with ones on its diagonal.  Algorithm uses
-		// Gram-Schmidt orthogonalization (the QR algorithm).
-		//
-		// If M = [ m0 | m1 | m2 ] and Q = [ q0 | q1 | q2 ], then
-		//
-		//   q0 = m0/|m0|
-		//   q1 = (m1-(q0*m1)q0)/|m1-(q0*m1)q0|
-		//   q2 = (m2-(q0*m2)q0-(q1*m2)q1)/|m2-(q0*m2)q0-(q1*m2)q1|
-		//
-		// where |V| indicates length of vector V and A*B indicates dot
-		// product of vectors A and B.  The matrix R has entries
-		//
-		//   r00 = q0*m0  r01 = q0*m1  r02 = q0*m2
-		//   r10 = 0      r11 = q1*m1  r12 = q1*m2
-		//   r20 = 0      r21 = 0      r22 = q2*m2
-		//
-		// so D = diag(r00,r11,r22) and U has entries u01 = r01/r00,
-		// u02 = r02/r00, and u12 = r12/r11.
-
-		// Q = rotation
-		// D = scaling
-		// U = shear
-
-		// D stores the three diagonal entries r00, r11, r22
-		// U stores the entries U[0] = u01, U[1] = u02, U[2] = u12
-
-		// build orthogonal matrix Q
-		float inv_length = m_Value[0][0] * m_Value[0][0] + m_Value[1][0] * m_Value[1][0] + m_Value[2][0] * m_Value[2][0];
-		if (!Math::RealEqual(inv_length, 0))
-			inv_length = Math::InvSqrt(inv_length);
-
-		out_Q[0][0] = m_Value[0][0] * inv_length;
-		out_Q[1][0] = m_Value[1][0] * inv_length;
-		out_Q[2][0] = m_Value[2][0] * inv_length;
-
-		float dot = out_Q[0][0] * m_Value[0][1] + out_Q[1][0] * m_Value[1][1] + out_Q[2][0] * m_Value[2][1];
-		out_Q[0][1] = m_Value[0][1] - dot * out_Q[0][0];
-		out_Q[1][1] = m_Value[1][1] - dot * out_Q[1][0];
-		out_Q[2][1] = m_Value[2][1] - dot * out_Q[2][0];
-		inv_length = out_Q[0][1] * out_Q[0][1] + out_Q[1][1] * out_Q[1][1] + out_Q[2][1] * out_Q[2][1];
-		if (!Math::RealEqual(inv_length, 0))
-			inv_length = Math::InvSqrt(inv_length);
-
-		out_Q[0][1] *= inv_length;
-		out_Q[1][1] *= inv_length;
-		out_Q[2][1] *= inv_length;
-
-		dot = out_Q[0][0] * m_Value[0][2] + out_Q[1][0] * m_Value[1][2] + out_Q[2][0] * m_Value[2][2];
-		out_Q[0][2] = m_Value[0][2] - dot * out_Q[0][0];
-		out_Q[1][2] = m_Value[1][2] - dot * out_Q[1][0];
-		out_Q[2][2] = m_Value[2][2] - dot * out_Q[2][0];
-		dot = out_Q[0][1] * m_Value[0][2] + out_Q[1][1] * m_Value[1][2] + out_Q[2][1] * m_Value[2][2];
-		out_Q[0][2] -= dot * out_Q[0][1];
-		out_Q[1][2] -= dot * out_Q[1][1];
-		out_Q[2][2] -= dot * out_Q[2][1];
-		inv_length = out_Q[0][2] * out_Q[0][2] + out_Q[1][2] * out_Q[1][2] + out_Q[2][2] * out_Q[2][2];
-		if (!Math::RealEqual(inv_length, 0))
-			inv_length = Math::InvSqrt(inv_length);
-
-		out_Q[0][2] *= inv_length;
-		out_Q[1][2] *= inv_length;
-		out_Q[2][2] *= inv_length;
-
-		// guarantee that orthogonal matrix has determinant 1 (no reflections)
-		float det = out_Q[0][0] * out_Q[1][1] * out_Q[2][2] + out_Q[0][1] * out_Q[1][2] * out_Q[2][0] +
-			out_Q[0][2] * out_Q[1][0] * out_Q[2][1] - out_Q[0][2] * out_Q[1][1] * out_Q[2][0] -
-			out_Q[0][1] * out_Q[1][0] * out_Q[2][2] - out_Q[0][0] * out_Q[1][2] * out_Q[2][1];
-
-		if (det < 0.0)
-		{
-			for (size_t row_index = 0; row_index < 3; row_index++)
-				for (size_t rol_index = 0; rol_index < 3; rol_index++)
-					out_Q[row_index][rol_index] = -out_Q[row_index][rol_index];
-		}
-
-		// build "right" matrix R
-		Matrix3x3 R;
-		R[0][0] = out_Q[0][0] * m_Value[0][0] + out_Q[1][0] * m_Value[1][0] + out_Q[2][0] * m_Value[2][0];
-		R[0][1] = out_Q[0][0] * m_Value[0][1] + out_Q[1][0] * m_Value[1][1] + out_Q[2][0] * m_Value[2][1];
-		R[1][1] = out_Q[0][1] * m_Value[0][1] + out_Q[1][1] * m_Value[1][1] + out_Q[2][1] * m_Value[2][1];
-		R[0][2] = out_Q[0][0] * m_Value[0][2] + out_Q[1][0] * m_Value[1][2] + out_Q[2][0] * m_Value[2][2];
-		R[1][2] = out_Q[0][1] * m_Value[0][2] + out_Q[1][1] * m_Value[1][2] + out_Q[2][1] * m_Value[2][2];
-		R[2][2] = out_Q[0][2] * m_Value[0][2] + out_Q[1][2] * m_Value[1][2] + out_Q[2][2] * m_Value[2][2];
-
-		// the scaling component
-		out_D[0] = R[0][0];
-		out_D[1] = R[1][1];
-		out_D[2] = R[2][2];
-
-		// the shear component
-		float inv_d0 = 1.0f / out_D[0];
-		out_U[0] = R[0][1] * inv_d0;
-		out_U[1] = R[0][2] * inv_d0;
-		out_U[2] = R[1][2] / out_D[1];
-
-	}
-
+	
 	void Matrix3x3::ToAngleAxis(Vector3& axis, Radian& radian) const
 	{
 		// Let (x,y,z) be the unit-length axis and let A be an angle of rotation.
@@ -302,7 +179,7 @@ namespace Engine
 				axis[0] = m_Value[2][1] - m_Value[1][2];
 				axis[1] = m_Value[0][2] - m_Value[2][0];
 				axis[2] = m_Value[1][0] - m_Value[0][1];
-				axis.Normalise();
+				axis.Normalize();
 			}
 			else
 			{
@@ -359,7 +236,7 @@ namespace Engine
 			axis[2] = 0.0;
 		}
 	}
-
+	
 	void Matrix3x3::ToAngleAxis(Vector3& axis, Degree& angle) const
 	{
 		Radian r;
@@ -384,14 +261,15 @@ namespace Engine
 		float z_sinv = axis[2] * sin_v;
 
 		m_Value[0][0] = x2 * one_minus_cos + cos_v;
-		m_Value[0][1] = xym - z_sinv;
+		m_Value[0][1] = xym + z_sinv;
 		m_Value[0][2] = xzm + y_sin_v;
-		m_Value[1][0] = xym + z_sinv;
+		m_Value[1][0] = xym - z_sinv;
 		m_Value[1][1] = y2 * one_minus_cos + cos_v;
-		m_Value[1][2] = yzm - x_sin_v;
+		m_Value[1][2] = yzm + x_sin_v;
 		m_Value[2][0] = xzm - y_sin_v;
-		m_Value[2][1] = yzm + x_sin_v;
+		m_Value[2][1] = yzm - x_sin_v;
 		m_Value[2][2] = z2 * one_minus_cos + cos_v;
+
 	}
 
 	Matrix3x3 Matrix3x3::Scale(const Vector3& scale)
@@ -493,7 +371,7 @@ namespace Engine
 		}
 		return prod;
 	}
-
+	/*
 	Vector3 Matrix3x3::operator*(const Vector3& rhs) const
 	{
 		Vector3 prod;
@@ -504,16 +382,14 @@ namespace Engine
 		}
 		return prod;
 	}
-
+	*/
 	Vector3 operator*(const Vector3& point, const Matrix3x3& rhs)
 	{
-		Vector3 prod;
-		for (size_t row_index = 0; row_index < 3; row_index++)
-		{
-			prod[row_index] = point[0] * rhs.m_Value[0][row_index] + point[1] * rhs.m_Value[1][row_index] +
-				point[2] * rhs.m_Value[2][row_index];
-		}
-		return prod;
+		return Vector3(
+			point[0] * rhs[0][0] + point[1] * rhs[1][0] + point[2] * rhs[2][0],
+			point[0] * rhs[0][1] + point[1] * rhs[1][1] + point[2] * rhs[2][1],
+			point[0] * rhs[0][2] + point[1] * rhs[1][2] + point[2] * rhs[2][2]
+		);
 	}
 
 	Matrix3x3 operator*(float scalar, const Matrix3x3& rhs)

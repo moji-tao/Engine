@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "EngineRuntime/include/Core/Random/GUID.h"
 
 namespace Engine
 {
@@ -39,28 +40,40 @@ namespace Engine
 	class Object
 	{
 		DECLARE_RTTI
+	public:
+		Object() = default;
+
+		virtual ~Object() = default;
+
+	public:
+		void SetGuid(const GUID& guid);
+
+		GUID GetGuid() const;
+
+	protected:
+		GUID mGuid;
 	};
 
 	template <typename T, typename F>
-	T* StaticCase(F* obj)
+	T* StaticCast(F* obj)
 	{
 		return (T*)obj;
 	}
 
 	template <typename T, typename F>
-	const T* StaticCase(const F* obj)
+	const T* StaticCast(const F* obj)
 	{
 		return (const T*)obj;
 	}
 
 	template <typename T, typename F>
-	T* DynamicCase(F* obj)
+	T* DynamicCast(F* obj)
 	{
 		return obj && obj->GetType().CanCastTo(T::mType) ? (T*)obj : nullptr;
 	}
 
 	template <typename T, typename F>
-	const T* DynamicCase(const F* obj)
+	const T* DynamicCast(const F* obj)
 	{
 		return obj && obj->GetType().CanCastTo(T::mType) ? (T*)obj : nullptr;
 	}

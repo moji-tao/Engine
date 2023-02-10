@@ -1,29 +1,51 @@
 #pragma once
-#include <memory>
-#include "EngineRuntime/include/Core/Meta/Object.h"
-#include "EngineRuntime/include/Framework/Interface/ISerializable.h"
+#include "EngineRuntime/include/Function/Framework/Object/GameObject.h"
+#include "EngineRuntime/include/Core/Meta/Reflection.h"
 
 namespace Engine
 {
 	class Actor;
 	class TransformComponent;
 
-	class Component : public Object, public ISerializable
+	class ComponentClassRegister
+	{
+	public:
+		ComponentClassRegister(const std::string& className);
+	};
+
+#define REGISTER_COMPONENT(class_name) REGISTER_CLASS(class_name); Engine::ComponentClassRegister REGISTERComponent##class_name##ComponentClassRegister(#class_name);
+
+
+	class Component : public GameObject
 	{
 		DECLARE_RTTI;
 	public:
 		Component();
 
-		virtual ~Component();
+		virtual ~Component() override;
 
 	public:
 		void SetParent(Actor* parentObject);
 
-		virtual void Tick(float deltaTime);
+		virtual void Tick(float deltaTime) = 0;
+
+		virtual void Serialize(SerializerDataFrame& stream) const override = 0;
+
+		virtual bool Deserialize(SerializerDataFrame& stream) override = 0;
+
+		virtual void CloneData(GameObject* node) override = 0;
 
 	protected:
 		Actor* mParentObject;
 
 		bool mIsEnable = true;
+
+	protected:
+		unsigned mOrder;
+
+		friend class Actor;
+
+	public:
+		static std::vector<std::string> ALLInstanceComponentName;
 	};
 }

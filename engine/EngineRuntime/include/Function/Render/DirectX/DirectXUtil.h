@@ -6,7 +6,6 @@
 #include <dxgi1_4.h>
 #include <d3d12.h>
 #include <DirectXCollision.h>
-#include "EngineRuntime/include/Platform/CharSet.h"
 #include "EngineRuntime/include/core/Alloter/MemoryPool.h"
 #include "EngineRuntime/include/core/base/macro.h"
 

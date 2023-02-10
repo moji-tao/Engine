@@ -1,28 +1,21 @@
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include "EngineRuntime/include/Core/Random/Random.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
 
 namespace Engine
 {
-	boost::mt19937 Random::mt = boost::mt19937((uint32_t)time(nullptr));
+	std::default_random_engine Random::engine = std::default_random_engine((unsigned int)time(nullptr));
+	std::uniform_real_distribution<float> Random::ds_float = std::uniform_real_distribution<float>(0.0f, 1.0f);
+	std::uniform_int_distribution<int> Random::ds_int = std::uniform_int_distribution<int>();
 
 	float Random::GetRandom()
 	{
-		static boost::uniform_01<boost::mt19937&>  u01(mt);
-		return (float)u01();
+		return ds_float(engine);
 	}
 
 	int Random::GetRandom(int min, int max)
 	{
 		ASSERT(min <= max);
-		return min + mt() % (max - min);
-	}
-
-	GUID Random::GetGUID()
-	{
-		boost::uuids::uuid uid = boost::uuids::random_generator()();
-		return boost::uuids::to_string(uid);
+		ds_int.param(std::uniform_int_distribution<int>::param_type(min, max));
+		return ds_int(engine);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "EngineEditor/include/Application/EngineEditor.h"
+#include "EngineEditor/include/UI/EditorUIMessage.h"
 #include "EngineRuntime/include/Function/Render/ImGuiDevice.h"
 #include "EngineRuntime/include/Core/Meta/Object.h"
 
@@ -13,7 +14,7 @@ namespace Editor
 
 		virtual ~EditorUIPassBase() = default;
 
-		virtual void Initialize(Engine::ImGuiDevice* device, EngineEditor* editor);
+		virtual void Initialize(EditorUIMessage* messageBox, Engine::ImGuiDevice* device, EngineEditor* editor);
 
 	public:
 		virtual void ShowUI() = 0;
@@ -25,5 +26,7 @@ namespace Editor
 		Engine::ImGuiDevice* mDevice = nullptr;
 
 		EngineEditor* mEditor = nullptr;
+
+		EditorUIMessage* mMessageBox = nullptr;
 	};
 }
