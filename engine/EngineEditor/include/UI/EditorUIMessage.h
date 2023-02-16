@@ -10,7 +10,13 @@ namespace Editor
 
 		Engine::Actor* GetInspectorShowActor();
 
+		void SetProjectSelectFile(const Engine::GUID& guid);
+
+		Engine::GUID GetProjectSelectFile();
+
 	private:
 		Engine::Actor* mInspectorShowActor = nullptr;
+
+		Engine::GUID mProjectSelectFile;
 	};
 }

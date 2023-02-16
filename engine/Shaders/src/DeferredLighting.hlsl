@@ -1,10 +1,14 @@
 #include "Common.hlsl"
+#include "PBRUtlis.hlsl"
+#include "ShadowMap.hlsl"
 
 struct DirectionalLight
 {
+    float4x4 LightViewProj;
 	float4 Color;
 	float3 Direction;
     float Intensity;
+    int ShadowMapIndex;
 };
 
 struct PointLight
@@ -13,15 +17,18 @@ struct PointLight
 	float3 Position;
 	float Range;
     float Intensity;
+    int ShadowMapIndex;
 };
 
 struct SpotLight
 {
+    float4x4 LightViewProj;
 	float4 Color;
 	float3 Position;
 	float Light;
 	float Angle;
     float Intensity;
+    int ShadowMapIndex;
 };
 
 cbuffer cbLightCommon
@@ -29,12 +36,23 @@ cbuffer cbLightCommon
     uint gDirectionalLightCount;
     uint gPointLightCount;
     uint gSpotLightCount;
+
+    uint gEnableSSAO;
+    uint gEnableAmbientLighting;
 };
 
 Texture2D PositionGBuffer;
 Texture2D NormalGBuffer;
 Texture2D ColorGBuffer;
-Texture2D MetallicGBuffer;
+Texture2D MetallicRoughnessGBuffer;
+Texture2D EmissiveGBuffer;
+
+TextureCube IBLIrradianceMap;
+#define IBL_PREFILTER_ENVMAP_MIP_LEVEL 5
+TextureCube IBLPrefilterEnvMaps[IBL_PREFILTER_ENVMAP_MIP_LEVEL];
+Texture2D EnvBRDFLUT;
+
+Texture2D SSAOBuffer;
 
 StructuredBuffer<DirectionalLight> DirectionalLightList;
 StructuredBuffer<PointLight> PointLightList;
@@ -64,15 +82,92 @@ VertexOut VS(VertexIn vertexIn)
     return vertexOut;
 }
 
+float3 GetPrefilteredColor(float Roughness, float3 ReflectDir)
+{
+	float Level = Roughness * (IBL_PREFILTER_ENVMAP_MIP_LEVEL - 1);
+	int FloorLevel = floor(Level);
+	int CeilLevel = ceil(Level);
+
+	float3 FloorSample = IBLPrefilterEnvMaps[FloorLevel].SampleLevel(LinearClampSampler, ReflectDir, 0).rgb;
+	float3 CeilSample = IBLPrefilterEnvMaps[CeilLevel].SampleLevel(LinearClampSampler, ReflectDir, 0).rgb;
+	
+	float3 PrefilteredColor = lerp(FloorSample, CeilSample, (Level - FloorLevel));
+	return PrefilteredColor;
+}
+
 float4 PS(VertexOut pixelIn) : SV_TARGET
 {
     float3 baseColor = ColorGBuffer.Sample(PointClampSampler, pixelIn.TexC).rgb;
     float3 normal = NormalGBuffer.Sample(PointClampSampler, pixelIn.TexC).rgb;
     float3 worldPos = PositionGBuffer.Sample(PointClampSampler, pixelIn.TexC).rgb;
-    float3 metallic = MetallicGBuffer.Sample(PointClampSampler, pixelIn.TexC).rgb;
+    float shadingModel = PositionGBuffer.Sample(PointClampSampler, pixelIn.TexC).a;
+    float metallic = MetallicRoughnessGBuffer.Sample(PointClampSampler, pixelIn.TexC).r;
+    float roughness = MetallicRoughnessGBuffer.Sample(PointClampSampler, pixelIn.TexC).g;
 
-    float3 outColor = baseColor * 0.1f;
+	float ambientAccess = 1.0f;
 
+    if (gEnableSSAO == 1)
+    {
+        ambientAccess = SSAOBuffer.Sample(PointClampSampler, pixelIn.TexC).r;
+    }
+
+    float3 outColor = float3(0.0f, 0.0f, 0.0f);
+
+    if (shadingModel == 0.0f)
+    {
+        //outColor += ambientAccess * baseColor * 0.1f;
+        // 环境光照
+        if (gEnableAmbientLighting == 1)
+        {
+            float3 irradiance = IBLIrradianceMap.Sample(LinearClampSampler, normal).rgb;
+
+            float3 refDir = reflect(normalize(gEyePosW - worldPos), normal);
+            float3 prefilteredColor = GetPrefilteredColor(roughness, refDir);
+
+            float nDotV = dot(normal, gEyePosW - worldPos);
+            float2 lut = EnvBRDFLUT.Sample(LinearClampSampler, float2(nDotV, roughness)).rg;
+
+            outColor += ambientAccess * AmbientLighting(baseColor, irradiance, prefilteredColor, lut, metallic);
+        }
+
+
+        // 直接光照
+        uint i;
+        [unroll(10)]
+        for (i = 0; i < gDirectionalLightCount; ++i)
+        {
+            DirectionalLight light = DirectionalLightList[i];
+
+            float visibility = 1.0f;
+
+            if (light.ShadowMapIndex != -1)
+            {
+                float4 shadowPosH = mul(light.LightViewProj, float4(worldPos, 1.0f));
+                
+                visibility = ShadowVisibility(shadowPosH, light.ShadowMapIndex, light.Direction, normal);
+            }
+
+            float3 radiance = light.Color.rgb * light.Intensity;
+
+            outColor += DirectLighting(radiance, -light.Direction, normal, normalize(gEyePosW - worldPos), metallic, roughness, baseColor) * visibility;
+        }
+
+        for (i = 0; i < gPointLightCount; ++i)
+        {
+            PointLight light = PointLightList[i];
+        }
+
+        for (i = 0; i < gSpotLightCount; ++i)
+        {
+            SpotLight light = SpotLightList[i];
+        }
+    }
+    else
+    {
+        outColor = baseColor;
+    }
+
+/*
     uint i;
     for (i = 0; i < gDirectionalLightCount; ++i)
     {
@@ -96,8 +191,7 @@ float4 PS(VertexOut pixelIn) : SV_TARGET
     }
 
 
-
-
+*/
 
     return float4(outColor, 1.0f);
 }

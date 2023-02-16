@@ -35,6 +35,8 @@ namespace Editor
 		void Ref_GameObjectDelete();
 		void Ref_CreateEmptyGameObject();
 		void Ref_Create3DCube();
+		void Ref_Create3DSphere();
+		void Ref_Create3DQuad();
 
 		bool mIsSelectedNode = false;
 		int mIsSelectedNodeNum = true;

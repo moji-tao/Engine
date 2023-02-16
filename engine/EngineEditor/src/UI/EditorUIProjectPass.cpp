@@ -13,6 +13,7 @@
 #include "EngineRuntime/include/Core/Meta/Reflection.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Function/Framework/Level/Level.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/MaterialData.h"
 #include "EngineRuntime/include/Resource/ResourceType/Data/TextData.h"
 
 namespace Editor
@@ -22,6 +23,7 @@ namespace Editor
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_CreateFolder, void);
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_CreateLuaScript, void);
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_CreateScene, void);
+	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_CreateMaterial, void);
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_ShowFolderInExplorer, void);
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_Open, void);
 	REGISTER_CLASS_METHOD(EditorUIProjectPass, Ref_Delete, void);
@@ -33,9 +35,9 @@ namespace Editor
 		:EditorUIPassBase()
 	{
 		mCreateOrderMap[CreateItem::emCreateFolder] = [this] {CreateFolder(); };
-
 		mCreateOrderMap[CreateItem::emCreateLuaScript] = [this] {CreateLuaScript(); };
 		mCreateOrderMap[CreateItem::emCreateScene] = [this] {CreateScene(); };
+		mCreateOrderMap[CreateItem::emCreateMaterial] = [this] {CreateMaterial(); };
 	}
 
 	EditorUIProjectPass::~EditorUIProjectPass()
@@ -58,6 +60,16 @@ namespace Editor
 		mIconIntegralTexture = mDevice->LoadTexture(mEditor->Config.editorResourceConfig.editorIntegralIcon);
 
 		mRightMenu = EditorRightMenu::CreateRightMenu(Engine::EngineFileSystem::GetInstance()->GetActualPath("UI/RightMenuInProject.xml"), "EditorUIProjectPassRightMenu");
+
+		Engine::WindowSystem::GetInstance()->RegisterFilesDropCallback([this](int fileCount, const char** filePath)
+			{
+				for (int i = 0; i < fileCount; ++i)
+				{
+					LOG_INFO("有文件拖入 {0}", filePath[i]);
+					std::filesystem::path ph(filePath[i]);
+					AssetTool::LoadAsset(ph, mCurrentOpenFolder[mCurrentIndex].back());
+				}
+			});
 	}
 
 	void EditorUIProjectPass::ShowUI()
@@ -190,6 +202,11 @@ namespace Editor
 					else
 					{
 						LOG_INFO("click");
+						
+						if (!file->mIsFolder)
+						{
+							mMessageBox->SetProjectSelectFile(file->GetAssetGuid());
+						}
 					}
 				}
 
@@ -605,6 +622,31 @@ namespace Editor
 		}
 	}
 
+	void EditorUIProjectPass::Ref_CreateMaterial()
+	{
+		LOG_INFO("创建一个空材质");
+		mIsOpenCreateWindow = true;
+		mCreateOrder = CreateItem::emCreateMaterial;
+		mExtensionName = ".material";
+	}
+
+	void EditorUIProjectPass::CreateMaterial()
+	{
+		AssetsFileSystem* fileSystem = mEditor->GetFileSystem();
+
+		std::filesystem::path currentFolder = GetCurrentFolder();
+		std::string name(mCreateBuffer);
+		name += ".material";
+
+		Engine::MaterialData material;
+
+		Engine::SerializerDataFrame frame;
+		frame << material;
+		Engine::SceneMeta meta;
+		meta.SetGuid(Engine::GUID::Get());
+		AssetsFileSystem::CreateResult result = fileSystem->CreateAssetFile(mCurrentOpenFolder[mCurrentIndex].back(), name, frame, meta);
+	}
+
 	void EditorUIProjectPass::Ref_ShowFolderInExplorer()
 	{
 		LOG_INFO("在资源管理器中显示");
@@ -646,7 +688,7 @@ namespace Editor
 		std::filesystem::path filePath;
 		if (mEditor->OpenFileSelector(filePath))
 		{
-			AssetTool::LoadAsset(filePath, GetCurrentFolder(), mCurrentOpenFolder[mCurrentIndex].back());
+			AssetTool::LoadAsset(filePath, mCurrentOpenFolder[mCurrentIndex].back());
 		}
 	}
 }

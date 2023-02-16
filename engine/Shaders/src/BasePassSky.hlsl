@@ -21,11 +21,12 @@ struct VertexOut
 
 struct PixelOut
 {
-    float4 Position     : SV_TARGET0;
-    float4 Normal       : SV_TARGET1;
-    float4 BaseColor    : SV_TARGET2;
-    float4 Metallic     : SV_TARGET3;
-    float2 Velocity     : SV_Target4;
+    float4 Position             : SV_TARGET0;
+    float4 Normal               : SV_TARGET1;
+    float4 BaseColor            : SV_TARGET2;
+    float4 MetallicRoughness    : SV_TARGET3;
+    float4 Emissive             : SV_TARGET4;
+    float2 Velocity             : SV_Target5;
 };
 
 VertexOut VS(VertexIn vertexIn)
@@ -52,9 +53,10 @@ PixelOut PS(VertexOut pixelIn)
 
     pixelOut.BaseColor = SkyCubeTexture.Sample(LinearWrapSampler, pixelIn.PosL);
 
-    pixelOut.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    pixelOut.Position = float4(0.0f, 0.0f, 0.0f, 1.0f);
     pixelOut.Normal = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    pixelOut.Metallic = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    pixelOut.MetallicRoughness = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    pixelOut.Emissive = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
     float4 curPos = pixelIn.CurPosH;
     float4 prevPos = pixelIn.PrevPosH;

@@ -71,6 +71,11 @@ namespace Editor
 		return mParent->GetParentPath() / mParent->mName;
 	}
 
+	Engine::GUID AssetFile::GetAssetGuid()
+	{
+		return Engine::AssetManager::GetInstance()->GetAssetGuidFormAssetPath(GetAssetFilePath());
+	}
+
 
 	AssetsFileSystem::AssetsFileSystem(const std::filesystem::path& projectPath)
 	{

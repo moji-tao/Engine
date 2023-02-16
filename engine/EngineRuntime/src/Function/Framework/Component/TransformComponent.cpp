@@ -41,8 +41,10 @@ namespace Engine
 
 	Vector3 TransformComponent::GetGlobalPosition() const
 	{
-		Actor* parent = mParentObject;
 		Vector3 result = mTransform[mCurrentTick].position;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			result += parent->GetComponent<TransformComponent>()->GetLocalPosition();
@@ -59,8 +61,10 @@ namespace Engine
 
 	Vector3 TransformComponent::GetGlobalScale() const
 	{
-		Actor* parent = mParentObject;
 		Vector3 result = mTransform[mCurrentTick].scale;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			result *= parent->GetComponent<TransformComponent>()->GetLocalScale();
@@ -77,8 +81,10 @@ namespace Engine
 
 	Quaternion TransformComponent::GetGlobalQuaternion() const
 	{
-		Actor* parent = mParentObject;
 		Quaternion result = mTransform[mCurrentTick].rotation;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			result = parent->GetComponent<TransformComponent>()->GetLocalQuaternion() * result;
@@ -120,7 +126,7 @@ namespace Engine
 
 	void TransformComponent::SetGlobalTransform(Matrix4x4 mat)
 	{
-		Actor* parent = mParentObject;
+		Actor* parent = mParentObject->GetParent();
 
 		if (parent != nullptr)
 		{
@@ -139,11 +145,11 @@ namespace Engine
 
 	Matrix4x4 TransformComponent::GetGlobalMatrix() const
 	{
-		Actor* parent = mParentObject;
-		
-		Vector3 globalPosition;
-		Vector3 globalScale = Vector3::UNIT_SCALE;
-		Quaternion globalOrientation;
+		Vector3 globalPosition = mTransform[mCurrentTick].position;
+		Vector3 globalScale = mTransform[mCurrentTick].scale;
+		Quaternion globalOrientation = mTransform[mCurrentTick].rotation;
+
+		Actor* parent = mParentObject->GetParent();
 		while (parent != nullptr)
 		{
 			TransformComponent* parentComponent = parent->GetComponent<TransformComponent>();
@@ -157,11 +163,12 @@ namespace Engine
 
 	Matrix4x4 TransformComponent::GetLastGlobalMatrix() const
 	{
-		Actor* parent = mParentObject;
+		Vector3 globalLastPosition = mTransform[mLastTick].position;
+		Vector3 globalLastScale = mTransform[mLastTick].scale;
+		Quaternion globalLastOrientation = mTransform[mLastTick].rotation;
 
-		Vector3 globalLastPosition;
-		Vector3 globalLastScale = Vector3::UNIT_SCALE;
-		Quaternion globalLastOrientation;
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			TransformComponent* parentComponent = parent->GetComponent<TransformComponent>();
@@ -175,18 +182,19 @@ namespace Engine
 
 	void TransformComponent::GetRenderMatrix(Matrix4x4& currentMat, Matrix4x4& lastMat)
 	{
-		Actor* parent = mParentObject;
+		Vector3 globalPosition = mTransform[mCurrentTick].position;
+		Vector3 globalScale = mTransform[mCurrentTick].scale;
+		Quaternion globalOrientation = mTransform[mCurrentTick].rotation;
+		Vector3 globalLastPosition = mTransform[mLastTick].position;
+		Vector3 globalLastScale = mTransform[mLastTick].scale;
+		Quaternion globalLastOrientation = mTransform[mLastTick].rotation;
 
-		Vector3 globalPosition;
-		Vector3 globalScale = Vector3::UNIT_SCALE;
-		Quaternion globalOrientation;
-		Vector3 globalLastPosition;
-		Vector3 globalLastScale = Vector3::UNIT_SCALE;
-		Quaternion globalLastOrientation;
+		Actor* parent = mParentObject->GetParent();
 
 		while (parent != nullptr)
 		{
 			TransformComponent* parentComponent = parent->GetComponent<TransformComponent>();
+
 			globalPosition += parentComponent->GetLocalPosition();
 			globalScale *= parentComponent->GetLocalScale();
 			globalOrientation = parentComponent->GetLocalQuaternion() * globalOrientation;
@@ -209,11 +217,13 @@ namespace Engine
 
 	Vector3 TransformComponent::GetLastGlobalPosition() const
 	{
-		Actor* parent = mParentObject;
 		Vector3 result = mTransform[mLastTick].position;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
-			result += parent->GetComponent<TransformComponent>()->GetLastGlobalPosition();
+			result += parent->GetComponent<TransformComponent>()->GetLastLocalPosition();
 			parent = parent->GetParent();
 		}
 
@@ -227,8 +237,10 @@ namespace Engine
 
 	Vector3 TransformComponent::GetLastGlobalScale() const
 	{
-		Actor* parent = mParentObject;
 		Vector3 result = mTransform[mLastTick].scale;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			result *= parent->GetComponent<TransformComponent>()->GetLastLocalScale();
@@ -245,8 +257,10 @@ namespace Engine
 
 	Quaternion TransformComponent::GetLastGlobalQuaternion() const
 	{
-		Actor* parent = mParentObject;
 		Quaternion result = mTransform[mLastTick].rotation;
+
+		Actor* parent = mParentObject->GetParent();
+
 		while (parent != nullptr)
 		{
 			result = parent->GetComponent<TransformComponent>()->GetLocalQuaternion() * result;

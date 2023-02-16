@@ -148,6 +148,7 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\DirectXUtil.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderInfo.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\RenderTarget.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\ShadowMap.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\SceneCaptureCube.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\d3dx12.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\ImGuiDevice.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\D3D12Viewport.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\DirectXUtil.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\RenderTarget.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\ShadowMap.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\SceneCaptureCube.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\ImGuiDevice.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\RenderCamera.cpp" />

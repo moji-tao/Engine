@@ -75,9 +75,15 @@ namespace Engine
 
 	void D3D12RHI::InitializeRenderPipeline(std::unique_ptr<RenderPipeline>& renderPipeline, std::unique_ptr<RenderResource>& renderResource)
 	{
+		ResetCommandAllocator();
+		ResetCommandList();
+
 		renderResource = std::make_unique<D3D12RenderResource>(this);
 		
 		renderPipeline = std::make_unique<D3D12DeferredRenderPipeline>(this, dynamic_cast<D3D12RenderResource*>(renderResource.get()));
+
+		ExecuteCommandLists();
+		FlushCommandQueue();
 	}
 
 	D3D12Device* D3D12RHI::GetDevice()

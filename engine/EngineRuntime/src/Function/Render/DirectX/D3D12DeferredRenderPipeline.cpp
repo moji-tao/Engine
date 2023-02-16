@@ -1,10 +1,8 @@
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Core/Math/Color.h"
+#include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12RHI.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12DeferredRenderPipeline.h"
-
-#include "EngineRuntime/include/EngineRuntime.h"
-#include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12Shader.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
@@ -30,33 +28,36 @@ namespace Engine
 		mRHI->ResetCommandAllocator();
 		mRHI->ResetCommandList();
 
-		if (EngineRuntime::GetInstance()->rdoc_api != nullptr && RenderSystem::GetInstance()->mFrameCount == 0)
+		if (RenderSystem::GetInstance()->rdoc_api != nullptr && RenderSystem::GetInstance()->mFrameCount == 0)
 		{
-			EngineRuntime::GetInstance()->rdoc_api->StartFrameCapture(NULL, NULL);
+			RenderSystem::GetInstance()->rdoc_api->StartFrameCapture(NULL, NULL);
 		}
 
 		if (mImGuiDevice != nullptr)
 		{
 			mImGuiDevice->DrawUI();
 		}
-		
-		/*
-		* 场景渲染
-		*/
+
 		SetDescriptorHeaps();
 
-		/*
 		if (RenderSystem::GetInstance()->mFrameCount == 0)
 		{
-			CreateIBLEnviromentMap();
+			CreateIBLEnvironmentMap();
+
+			CreateIBLIrradianceMap();
+
+			CreateIBLPrefilterEnvironmentMap();
 		}
-		*/
 
 		UploadResource();
+
+		ShadowsPass();
 
 		DepthPrePass();
 
 		BasePass();
+
+		SSAOPass();
 
 		DeferredLightingPass();
 
@@ -78,9 +79,9 @@ namespace Engine
 		mRHI->FlushCommandQueue();
 		mRHI->EndFrame();
 
-		if (EngineRuntime::GetInstance()->rdoc_api != nullptr && RenderSystem::GetInstance()->mFrameCount == 0)
+		if (RenderSystem::GetInstance()->rdoc_api != nullptr && RenderSystem::GetInstance()->mFrameCount == 0)
 		{
-			EngineRuntime::GetInstance()->rdoc_api->EndFrameCapture(NULL, NULL);
+			RenderSystem::GetInstance()->rdoc_api->EndFrameCapture(NULL, NULL);
 		}
 	}
 
@@ -112,6 +113,8 @@ namespace Engine
 
 		ResizeRenderTarget();
 
+		ResizeSSAOBuffer();
+
 		ResizeTAABuffer();
 	}
 
@@ -122,18 +125,22 @@ namespace Engine
 
 	void D3D12DeferredRenderPipeline::CreateD3D12State()
 	{
-		mRHI->ResetCommandAllocator();
-		mRHI->ResetCommandList();
-
 		mRenderResource->UploadDefaultVertexResource();
 
-		//CreateSceneCaptureCube();
-		CreateIBLEnviromentTexture();
+		CreateSceneCaptureCube();
+		//CreateIBLEnviromentTexture();
 		CreateGlobalShaders();
 		CreateGlobalPSO();
 
-		mRHI->ExecuteCommandLists();
-		mRHI->FlushCommandQueue();
+		for (int i = 0; i < MAX_2DSHADOWMAP; ++i)
+		{
+			mShadowMap2D[i] = std::make_unique<ShadowMap2D>(SHADOWMAP_SIZE, mRHI);
+		}
+
+		for (int i = 0; i < MAX_CubeSHADOWMAP; ++i)
+		{
+			mShadowMapCube[i] = std::make_unique<ShadowMapCube>(SHADOWMAP_SIZE, mRHI);
+		}
 	}
 
 	void D3D12DeferredRenderPipeline::CreateGlobalShaders()
@@ -151,7 +158,32 @@ namespace Engine
 			mZPrePassShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
 
-		/*
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/OmnidirectionalShadowMapVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/OmnidirectionalShadowMapPS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("OmnidirectionalShadowMapShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mOmnidirectionalShadowMapShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
+
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SingleShadowMapVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SingleShadowMapPS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("SingleShadowMapShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mSingleShadowMapShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
+
 		{
 			ShaderInfo shaderInfo;
 			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/IBLEnvironmentVS.cso");
@@ -164,7 +196,32 @@ namespace Engine
 			shaderInfo.mPixelShader = psBlob;
 			mIBLEnvironmentShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
-		*/
+
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/IBLIrradianceVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/IBLIrradiancePS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("IBLIrradianceShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mIBLIrradianceShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
+
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/IBLPrefilterVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/IBLPrefilterPS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("IBLPrefilterShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mIBLPrefilterShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
 
 		{
 			ShaderInfo shaderInfo;
@@ -172,11 +229,24 @@ namespace Engine
 			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/BasePassSkyPS.cso");
 			if (vsBlob == nullptr || psBlob == nullptr)
 			{
-				LOG_FATAL("IBLEnvironmentShader文件读取出错");
+				LOG_FATAL("BasePassSkyShader文件读取出错");
 			}
 			shaderInfo.mVertexShader = vsBlob;
 			shaderInfo.mPixelShader = psBlob;
 			mSkyBoxPassShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
+
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SSAOVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SSAOPS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("SSAOShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mSSAOShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
 
 		{
@@ -233,7 +303,30 @@ namespace Engine
 			mRenderResource->TryCreatePSO(mZPrePassPSODescriptor);
 		}
 
-		/*
+		{
+			mOmnidirectionalShadowMapPSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mOmnidirectionalShadowMapPSODescriptor.mShader = mOmnidirectionalShadowMapShader.get();
+			mOmnidirectionalShadowMapPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mOmnidirectionalShadowMapPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+			mOmnidirectionalShadowMapPSODescriptor.mNumRenderTargets = 0;
+			mOmnidirectionalShadowMapPSODescriptor.mRasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			mOmnidirectionalShadowMapPSODescriptor.mDepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+			mOmnidirectionalShadowMapPSODescriptor.mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			mRenderResource->TryCreatePSO(mOmnidirectionalShadowMapPSODescriptor);
+		}
+
+		{
+			mSingleShadowMapPSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mSingleShadowMapPSODescriptor.mShader = mSingleShadowMapShader.get();
+			mSingleShadowMapPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mSingleShadowMapPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+			mSingleShadowMapPSODescriptor.mNumRenderTargets = 0;
+			mSingleShadowMapPSODescriptor.mRasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			mSingleShadowMapPSODescriptor.mDepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+			mSingleShadowMapPSODescriptor.mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			mRenderResource->TryCreatePSO(mSingleShadowMapPSODescriptor);
+		}
+
 		{
 			mIBLEnvironmentPSODescriptor.mInputLayoutName = "BaseInputLayout";
 			mIBLEnvironmentPSODescriptor.mShader = mIBLEnvironmentShader.get();
@@ -247,18 +340,46 @@ namespace Engine
 
 			mRenderResource->TryCreatePSO(mIBLEnvironmentPSODescriptor);
 		}
-		*/
+
+		{
+			mIBLIrradiancePSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mIBLIrradiancePSODescriptor.mShader = mIBLIrradianceShader.get();
+			mIBLIrradiancePSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mIBLIrradiancePSODescriptor.mRTVFormats[0] = mIBLIrradianceMap->GetRTCube()->GetFormat();
+			mIBLIrradiancePSODescriptor.mNumRenderTargets = 1;
+			// The camera is inside the cube, so just turn off culling.
+			mIBLIrradiancePSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+			mIBLIrradiancePSODescriptor.mDepthStencilDesc.DepthEnable = false;
+			mIBLIrradiancePSODescriptor.mDepthStencilFormat = DXGI_FORMAT_UNKNOWN;
+
+			mRenderResource->TryCreatePSO(mIBLIrradiancePSODescriptor);
+		}
+
+		{
+			mIBLPrefilterPSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mIBLPrefilterPSODescriptor.mShader = mIBLPrefilterShader.get();
+			mIBLPrefilterPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mIBLPrefilterPSODescriptor.mRTVFormats[0] = mIBLPrefilterMap[0]->GetRTCube()->GetFormat();
+			mIBLPrefilterPSODescriptor.mNumRenderTargets = 1;
+			// The camera is inside the cube, so just turn off culling.
+			mIBLPrefilterPSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+			mIBLPrefilterPSODescriptor.mDepthStencilDesc.DepthEnable = false;
+			mIBLPrefilterPSODescriptor.mDepthStencilFormat = DXGI_FORMAT_UNKNOWN;
+
+			mRenderResource->TryCreatePSO(mIBLPrefilterPSODescriptor);
+		}
 
 		{
 			mSkyBoxPassPSODescriptor.mInputLayoutName = "BaseInputLayout";
 			mSkyBoxPassPSODescriptor.mShader = mSkyBoxPassShader.get();
 			mSkyBoxPassPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			mSkyBoxPassPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			mSkyBoxPassPSODescriptor.mRTVFormats[1] = DXGI_FORMAT_R8G8B8A8_SNORM;
-			mSkyBoxPassPSODescriptor.mRTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			mSkyBoxPassPSODescriptor.mRTVFormats[3] = DXGI_FORMAT_R8G8B8A8_UNORM;
-			mSkyBoxPassPSODescriptor.mRTVFormats[4] = DXGI_FORMAT_R16G16_FLOAT;
-			mSkyBoxPassPSODescriptor.mNumRenderTargets = 5;
+			mSkyBoxPassPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// Position
+			mSkyBoxPassPSODescriptor.mRTVFormats[1] = DXGI_FORMAT_R8G8B8A8_SNORM;		// Normal
+			mSkyBoxPassPSODescriptor.mRTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// BaseColor
+			mSkyBoxPassPSODescriptor.mRTVFormats[3] = DXGI_FORMAT_R8G8B8A8_UNORM;		// MetallicRoughness
+			mSkyBoxPassPSODescriptor.mRTVFormats[4] = DXGI_FORMAT_R8G8B8A8_UNORM;		// Emissive
+			mSkyBoxPassPSODescriptor.mRTVFormats[5] = DXGI_FORMAT_R16G16_FLOAT;			// Velocity
+			mSkyBoxPassPSODescriptor.mNumRenderTargets = 6;
 			mSkyBoxPassPSODescriptor.mRasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			mSkyBoxPassPSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 			mSkyBoxPassPSODescriptor.mDepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -270,6 +391,46 @@ namespace Engine
 		}
 
 		{
+			mSSAOPSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mSSAOPSODescriptor.m4xMsaaState = false;
+			mSSAOPSODescriptor.mDepthStencilDesc.DepthEnable = false;
+			mSSAOPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mSSAOPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_R16_UNORM;
+			mSSAOPSODescriptor.mNumRenderTargets = 1;
+			mSSAOPSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+			mSSAOPSODescriptor.mRasterizerDesc.DepthClipEnable = false;
+			mSSAOPSODescriptor.mShader = mSSAOShader.get();
+
+			mRenderResource->TryCreatePSO(mSSAOPSODescriptor);
+		}
+
+		{
+			D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			blendDesc.AlphaToCoverageEnable = false;
+			blendDesc.IndependentBlendEnable = false;
+			blendDesc.RenderTarget[0].BlendEnable = true;
+			blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+			blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+
+
+			D3D12_DEPTH_STENCIL_DESC depthDesc;
+			depthDesc.DepthEnable = false;
+			depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+			depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+			depthDesc.StencilEnable = true;
+			depthDesc.StencilReadMask = 0xff;
+			depthDesc.StencilWriteMask = 0x0;
+			depthDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+			// We are not rendering backfacing polygons, so these settings do not matter. 
+			depthDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+			depthDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+			
 			mDeferredLightingPSODescriptor.mInputLayoutName = "BaseInputLayout";
 			mDeferredLightingPSODescriptor.m4xMsaaState = false;
 			mDeferredLightingPSODescriptor.mDepthStencilDesc.DepthEnable = false;
@@ -278,6 +439,8 @@ namespace Engine
 			mDeferredLightingPSODescriptor.mNumRenderTargets = 1;
 			mDeferredLightingPSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 			mDeferredLightingPSODescriptor.mRasterizerDesc.DepthClipEnable = false;
+			mDeferredLightingPSODescriptor.mBlendDesc = blendDesc;
+			mDeferredLightingPSODescriptor.mDepthStencilDesc = depthDesc;
 			mDeferredLightingPSODescriptor.mShader = mDeferredLightingShader.get();
 
 			mRenderResource->TryCreatePSO(mDeferredLightingPSODescriptor);
@@ -362,6 +525,34 @@ namespace Engine
 		//return mRHI->GetViewport()->GetDepthStencilView()->GetDescriptorHandle();
 	}
 
+	void D3D12DeferredRenderPipeline::ShadowsPass()
+	{
+		auto& shadowParameters = mRenderResource->GetShadowParameters();
+
+		mCurrentShadowMap2DIndex = 0;
+		mCurrentShadowMapCubeIndex = 0;
+
+		for (int i = 0; i < shadowParameters.size(); ++i)
+		{
+			ShadowParameter& shadowParameter = shadowParameters[i];
+
+			if (shadowParameter.Type == ShadowParameter::emShadowMap2D)
+			{
+				GenerateSingleShadowMap(shadowParameter);
+				++mCurrentShadowMap2DIndex;
+			}
+			else if (shadowParameter.Type == ShadowParameter::emShadowMapCube)
+			{
+				GenerateOmnidirectionalShadowMap(shadowParameter);
+				++mCurrentShadowMapCubeIndex;
+			}
+			else
+			{
+				ASSERT(0);
+			}
+		}
+	}
+
 	void D3D12DeferredRenderPipeline::DepthPrePass()
 	{
 		auto commandList = mRHI->GetDevice()->GetCommandList();
@@ -402,27 +593,30 @@ namespace Engine
 
 		mRHI->TransitionResource(mPositionGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mRHI->TransitionResource(mNormalGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-		mRHI->TransitionResource(mColorGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-		mRHI->TransitionResource(mMetallicGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mRHI->TransitionResource(mBaseColorGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mRHI->TransitionResource(mMetallicRoughnessGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mRHI->TransitionResource(mEmissiveGBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 		mRHI->TransitionResource(mVelocityBuffer->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		commandList->ClearRenderTargetView(mPositionGBuffer->GetRTV()->GetDescriptorHandle(), mPositionGBuffer->GetClearColorPtr(), 0, nullptr);
 		commandList->ClearRenderTargetView(mNormalGBuffer->GetRTV()->GetDescriptorHandle(), mNormalGBuffer->GetClearColorPtr(), 0, nullptr);
-		commandList->ClearRenderTargetView(mColorGBuffer->GetRTV()->GetDescriptorHandle(), mColorGBuffer->GetClearColorPtr(), 0, nullptr);
-		commandList->ClearRenderTargetView(mMetallicGBuffer->GetRTV()->GetDescriptorHandle(), mMetallicGBuffer->GetClearColorPtr(), 0, nullptr);
+		commandList->ClearRenderTargetView(mBaseColorGBuffer->GetRTV()->GetDescriptorHandle(), mBaseColorGBuffer->GetClearColorPtr(), 0, nullptr);
+		commandList->ClearRenderTargetView(mMetallicRoughnessGBuffer->GetRTV()->GetDescriptorHandle(), mMetallicRoughnessGBuffer->GetClearColorPtr(), 0, nullptr);
+		commandList->ClearRenderTargetView(mEmissiveGBuffer->GetRTV()->GetDescriptorHandle(), mEmissiveGBuffer->GetClearColorPtr(), 0, nullptr);
 		commandList->ClearRenderTargetView(mVelocityBuffer->GetRTV()->GetDescriptorHandle(), mVelocityBuffer->GetClearColorPtr(), 0, nullptr);
 
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvDescriptors;
 		rtvDescriptors.push_back(mPositionGBuffer->GetRTV()->GetDescriptorHandle());
 		rtvDescriptors.push_back(mNormalGBuffer->GetRTV()->GetDescriptorHandle());
-		rtvDescriptors.push_back(mColorGBuffer->GetRTV()->GetDescriptorHandle());
-		rtvDescriptors.push_back(mMetallicGBuffer->GetRTV()->GetDescriptorHandle());
+		rtvDescriptors.push_back(mBaseColorGBuffer->GetRTV()->GetDescriptorHandle());
+		rtvDescriptors.push_back(mMetallicRoughnessGBuffer->GetRTV()->GetDescriptorHandle());
+		rtvDescriptors.push_back(mEmissiveGBuffer->GetRTV()->GetDescriptorHandle());
 		rtvDescriptors.push_back(mVelocityBuffer->GetRTV()->GetDescriptorHandle());
 
 		auto descriptorCache = mRHI->GetDevice()->GetCommandContext()->GetDescriptorCache();
 		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle = descriptorCache->AppendRtvDescriptors(rtvDescriptors);
 
-		commandList->OMSetRenderTargets(5, &cpuHandle, true, &DepthStencilView());
+		commandList->OMSetRenderTargets(6, &cpuHandle, true, &DepthStencilView());
 
 		const auto& batchs = mRenderResource->GetBasePassBatchs();
 
@@ -470,8 +664,8 @@ namespace Engine
 			commandList->SetGraphicsRootSignature(mSkyBoxPassPSODescriptor.mShader->mRootSignature.Get());
 
 			mSkyBoxPassPSODescriptor.mShader->SetParameter("cbPass", mRenderResource->GetCbPassRef());
-			//mSkyBoxPassPSODescriptor.mShader->SetParameter("SkyCubeTexture", mIBLEnvironmentMap->GetRTCube()->GetSRV());
-			mSkyBoxPassPSODescriptor.mShader->SetParameter("SkyCubeTexture", mIBLEnviromentTexture->GetSRV());
+			mSkyBoxPassPSODescriptor.mShader->SetParameter("SkyCubeTexture", mIBLEnvironmentMap->GetRTCube()->GetSRV());
+			//mSkyBoxPassPSODescriptor.mShader->SetParameter("SkyCubeTexture", mIBLEnviromentTexture->GetSRV());
 			mSkyBoxPassPSODescriptor.mShader->BindParameters();
 			
 			mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
@@ -484,9 +678,38 @@ namespace Engine
 		
 		mRHI->TransitionResource(mPositionGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 		mRHI->TransitionResource(mNormalGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
-		mRHI->TransitionResource(mColorGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
-		mRHI->TransitionResource(mMetallicGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+		mRHI->TransitionResource(mBaseColorGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+		mRHI->TransitionResource(mMetallicRoughnessGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+		mRHI->TransitionResource(mEmissiveGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 		mRHI->TransitionResource(mVelocityBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+	}
+
+	void D3D12DeferredRenderPipeline::SSAOPass()
+	{
+		auto commandList = mRHI->GetDevice()->GetCommandList();
+
+		mRHI->TransitionResource(mSSAOTexture->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		commandList->ClearRenderTargetView(mSSAOTexture->GetRTV()->GetDescriptorHandle(), mSSAOTexture->GetClearColorPtr(), 0, nullptr);
+
+		commandList->OMSetRenderTargets(1, &mSSAOTexture->GetRTV()->GetDescriptorHandle(), true, nullptr);
+
+		ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mSSAOPSODescriptor);
+		ASSERT(pipeline_state != nullptr);
+		commandList->SetPipelineState(pipeline_state);
+
+		commandList->SetGraphicsRootSignature(mSSAOPSODescriptor.mShader->mRootSignature.Get());
+
+		mSSAOPSODescriptor.mShader->SetParameter("cbPass", mRenderResource->GetCbPassRef());
+		mSSAOPSODescriptor.mShader->SetParameter("cbSSAO", mRenderResource->GetSSAOCBRef());
+		mSSAOPSODescriptor.mShader->SetParameter("NormalGBuffer", mNormalGBuffer->GetSRV());
+		mSSAOPSODescriptor.mShader->SetParameter("DepthGBuffer", mDepthTestBuffer->GetSRV());
+
+		mSSAOPSODescriptor.mShader->BindParameters();
+
+		DrawCallScreen(commandList);
+
+		mRHI->TransitionResource(mSSAOTexture->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
 	void D3D12DeferredRenderPipeline::DeferredLightingPass()
@@ -505,54 +728,83 @@ namespace Engine
 
 		commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
 
-		mDeferredLightingPSODescriptor.mShader->SetParameter("PositionGBuffer", mPositionGBuffer->GetSRV());
-		mDeferredLightingPSODescriptor.mShader->SetParameter("NormalGBuffer", mNormalGBuffer->GetSRV());
-		mDeferredLightingPSODescriptor.mShader->SetParameter("ColorGBuffer", mColorGBuffer->GetSRV());
-		mDeferredLightingPSODescriptor.mShader->SetParameter("MetallicGBuffer", mMetallicGBuffer->GetSRV());
-		
-		mDeferredLightingPSODescriptor.mShader->SetParameter("cbPass", mRenderResource->GetCbPassRef());
+		shader->SetParameter("PositionGBuffer", mPositionGBuffer->GetSRV());
+		shader->SetParameter("NormalGBuffer", mNormalGBuffer->GetSRV());
+		shader->SetParameter("ColorGBuffer", mBaseColorGBuffer->GetSRV());
+		shader->SetParameter("MetallicRoughnessGBuffer", mMetallicRoughnessGBuffer->GetSRV());
+		shader->SetParameter("EmissiveGBuffer", mEmissiveGBuffer->GetSRV());
+
+		shader->SetParameter("EnvBRDFLUT", mBRDFLUTTexture->GetSRV());
+		shader->SetParameter("IBLIrradianceMap", mIBLIrradianceMap->GetRTCube()->GetSRV());
+
+		std::vector<D3D12ShaderResourceView*> shadowMap2DSRVs;
+		for (int i = 0; i < mCurrentShadowMap2DIndex; ++i)
+		{
+			shadowMap2DSRVs.push_back(mShadowMap2D[i]->GetTarget()->GetSRV());
+		}
+		for (int i = mCurrentShadowMap2DIndex; i < MAX_2DSHADOWMAP; ++i)
+		{
+			shadowMap2DSRVs.push_back(mRenderResource->mNullTextureResource->GetSRV());
+		}
+		shader->SetParameter("ShadowMaps2D", shadowMap2DSRVs);
+
+		std::vector<D3D12ShaderResourceView*> shadowMapCubeSRVs;
+		for (int i = 0; i < mCurrentShadowMapCubeIndex; ++i)
+		{
+			shadowMapCubeSRVs.push_back(mShadowMapCube[i]->GetTarget()->GetSRV());
+		}
+		for (int i = mCurrentShadowMapCubeIndex; i < MAX_CubeSHADOWMAP; ++i)
+		{
+			shadowMapCubeSRVs.push_back(mRenderResource->mNullTextureResource->GetSRV());
+		}
+		shader->SetParameter("ShadowMapsCube", shadowMapCubeSRVs);
+
+		std::vector<D3D12ShaderResourceView*> IBLPrefilterEnvMapSRVs;
+		for (UINT i = 0; i < mIBLPrefilterMaxMipLevel; i++)
+		{
+			IBLPrefilterEnvMapSRVs.push_back(mIBLPrefilterMap[i]->GetRTCube()->GetSRV());
+		}
+		shader->SetParameter("IBLPrefilterEnvMaps", IBLPrefilterEnvMapSRVs);
+
+		if (RenderSystem::GetInstance()->mEnableSSAO)
+		{
+			shader->SetParameter("SSAOBuffer", mSSAOTexture->GetSRV());
+		}
+		else
+		{
+			shader->SetParameter("SSAOBuffer", mRenderResource->mNullTextureResource->GetSRV());
+		}
+
+		shader->SetParameter("cbPass", mRenderResource->GetCbPassRef());
 		if (mRenderResource->mDirectionalLightStructuredBufferRef != nullptr)
 		{
-			mDeferredLightingPSODescriptor.mShader->SetParameter("DirectionalLightList", mRenderResource->mDirectionalLightStructuredBufferRef->GetSRV());
+			shader->SetParameter("DirectionalLightList", mRenderResource->mDirectionalLightStructuredBufferRef->GetSRV());
+		}
+		else
+		{
+			shader->SetParameter("DirectionalLightList", mRenderResource->mNullSRV->GetSRV());
 		}
 		if (mRenderResource->mPointLightStructuredBufferRef)
 		{
-			mDeferredLightingPSODescriptor.mShader->SetParameter("PointLightList", mRenderResource->mPointLightStructuredBufferRef->GetSRV());
+			shader->SetParameter("PointLightList", mRenderResource->mPointLightStructuredBufferRef->GetSRV());
+		}
+		else
+		{
+			shader->SetParameter("PointLightList", mRenderResource->mNullSRV->GetSRV());
 		}
 		if (mRenderResource->mSpotLightStructuredBufferRef)
 		{
-			mDeferredLightingPSODescriptor.mShader->SetParameter("SpotLightList", mRenderResource->mSpotLightStructuredBufferRef->GetSRV());
+			shader->SetParameter("SpotLightList", mRenderResource->mSpotLightStructuredBufferRef->GetSRV());
 		}
-		mDeferredLightingPSODescriptor.mShader->SetParameter("cbLightCommon", mRenderResource->mLightCommonDataBuffer);
-		
-
-		mDeferredLightingPSODescriptor.mShader->BindParameters();
-
+		else
 		{
-			Mesh* load_default_mesh_resource = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_ScreenQuad);
-			ASSERT(load_default_mesh_resource != nullptr);
-			SubMesh& refSubMesh = load_default_mesh_resource->Meshes[0];
-			SubMeshResource subMesh;
-			subMesh.VertexByteStride = sizeof(Vertex);
-			subMesh.VertexBufferByteSize = subMesh.VertexByteStride * refSubMesh.Vertices.size();
-			subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
-			subMesh.IndexBufferByteSize = sizeof(unsigned) * refSubMesh.Indices.size();
-			subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-			subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-			subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-
-			subMesh.IndexCount = refSubMesh.Indices.size();
-			subMesh.StartIndexLocation = 0;
-			subMesh.BaseVertexLocation = 0;
-
-			mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
-			mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
-
-			commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
-
-			commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+			shader->SetParameter("SpotLightList", mRenderResource->mNullSRV->GetSRV());
 		}
+		shader->SetParameter("cbLightCommon", mRenderResource->mLightCommonDataBuffer);
+
+		shader->BindParameters();
+
+		DrawCallScreen(commandList);
 
 		mRHI->TransitionResource(mColorTexture->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
@@ -587,32 +839,7 @@ namespace Engine
 
 		mTAAPSODescriptor.mShader->BindParameters();
 
-		{
-			Mesh* load_default_mesh_resource = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_ScreenQuad);
-			ASSERT(load_default_mesh_resource != nullptr);
-			SubMesh& refSubMesh = load_default_mesh_resource->Meshes[0];
-			SubMeshResource subMesh;
-			subMesh.VertexByteStride = sizeof(Vertex);
-			subMesh.VertexBufferByteSize = subMesh.VertexByteStride * refSubMesh.Vertices.size();
-			subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
-			subMesh.IndexBufferByteSize = sizeof(unsigned) * refSubMesh.Indices.size();
-			subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-			subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-			subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-
-			subMesh.IndexCount = refSubMesh.Indices.size();
-			subMesh.StartIndexLocation = 0;
-			subMesh.BaseVertexLocation = 0;
-
-			mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
-			mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
-
-			commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
-
-			commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
-		}
-
+		DrawCallScreen(commandList);
 
 		// 缓存当前帧的色彩图 供下一帧使用
 		mRHI->TransitionResource(mColorTexture->GetResource(), D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -643,31 +870,7 @@ namespace Engine
 		mPostProcessPSODescriptor.mShader->SetParameter("ColorTexture", mColorTexture->GetSRV());
 		mPostProcessPSODescriptor.mShader->BindParameters();
 
-		{
-			Mesh* load_default_mesh_resource = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_ScreenQuad);
-			ASSERT(load_default_mesh_resource != nullptr);
-			SubMesh& refSubMesh = load_default_mesh_resource->Meshes[0];
-			SubMeshResource subMesh;
-			subMesh.VertexByteStride = sizeof(Vertex);
-			subMesh.VertexBufferByteSize = subMesh.VertexByteStride * refSubMesh.Vertices.size();
-			subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
-			subMesh.IndexBufferByteSize = sizeof(unsigned) * refSubMesh.Indices.size();
-			subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-			subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-			subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
-
-			subMesh.IndexCount = refSubMesh.Indices.size();
-			subMesh.StartIndexLocation = 0;
-			subMesh.BaseVertexLocation = 0;
-
-			mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
-			mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
-
-			commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
-
-			commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
-		}
+		DrawCallScreen(commandList);
 
 		mRHI->TransitionResource(CurrentBackBuffer(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
@@ -697,11 +900,12 @@ namespace Engine
 		mPositionGBuffer->GetResource()->D3DResource->SetName(L"PositionGBuffer");
 		mNormalGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R8G8B8A8_SNORM);
 		mNormalGBuffer->GetResource()->D3DResource->SetName(L"NormalGBuffer");
-		mColorGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
-		mColorGBuffer->GetResource()->D3DResource->SetName(L"ColorGBuffer");
-		mMetallicGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-		mMetallicGBuffer->GetResource()->D3DResource->SetName(L"MetallicGBuffer");
-
+		mBaseColorGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		mBaseColorGBuffer->GetResource()->D3DResource->SetName(L"BaseColorGBuffer");
+		mMetallicRoughnessGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+		mMetallicRoughnessGBuffer->GetResource()->D3DResource->SetName(L"MetallicRoughnessGBuffer");
+		mEmissiveGBuffer = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+		mEmissiveGBuffer->GetResource()->D3DResource->SetName(L"EmissiveGBuffer");
 	}
 
 	void D3D12DeferredRenderPipeline::ResizeRenderTarget()
@@ -713,6 +917,12 @@ namespace Engine
 		mSceneRenderTarget->GetResource()->D3DResource->SetName(L"测试 渲染到纹理");
 
 		mImGuiDevice->SetSceneUITexture(mSceneRenderTarget->GetResource()->D3DResource.Get());
+	}
+
+	void D3D12DeferredRenderPipeline::ResizeSSAOBuffer()
+	{
+		mSSAOTexture = std::make_unique<RenderTarget2D>(mRHI, false, mTargetWight, mTargetHeight, DXGI_FORMAT_R16_UNORM, Colors::Black);
+		mSSAOTexture->GetResource()->D3DResource->SetName(L"SSAO Buffer");
 	}
 
 	void D3D12DeferredRenderPipeline::ResizeTAABuffer()
@@ -738,11 +948,120 @@ namespace Engine
 		mCacheColorTexture->GetD3DResource()->SetName(L"CacheColorBuffer");
 	}
 
-	/*
+	void D3D12DeferredRenderPipeline::DrawCallScreen(ID3D12GraphicsCommandList* commandList)
+	{
+		Mesh* load_default_mesh_resource = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_ScreenQuad);
+		ASSERT(load_default_mesh_resource != nullptr);
+		SubMesh& refSubMesh = load_default_mesh_resource->Meshes[0];
+		SubMeshResource subMesh;
+		subMesh.VertexByteStride = sizeof(Vertex);
+		subMesh.VertexBufferByteSize = subMesh.VertexByteStride * refSubMesh.Vertices.size();
+		subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
+		subMesh.IndexBufferByteSize = sizeof(unsigned) * refSubMesh.Indices.size();
+		subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+		subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
+		subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_ScreenQuad));
+
+		subMesh.IndexCount = refSubMesh.Indices.size();
+		subMesh.StartIndexLocation = 0;
+		subMesh.BaseVertexLocation = 0;
+
+		mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
+		mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
+
+		commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
+
+		commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+	}
+
+	void D3D12DeferredRenderPipeline::GenerateSingleShadowMap(const ShadowParameter& shadowParameter)
+	{
+		auto commandList = mRHI->GetDevice()->GetCommandList();
+
+		auto& shadowMap = mShadowMap2D[mCurrentShadowMap2DIndex];
+
+		commandList->RSSetViewports(1, &shadowMap->GetViewport());
+		commandList->RSSetScissorRects(1, &shadowMap->GetScissorRect());
+		
+		commandList->ClearDepthStencilView(shadowMap->GetTarget()->GetDSV()->GetDescriptorHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+		commandList->OMSetRenderTargets(0, nullptr, true, &shadowMap->GetTarget()->GetDSV()->GetDescriptorHandle());
+
+		const auto& batchs = mRenderResource->GetBasePassBatchs();
+
+		Shader* shader = mSingleShadowMapPSODescriptor.mShader;
+
+		ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mSingleShadowMapPSODescriptor);
+		commandList->SetPipelineState(pipeline_state);
+		commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
+
+		ShadowPassCBRef = mRHI->CreateConstantBuffer(&shadowParameter, sizeof(shadowParameter));
+
+		for (const auto& [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+		{
+			shader->SetParameter("gInstanceData", cD3D12StructuredBufferRef->GetSRV());
+			shader->SetParameter("cbLight", ShadowPassCBRef);
+			shader->BindParameters();
+
+			mRHI->SetVertexBuffer(subMeshResource.VertexBufferRef, 0, subMeshResource.VertexByteStride, subMeshResource.VertexBufferByteSize);
+			mRHI->SetIndexBuffer(subMeshResource.IndexBufferRef, 0, subMeshResource.IndexFormat, subMeshResource.IndexBufferByteSize);
+
+			commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
+
+			commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+		}
+
+	}
+
+	void D3D12DeferredRenderPipeline::GenerateOmnidirectionalShadowMap(ShadowParameter& shadowParameter)
+	{
+		auto commandList = mRHI->GetDevice()->GetCommandList();
+
+		auto& shadowMap = mShadowMapCube[mCurrentShadowMapCubeIndex];
+
+		commandList->RSSetViewports(1, &shadowMap->GetViewport());
+		commandList->RSSetScissorRects(1, &shadowMap->GetScissorRect());
+
+		shadowMap->SetView(shadowParameter.LightPosition); 
+		for (int i = 0; i < 6; ++i)
+		{
+			commandList->ClearDepthStencilView(shadowMap->GetTarget()->GetDSV(i)->GetDescriptorHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+			commandList->OMSetRenderTargets(0, nullptr, true, &shadowMap->GetTarget()->GetDSV(i)->GetDescriptorHandle());
+
+			const auto& batchs = mRenderResource->GetBasePassBatchs();
+
+			Shader* shader = mSingleShadowMapPSODescriptor.mShader;
+
+			ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mSingleShadowMapPSODescriptor);
+			commandList->SetPipelineState(pipeline_state);
+			commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
+
+			shadowParameter.View = shadowMap->GetSceneView(i);
+			ShadowPassCBRef = mRHI->CreateConstantBuffer(&shadowParameter, sizeof(shadowParameter));
+
+			for (const auto& [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+			{
+				shader->SetParameter("gInstanceData", cD3D12StructuredBufferRef->GetSRV());
+				shader->SetParameter("cbLight", ShadowPassCBRef);
+				shader->BindParameters();
+
+				mRHI->SetVertexBuffer(subMeshResource.VertexBufferRef, 0, subMeshResource.VertexByteStride, subMeshResource.VertexBufferByteSize);
+				mRHI->SetIndexBuffer(subMeshResource.IndexBufferRef, 0, subMeshResource.IndexFormat, subMeshResource.IndexBufferByteSize);
+
+				commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
+
+				commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+			}
+		}
+
+	}
+	
 	void D3D12DeferredRenderPipeline::CreateSceneCaptureCube()
 	{
 		mIBLEnvironmentMap = std::make_unique<SceneCaptureCube>(false, 2048, DXGI_FORMAT_R32G32B32A32_FLOAT, mRHI);
-		
+
 		mIBLEnvironmentMap->CreatePerspectiveViews({ 0.0f, 0.0f, 0.0f }, 0.1f, 10.0f);
 		std::shared_ptr<TextureData> texture = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/Shiodome_Stairs_3k.hdr"));
 		D3D12TextureInfo info;
@@ -756,25 +1075,49 @@ namespace Engine
 		info.ArraySize = texture->Info.mArrayLayers;
 		info.MipCount = texture->Info.mMipLevels;
 
-		mIBLEnviromentTexture = mRHI->CreateTexture(info, TexCreate_SRV);
+		mIBLEquirectangularTexture = mRHI->CreateTexture(info, TexCreate_SRV);
 
-		mRHI->UploadTextureData(mIBLEnviromentTexture, texture.get());
+		mRHI->UploadTextureData(mIBLEquirectangularTexture, texture.get());
+
+		mIBLIrradianceMap = std::make_unique<SceneCaptureCube>(false, 32, DXGI_FORMAT_R32G32B32A32_FLOAT, mRHI);
+		mIBLIrradianceMap->CreatePerspectiveViews({ 0.0f, 0.0f, 0.0f }, 0.1f, 10.0f);
+
+		for (uint32_t i = 0; i < mIBLPrefilterMaxMipLevel; ++i)
+		{
+			UINT MipWidth = UINT(128 * std::pow(0.5, i));
+			auto PrefilterEnvMap = std::make_unique<SceneCaptureCube>(false, MipWidth, DXGI_FORMAT_R16G16B16A16_FLOAT, mRHI);
+			PrefilterEnvMap->CreatePerspectiveViews({ 0.0f, 0.0f, 0.0f }, 0.1f, 10.0f);
+
+			mIBLPrefilterMap.push_back(std::move(PrefilterEnvMap));
+		}
+
+		std::shared_ptr<TextureData> lutTexture = LoadTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/IBL_BRDF_LUT.png"), false);
+		info.Type = lutTexture->Info.mType;
+		info.Format = D3D12Texture::TransformationToD3DFormat(lutTexture->Info.mFormat);
+		info.Width = lutTexture->Info.mWidth;
+		info.Height = lutTexture->Info.mHeight;
+		// TODO:纹理类型记得扩展
+		info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		info.Depth = lutTexture->Info.mDepth;
+		info.ArraySize = lutTexture->Info.mArrayLayers;
+		info.MipCount = lutTexture->Info.mMipLevels;
+
+		mBRDFLUTTexture = mRHI->CreateTexture(info, TexCreate_SRV);
 	}
-	*/
-
-	/*
-	void D3D12DeferredRenderPipeline::CreateIBLEnviromentMap()
+	
+	
+	void D3D12DeferredRenderPipeline::CreateIBLEnvironmentMap()
 	{
 		for (int i = 0; i < 6; ++i)
 		{
 			Matrix4x4 View = mIBLEnvironmentMap->GetSceneView(i).View;
 			Matrix4x4 Proj = mIBLEnvironmentMap->GetSceneView(i).Proj;
 
-			CameraPassConstants PassCB;
-			PassCB.View = View.Transpose();
-			PassCB.Proj = Proj.Transpose();
+			EnvironmentConstant PassCB;
+			PassCB.View = View;
+			PassCB.Proj = Proj;
 
-			mIBLEnviromentPassCBRef[i] = mRHI->CreateConstantBuffer(&PassCB, sizeof(PassCB));
+			mIBLEnvironmentPassCBRef[i] = mRHI->CreateConstantBuffer(&PassCB, sizeof(PassCB));
 		}
 
 		ID3D12GraphicsCommandList* commandList = mRHI->GetDevice()->GetCommandList();
@@ -812,8 +1155,8 @@ namespace Engine
 			commandList->ClearRenderTargetView(rtv->GetDescriptorHandle(), mIBLEnvironmentMap->GetRTCube()->GetClearColorPtr(), 0, nullptr);
 			commandList->OMSetRenderTargets(1, &rtv->GetDescriptorHandle(), true, nullptr);
 
-			shader->SetParameter("cbPass", mIBLEnviromentPassCBRef[i]);
-			shader->SetParameter("EquirectangularMap", mIBLEnviromentTexture->GetSRV());
+			shader->SetParameter("cbEnvironmentPass", mIBLEnvironmentPassCBRef[i]);
+			shader->SetParameter("EquirectangularMap", mIBLEquirectangularTexture->GetSRV());
 
 			shader->BindParameters();
 
@@ -827,18 +1170,158 @@ namespace Engine
 
 		mRHI->TransitionResource(mIBLEnvironmentMap->GetRTCube()->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
-	*/
 
+	void D3D12DeferredRenderPipeline::CreateIBLIrradianceMap()
+	{
+		for (int i = 0; i < 6; ++i)
+		{
+			Matrix4x4 View = mIBLIrradianceMap->GetSceneView(i).View;
+			Matrix4x4 Proj = mIBLIrradianceMap->GetSceneView(i).Proj;
+
+			EnvironmentConstant PassCB;
+			PassCB.View = View;
+			PassCB.Proj = Proj;
+
+			mIBLIrradiancePassCBRef[i] = mRHI->CreateConstantBuffer(&PassCB, sizeof(PassCB));
+		}
+
+		ID3D12GraphicsCommandList* commandList = mRHI->GetDevice()->GetCommandList();
+
+		mRHI->TransitionResource(mIBLIrradianceMap->GetRTCube()->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		commandList->RSSetViewports(1, &mIBLIrradianceMap->GetViewport());
+		commandList->RSSetScissorRects(1, &mIBLIrradianceMap->GetScissorRect());
+
+		commandList->SetPipelineState(mRenderResource->GetPSO(mIBLIrradiancePSODescriptor));
+
+		Shader* shader = mIBLIrradiancePSODescriptor.mShader;
+		commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
+
+		Mesh* boxMesh = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_Box);
+		SubMeshResource subMesh;
+		subMesh.VertexByteStride = sizeof(Vertex);
+		subMesh.VertexBufferByteSize = (uint32_t)(subMesh.VertexByteStride * boxMesh->Meshes[0].Vertices.size());
+		subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
+		subMesh.IndexBufferByteSize = (uint32_t)(sizeof(unsigned) * boxMesh->Meshes[0].Indices.size());
+		subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+		subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_Box));
+		subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_Box));
+
+		subMesh.IndexCount = (uint32_t)boxMesh->Meshes[0].Indices.size();
+		subMesh.StartIndexLocation = 0;
+		subMesh.BaseVertexLocation = 0;
+
+		for (int i = 0; i < 6; ++i)
+		{
+			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvDescriptors;
+			auto rtv = mIBLIrradianceMap->GetRTCube()->GetRTV(i);
+
+			commandList->ClearRenderTargetView(rtv->GetDescriptorHandle(), mIBLIrradianceMap->GetRTCube()->GetClearColorPtr(), 0, nullptr);
+			commandList->OMSetRenderTargets(1, &rtv->GetDescriptorHandle(), true, nullptr);
+
+			shader->SetParameter("cbEnvironmentPass", mIBLIrradiancePassCBRef[i]);
+			shader->SetParameter("SkyCubeTexture", mIBLEnvironmentMap->GetRTCube()->GetSRV());
+
+			shader->BindParameters();
+
+			mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
+			mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
+
+			commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
+
+			commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+		}
+
+		mRHI->TransitionResource(mIBLIrradianceMap->GetRTCube()->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+	}
+
+	void D3D12DeferredRenderPipeline::CreateIBLPrefilterEnvironmentMap()
+	{
+		for (UINT Mip = 0; Mip < mIBLPrefilterMaxMipLevel; Mip++)
+		{
+			float Roughness = (float)Mip / (float)(mIBLPrefilterMaxMipLevel - 1);
+
+			for (UINT i = 0; i < 6; i++)
+			{
+				Matrix4x4 View = mIBLPrefilterMap[Mip]->GetSceneView(i).View;
+				Matrix4x4 Proj = mIBLPrefilterMap[Mip]->GetSceneView(i).Proj;
+
+				EnvironmentConstant PassCB;
+				PassCB.View = View;
+				PassCB.Proj = Proj;
+				PassCB.Roughness = Roughness;
+
+				mIBLPrefilterPassCBRef[Mip * 6 + i] = mRHI->CreateConstantBuffer(&PassCB, sizeof(PassCB));
+			}
+		}
+
+		ID3D12GraphicsCommandList* commandList = mRHI->GetDevice()->GetCommandList();
+
+		for (UINT Mip = 0; Mip < mIBLPrefilterMaxMipLevel; Mip++)
+		{
+			mRHI->TransitionResource(mIBLPrefilterMap[Mip]->GetRTCube()->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+			commandList->RSSetViewports(1, &mIBLPrefilterMap[Mip]->GetViewport());
+			commandList->RSSetScissorRects(1, &mIBLPrefilterMap[Mip]->GetScissorRect());
+
+			commandList->SetPipelineState(mRenderResource->GetPSO(mIBLPrefilterPSODescriptor));
+
+			Shader* shader = mIBLPrefilterPSODescriptor.mShader;
+			commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
+
+			Mesh* boxMesh = AssetManager::GetInstance()->LoadDefaultMeshResource(DefaultMesh_Box);
+			SubMeshResource subMesh;
+			subMesh.VertexByteStride = sizeof(Vertex);
+			subMesh.VertexBufferByteSize = (uint32_t)(subMesh.VertexByteStride * boxMesh->Meshes[0].Vertices.size());
+			subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
+			subMesh.IndexBufferByteSize = (uint32_t)(sizeof(unsigned) * boxMesh->Meshes[0].Indices.size());
+			subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+			subMesh.VertexBufferRef = mRenderResource->GetMeshVertexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_Box));
+			subMesh.IndexBufferRef = mRenderResource->GetMeshIndexBufferRef(AssetManager::GetInstance()->GetDefaultAssetGuid(DefaultMesh_Box));
+
+			subMesh.IndexCount = (uint32_t)boxMesh->Meshes[0].Indices.size();
+			subMesh.StartIndexLocation = 0;
+			subMesh.BaseVertexLocation = 0;
+
+			for (int i = 0; i < 6; ++i)
+			{
+				std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvDescriptors;
+				auto rtv = mIBLPrefilterMap[Mip]->GetRTCube()->GetRTV(i);
+
+				commandList->ClearRenderTargetView(rtv->GetDescriptorHandle(), mIBLPrefilterMap[Mip]->GetRTCube()->GetClearColorPtr(), 0, nullptr);
+				commandList->OMSetRenderTargets(1, &rtv->GetDescriptorHandle(), true, nullptr);
+
+				shader->SetParameter("cbEnvironmentPass", mIBLPrefilterPassCBRef[Mip * 6 + i]);
+				shader->SetParameter("SkyCubeTexture", mIBLEnvironmentMap->GetRTCube()->GetSRV());
+
+				shader->BindParameters();
+
+				mRHI->SetVertexBuffer(subMesh.VertexBufferRef, 0, subMesh.VertexByteStride, subMesh.VertexBufferByteSize);
+				mRHI->SetIndexBuffer(subMesh.IndexBufferRef, 0, subMesh.IndexFormat, subMesh.IndexBufferByteSize);
+
+				commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
+
+				commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+			}
+
+			mRHI->TransitionResource(mIBLPrefilterMap[Mip]->GetRTCube()->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+		}
+	}
+
+	/*
 	void D3D12DeferredRenderPipeline::CreateIBLEnviromentTexture()
 	{
 		std::array<std::shared_ptr<TextureData>, 6> datas;
-		datas[0] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_X+.hdr"));
-		datas[1] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_X-.hdr"));
-		datas[2] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_Y+.hdr"));
-		datas[3] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_X-.hdr"));
-		datas[4] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_Z+.hdr"));
-		datas[5] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/skybox_specular_Z-.hdr"));
-
+		
+		datas[0] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/X+.hdr"));
+		datas[1] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/X-.hdr"));
+		datas[2] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/Y+.hdr"));
+		datas[3] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/Y-.hdr"));
+		datas[4] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/Z+.hdr"));
+		datas[5] = LoadHDRTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/y/Z-.hdr"));
+		
 		D3D12TextureInfo info;
 		info.Type = IMAGE_TYPE::IMAGE_TYPE_CUBE;
 		info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -858,4 +1341,5 @@ namespace Engine
 
 		mRHI->UploadCubeTextureData(mIBLEnviromentTexture, up);
 	}
+	*/
 }

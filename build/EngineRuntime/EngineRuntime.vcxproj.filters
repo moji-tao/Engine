@@ -369,6 +369,9 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\renderdoc_app.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\ShadowMap.h">
+      <Filter>include\Function\Render\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Alloter\MemoryPool.cpp">
@@ -556,6 +559,9 @@
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Resource\ResourceType\Data\TextureData.cpp">
       <Filter>src\Resource\ResourceType\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\ShadowMap.cpp">
+      <Filter>src\Function\Render\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

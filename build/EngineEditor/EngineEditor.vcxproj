@@ -115,9 +115,11 @@ copy /B /Y D:\dev\Engine\engine\3rd\assimp\bin\assimp-mt.dll D:\dev\Engine\bin</
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\SubSystem\EditorInputSystem.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\Application\SubSystem\EditorSceneSystem.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\AssetTool.h" />
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\Loader\MeshLoader.h" />
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\Loader\TextureLoader.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\LuaScriptTemplate.h" />
-    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\ModelLoader.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUI.h" />
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIAssetAttribute.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIConsolePass.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIHierarchyPass.h" />
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIInspectorPass.h" />
@@ -138,8 +140,10 @@ copy /B /Y D:\dev\Engine\engine\3rd\assimp\bin\assimp-mt.dll D:\dev\Engine\bin</
     <ClCompile Include="..\..\engine\EngineEditor\src\Application\SubSystem\EditorInputSystem.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\Application\SubSystem\EditorSceneSystem.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\AssetTool.cpp" />
-    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\ModelLoader.cpp" />
+    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\Loader\MeshLoader.cpp" />
+    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\Loader\TextureLoader.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUI.cpp" />
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIAssetAttribute.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIConsolePass.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIHierarchyPass.cpp" />
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIInspectorPass.cpp" />

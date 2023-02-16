@@ -40,6 +40,26 @@
 			"ShaderName": "IBLEnvironment",
 			"EntryPoint": "PS",
 			"Version": "ps_5_1"
+		},		
+		{
+			"ShaderName": "IBLIrradiance",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "IBLIrradiance",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "IBLPrefilter",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "IBLPrefilter",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
 		},
 		{
 			"ShaderName": "PostProcess",
@@ -68,6 +88,36 @@
 		},
 		{
 			"ShaderName": "Z-PrePass",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "SSAO",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "SSAO",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "OmnidirectionalShadowMap",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "OmnidirectionalShadowMap",
+			"EntryPoint": "PS",
+			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "SingleShadowMap",
+			"EntryPoint": "VS",
+			"Version": "vs_5_1"
+		},
+		{
+			"ShaderName": "SingleShadowMap",
 			"EntryPoint": "PS",
 			"Version": "ps_5_1"
 		}

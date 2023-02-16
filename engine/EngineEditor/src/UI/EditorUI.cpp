@@ -10,7 +10,7 @@
 #include "EngineEditor/include/UI/EditorUIHierarchyPass.h"
 #include "EngineEditor/include/UI/EditorUIInspectorPass.h"
 #include "EngineEditor/include/UI/EditorUIScenePass.h"
-#include "EngineEditor/include/EditorTools/ModelLoader.h"
+#include "EngineEditor/include/UI/EditorUIAssetAttribute.h"
 #include "EngineEditor/include/UI/ImGuiExtensions/imgui_notify.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Core/Math/Math.h"
@@ -38,7 +38,9 @@ namespace Editor
 		mSceneUI->Initialize(mUIMessage, mDevice, editor);
 		mInspectorUI = new EditorUIInspectorPass();
 		mInspectorUI->Initialize(mUIMessage, mDevice, editor);
-		
+		mAssetAttributeUI = new EditorUIAssetAttributePass();
+		mAssetAttributeUI->Initialize(mUIMessage, mDevice, editor);
+
 		Engine::RenderSystem::GetInstance()->InitializeUIRenderBackendEnd();
 
 		ConfigStyleColor();
@@ -157,8 +159,9 @@ namespace Editor
 		mConsoleUI->ShowUI();
 		mProjectUI->ShowUI();
 		mHierarchyUI->ShowUI();
-		mSceneUI->ShowUI();
 		mInspectorUI->ShowUI();
+		mSceneUI->ShowUI();
+		mAssetAttributeUI->ShowUI();
 
 		// 测试1
 		{
@@ -239,36 +242,11 @@ namespace Editor
 
 		// 自定义控件
 		{
-			ImGui::Begin("自定义控件");
+			ImGui::Begin("渲染控制");
 
-			static const char* item_names[] = { "一", "二", "三", "四", "五" };
-			for (int n = 0; n < 5; n++)
-			{
-				const char* item = item_names[n];
-				ImGui::Selectable(item);
-
-				if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
-				{
-					int n_next = n + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-					if (n_next >= 0 && n_next < 5)
-					{
-						item_names[n] = item_names[n_next];
-						item_names[n_next] = item;
-						ImGui::ResetMouseDragDelta();
-					}
-				}
-			}
-
-			float xx = ImGui::GetMouseDragDelta(0).x;
-			float yy = ImGui::GetMouseDragDelta(0).y;
-
-			if (ImGui::IsKeyReleased(ImGuiKey_M))
-			{
-				ImGui::ResetMouseDragDelta();
-			}
-
-			ImGui::Text(std::to_string(xx).c_str());
-			ImGui::Text(std::to_string(yy).c_str());
+			ImGui::Checkbox("TAA", &Engine::RenderSystem::GetInstance()->mEnableTAA);
+			ImGui::Checkbox("SSAO", &Engine::RenderSystem::GetInstance()->mEnableSSAO);
+			ImGui::Checkbox("AmbientLighting", &Engine::RenderSystem::GetInstance()->mEnableAmbientLighting);
 
 			ImGui::End();
 

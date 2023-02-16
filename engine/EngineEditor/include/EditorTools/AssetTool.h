@@ -22,12 +22,10 @@ namespace Editor
 	public:
 		AssetTool();
 
-		bool static LoadAsset(const std::filesystem::path& oldPath, const std::filesystem::path& loadFolder, AssetFile* folder);
-
-		//void static SaveAsset(const std::filesystem::path& saveProjectPath, Engine::ISerializable* asset);
+		bool static LoadAsset(const std::filesystem::path& oldPath, AssetFile* folder);
 
 	private:
-		std::unordered_map<std::string, std::shared_ptr<Loader>> mExtensionMap;
+		std::unordered_map<std::string, std::function<Engine::GUID(const std::filesystem::path& src, AssetFile* dstFolder)>> mExtensionMap;
 
 		static AssetTool staticLoader;
 	};

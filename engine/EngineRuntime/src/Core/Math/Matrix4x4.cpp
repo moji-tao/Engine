@@ -402,6 +402,7 @@ namespace Engine
 
 	void Matrix4x4::MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
 	{
+		/*
 		// Ordering:
 		//    1. Scale
 		//    2. Rotate
@@ -423,6 +424,32 @@ namespace Engine
 
 		m_Value[2][0] = scale[2] * rot3x3[2][0];
 		m_Value[2][1] = scale[2] * rot3x3[2][1];
+		m_Value[2][2] = scale[2] * rot3x3[2][2];
+		m_Value[2][3] = 0;
+
+		// No projection term
+		m_Value[3][0] = position[0];
+		m_Value[3][1] = position[1];
+		m_Value[3][2] = position[2];
+		m_Value[3][3] = 1;
+		*/
+
+		Matrix3x3 rot3x3;
+		orientation.GetRotationMatrix(rot3x3);
+
+		// Set up final matrix with scale, rotation and translation
+		m_Value[0][0] = scale[0] * rot3x3[0][0];
+		m_Value[0][1] = scale[1] * rot3x3[0][1];
+		m_Value[0][2] = scale[1] * rot3x3[0][2];
+		m_Value[0][3] = 0;
+
+		m_Value[1][0] = scale[0] * rot3x3[1][0];
+		m_Value[1][1] = scale[1] * rot3x3[1][1];
+		m_Value[1][2] = scale[2] * rot3x3[1][2];
+		m_Value[1][3] = 0;
+
+		m_Value[2][0] = scale[0] * rot3x3[2][0];
+		m_Value[2][1] = scale[1] * rot3x3[2][1];
 		m_Value[2][2] = scale[2] * rot3x3[2][2];
 		m_Value[2][3] = 0;
 
@@ -482,11 +509,9 @@ namespace Engine
 		scale[0] = Math::Sqrt(scale_2[0][0]);
 		scale[1] = Math::Sqrt(scale_2[1][1]);
 		scale[2] = Math::Sqrt(scale_2[2][2]);
-		scale_2[0][0] = 1.0f / scale[0];
-		scale_2[1][1] = 1.0f / scale[1];
-		scale_2[2][2] = 1.0f / scale[2];
 
 		orientation = Quaternion(m3x3 * scale_2);
+		orientation.Normalize();
 	}
 
 	bool Matrix4x4::IsAffine(void) const

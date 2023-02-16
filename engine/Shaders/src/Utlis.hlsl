@@ -3,12 +3,12 @@
 
 const static float PI = 3.14159265359;
 
-float Square( float x )
+float Square(float x)
 {
 	return x*x;
 }
 
-float Pow4( float x )
+float Pow4(float x)
 {
 	float xx = x*x;
 	return xx * xx;
@@ -18,7 +18,7 @@ float Pow4( float x )
 float3 NormalSampleToWorldSpace(float3 NormalMapSample, float3 UnitNormalW, float3 TangentW)
 {
 	// Uncompress each component from [0,1] to [-1,1].
-	float3 NormalT = 2.0f* NormalMapSample - 1.0f;
+	float3 NormalT = 2.0f * NormalMapSample - 1.0f;
 
 	// Build orthonormal basis.
 	float3 N = UnitNormalW;
@@ -70,17 +70,17 @@ float2 LineBoxIntersect(float3 RayOrigin, float3 RayEnd, float3 BoxMin, float3 B
 
 float4 WorldToView(float4 WorldPos, float4x4 View)
 {
-	return mul(WorldPos, View);
+	return mul(View, WorldPos);
 }
 
 float4 ViewToWolrd(float4 ViewPos, float4x4 InvView)
 {
-	return mul(ViewPos, InvView);
+	return mul(InvView, ViewPos);
 }
 
 float4 ViewToNDC(float4 ViewPos, float4x4 Proj)
 {
-	float4 NDC = mul(ViewPos, Proj);
+	float4 NDC = mul(Proj, ViewPos);
 	NDC /= NDC.w;
 	
 	return NDC;
@@ -88,7 +88,7 @@ float4 ViewToNDC(float4 ViewPos, float4x4 Proj)
 
 float4 NDCToView(float4 NDCPos, float4x4 InvProj)
 {
-    float4 View = mul(NDCPos, InvProj);
+    float4 View = mul(InvProj, NDCPos);
     View /= View.w;
  
     return View;
@@ -96,14 +96,14 @@ float4 NDCToView(float4 NDCPos, float4x4 InvProj)
 
 float NDCDepthToViewDepth(float NDCDepth, float4x4 Proj)
 {
-	float ViewDepth = Proj[3][2] / (NDCDepth - Proj[2][2]);
+	float ViewDepth = Proj[2][3] / (NDCDepth - Proj[2][2]);
 	
 	return ViewDepth;
 }
 
 float ViewDepthToNDCDepth(float ViewDepth, float4x4 Proj)
 {
-	float NDCDepth = Proj[2][2] + Proj[3][2] / ViewDepth;
+	float NDCDepth = Proj[2][2] + Proj[2][3] / ViewDepth;
 	
 	return NDCDepth;
 }

@@ -9,19 +9,70 @@ namespace Engine
 		mResource.emplace_back(refMesh, refMaterials, gConstance);
 	}
 
-	void RenderResource::UploadDirectionalLight(const DirectionalLight& info)
+	void RenderResource::UploadDirectionalLight(DirectionalLight& info)
 	{
+		info.ShadowIndex = -1;
 		mDirectionalLightResource.emplace_back(info);
 	}
 
-	void RenderResource::UploadPointLight(const PointLight& info)
+	void RenderResource::UploadPointLight(PointLight& info)
 	{
+		info.ShadowIndex = -1;
 		mPointLightResource.emplace_back(info);
 	}
 
-	void RenderResource::UploadSpotLight(const SpotLight& info)
+	void RenderResource::UploadSpotLight(SpotLight& info)
 	{
+		info.ShadowIndex = -1;
 		mSpotLightResource.emplace_back(info);
+	}
+
+	void RenderResource::UploadDirectionalLightAndShadow(DirectionalLight& info, ShadowParameter shadowParameter)
+	{
+		if (m2DShadowMapCount == MAX_2DSHADOWMAP)
+		{
+			UploadDirectionalLight(info);
+		}
+		else
+		{
+			info.ShadowIndex = (int32_t)m2DShadowMapCount;
+			mDirectionalLightResource.emplace_back(info);
+			shadowParameter.Type = ShadowParameter::emShadowMap2D;
+			mShaderParameter.push_back(shadowParameter);
+			++m2DShadowMapCount;
+		}
+	}
+
+	void RenderResource::UploadPointLightAndShadow(PointLight& info, ShadowParameter shadowParameter)
+	{
+		if (mCubeShadowMapCount == MAX_CubeSHADOWMAP)
+		{
+			UploadPointLight(info);
+		}
+		else
+		{
+			info.ShadowIndex = (int32_t)mCubeShadowMapCount;
+			mPointLightResource.emplace_back(info);
+			shadowParameter.Type = ShadowParameter::emShadowMapCube;
+			mShaderParameter.push_back(shadowParameter);
+			++mCubeShadowMapCount;
+		}
+	}
+
+	void RenderResource::UploadSpotLightAndShadow(SpotLight& info, ShadowParameter shadowParameter)
+	{
+		if (m2DShadowMapCount == MAX_2DSHADOWMAP)
+		{
+			UploadSpotLight(info);
+		}
+		else
+		{
+			info.ShadowIndex = (int32_t)m2DShadowMapCount;
+			mSpotLightResource.emplace_back(info);
+			shadowParameter.Type = ShadowParameter::emShadowMap2D;
+			mShaderParameter.push_back(shadowParameter);
+			++m2DShadowMapCount;
+		}
 	}
 
 	void RenderResource::PerFrameBuffer(const RenderCamera* camera, float deltaTile)
@@ -31,12 +82,20 @@ namespace Engine
 		UpdateObjectCBs();
 	}
 
+	std::vector<ShadowParameter>& RenderResource::GetShadowParameters()
+	{
+		return mShaderParameter;
+	}
+
 	void RenderResource::EndFrameBuffer()
 	{
 		mResource.clear();
 		mDirectionalLightResource.clear();
 		mPointLightResource.clear();
 		mSpotLightResource.clear();
+		mShaderParameter.clear();
+		m2DShadowMapCount = 0;
+		mCubeShadowMapCount = 0;
 	}
 
 	const CameraPassConstants* RenderResource::GetCameraPass()

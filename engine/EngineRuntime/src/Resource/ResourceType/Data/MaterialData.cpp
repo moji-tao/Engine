@@ -8,31 +8,26 @@ namespace Engine
 
 	void MaterialData::Serialize(SerializerDataFrame& stream) const
 	{
-		stream << DiffuseColor;
-		stream << SpecularColor;
-		stream << AmbientColor;
-		stream << ReflectiveColor;
-		stream << EmissiveColor;
-		stream << TransparentColor;
-		stream << Opacity;
-		stream << Shininess;
-		stream << RefDiffuseTexture;
-		stream << RefSpecularTexture;
+		stream << Albedo;
+		stream << RefAlbedoTexture;
+		stream << RefNormalTexture;
+		stream << Metallic;
+		stream << RefMetallicTexture;
+		stream << Roughness;
+		stream << RefRoughnessTexture;
+		stream << Emissive;
 	}
 
 	bool MaterialData::Deserialize(SerializerDataFrame& stream)
 	{
-		stream >> DiffuseColor;
-		stream >> SpecularColor;
-		stream >> AmbientColor;
-		stream >> ReflectiveColor;
-		stream >> EmissiveColor;
-		stream >> TransparentColor;
-		stream >> Opacity;
-		stream >> Shininess;
-		stream >> RefDiffuseTexture;
-		stream >> RefSpecularTexture;
-
+		stream >> Albedo;
+		stream >> RefAlbedoTexture;
+		stream >> RefNormalTexture;
+		stream >> Metallic;
+		stream >> RefMetallicTexture;
+		stream >> Roughness;
+		stream >> RefRoughnessTexture;
+		stream >> Emissive;
 		return true;
 	}
 

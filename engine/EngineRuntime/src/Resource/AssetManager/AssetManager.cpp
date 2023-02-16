@@ -2,6 +2,7 @@
 #include <yaml-cpp/yaml.h>
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
+#include "EngineRuntime/include/Function/Framework/Object/Actor.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 
 namespace Engine
@@ -123,12 +124,48 @@ namespace Engine
 	Object* AssetManager::LoadResource(const GUID& guid)
 	{
 		auto it = mCacheAsset.find(guid);
+
 		if (it == mCacheAsset.end())
 		{
-			return nullptr;
+			auto it = mFilesPath.find(guid);
+
+			if (it == mFilesPath.end())
+			{
+				return nullptr;
+			}
+			
+			return LoadResource(it->second);
 		}
 
 		return it->second;
+
+	}
+
+	Object* AssetManager::LoadResource(const std::filesystem::path& resourcePath)
+	{
+		std::string ext = resourcePath.extension().generic_string();
+		if (ext == ".texture")
+		{
+			return LoadResourceFromFile<TextureData>(resourcePath);
+		}
+		else if (ext == ".material")
+		{
+			return LoadResourceFromFile<MaterialData>(resourcePath);
+		}
+		else if (ext == ".mesh")
+		{
+			return LoadResourceFromFile<Mesh>(resourcePath);
+		}
+		else if (ext == ".prefab")
+		{
+			return LoadResourceFromFile<Actor>(resourcePath);
+		}
+		else
+		{
+			ASSERT(0);
+		}
+
+		return nullptr;
 	}
 
 	Mesh* AssetManager::LoadDefaultMeshResource(DefaultMesh _mesh)
@@ -201,7 +238,7 @@ namespace Engine
 		{
 			Mesh* boxMesh = new Mesh;
 			Mesh::CreateBox(*boxMesh, 1.0f, 1.0f, 1.0f, 3);
-			mDefaultBoxMeshGuid = GUID::Get();
+			mDefaultBoxMeshGuid = GUID("9D4917EB9694472B99B2793E3668B9AC");
 			ASSERT(boxMesh->Meshes.size() == 1);
 			boxMesh->Meshes[0].mGuid = mDefaultBoxMeshGuid;
 			mCacheAsset.emplace(mDefaultBoxMeshGuid, boxMesh);
@@ -210,7 +247,7 @@ namespace Engine
 		{
 			Mesh* cylinderMesh = new Mesh;
 			Mesh::CreateCylinder(*cylinderMesh, 0.5f, 0.3f, 3.0f, 20, 20);
-			mDefaultCylinderMeshGuid = GUID::Get();
+			mDefaultCylinderMeshGuid = GUID("6BCE17D01FD04276982BBF90698E1D03");
 			ASSERT(cylinderMesh->Meshes.size() == 1);
 			cylinderMesh->Meshes[0].mGuid = mDefaultCylinderMeshGuid;
 			mCacheAsset.emplace(mDefaultCylinderMeshGuid, cylinderMesh);
@@ -219,7 +256,7 @@ namespace Engine
 		{
 			Mesh* gridMesh = new Mesh;
 			Mesh::CreateGrid(*gridMesh, 20.0f, 30.0f, 60, 40);
-			mDefaultGridMeshGuid = GUID::Get();
+			mDefaultGridMeshGuid = GUID("C59915B55127450CA4629899E8CB22D5");
 			ASSERT(gridMesh->Meshes.size() == 1);
 			gridMesh->Meshes[0].mGuid = mDefaultGridMeshGuid;
 			mCacheAsset.emplace(mDefaultGridMeshGuid, gridMesh);
@@ -228,7 +265,7 @@ namespace Engine
 		{
 			Mesh* quadMesh = new Mesh;
 			Mesh::CreateQuad(*quadMesh, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f);
-			mDefaultQuadMeshGuid = GUID::Get();
+			mDefaultQuadMeshGuid = GUID("BF54081E79C74E419AF036C2AE8415C9");
 			ASSERT(quadMesh->Meshes.size() == 1);
 			quadMesh->Meshes[0].mGuid = mDefaultQuadMeshGuid;
 			mCacheAsset.emplace(mDefaultQuadMeshGuid, quadMesh);
@@ -237,7 +274,7 @@ namespace Engine
 		{
 			Mesh* sphereMesh = new Mesh;
 			Mesh::CreateSphere(*sphereMesh, 0.5f, 20, 20);
-			mDefaultSphereMeshGuid = GUID::Get();
+			mDefaultSphereMeshGuid = GUID("A00C0EF279F14F39A32E4CC86FCFE6DB");
 			ASSERT(sphereMesh->Meshes.size() == 1);
 			sphereMesh->Meshes[0].mGuid = mDefaultSphereMeshGuid;
 			mCacheAsset.emplace(mDefaultSphereMeshGuid, sphereMesh);
@@ -246,7 +283,7 @@ namespace Engine
 		{
 			Mesh* screenQuadMesh = new Mesh;
 			Mesh::CreateQuad(*screenQuadMesh, -1.0f, 1.0f, 2.0f, 2.0f, 0.0f);
-			mDefaultScreenQuadMeshGuid = GUID::Get();
+			mDefaultScreenQuadMeshGuid = GUID("2CBE0D51BBE448A9967948534786C112");
 			ASSERT(screenQuadMesh->Meshes.size() == 1);
 			screenQuadMesh->Meshes[0].mGuid = mDefaultScreenQuadMeshGuid;
 			mCacheAsset.emplace(mDefaultScreenQuadMeshGuid, screenQuadMesh);

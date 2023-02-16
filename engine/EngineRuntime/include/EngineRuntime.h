@@ -3,7 +3,6 @@
 #include <string>
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
-#include "EngineRuntime/include/renderdoc_app.h"
 
 namespace Engine
 {
@@ -22,8 +21,6 @@ namespace Engine
 		virtual bool Tick(float deltaTime, bool isEditorMode);
 
 		float GetDeltaTime();
-
-		RENDERDOC_API_1_1_2* rdoc_api = nullptr;//API接口
 
 	private:
 		std::chrono::steady_clock::time_point mLastTickTimePoint;

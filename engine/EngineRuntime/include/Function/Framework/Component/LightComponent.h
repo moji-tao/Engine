@@ -26,5 +26,7 @@ namespace Engine
 		Vector4 mColor;
 
 		float mIntensity;
+
+		bool mShadow;
 	};
 }

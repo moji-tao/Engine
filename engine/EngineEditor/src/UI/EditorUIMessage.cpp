@@ -11,4 +11,14 @@ namespace Editor
 	{
 		return mInspectorShowActor;
 	}
+
+	void EditorUIMessage::SetProjectSelectFile(const Engine::GUID& guid)
+	{
+		mProjectSelectFile = guid;
+	}
+
+	Engine::GUID EditorUIMessage::GetProjectSelectFile()
+	{
+		return mProjectSelectFile;
+	}
 }

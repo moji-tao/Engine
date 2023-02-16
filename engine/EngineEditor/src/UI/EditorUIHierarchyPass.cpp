@@ -2,6 +2,7 @@
 #include "EngineEditor/include/UI/EditorUIHierarchyPass.h"
 #include "EngineEditor/include/UI/ImGuiExtensions/imgui_notify.h"
 #include "EngineRuntime/include/Core/Base/macro.h"
+#include "EngineRuntime/include/Function/Framework/Component/MeshRendererComponent.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
@@ -17,6 +18,8 @@ namespace Editor
 	REGISTER_CLASS_METHOD(EditorUIHierarchyPass, Ref_GameObjectDelete, void);
 	REGISTER_CLASS_METHOD(EditorUIHierarchyPass, Ref_CreateEmptyGameObject, void);
 	REGISTER_CLASS_METHOD(EditorUIHierarchyPass, Ref_Create3DCube, void);
+	REGISTER_CLASS_METHOD(EditorUIHierarchyPass, Ref_Create3DSphere, void);
+	REGISTER_CLASS_METHOD(EditorUIHierarchyPass, Ref_Create3DQuad, void);
 	REGISTER_CLASS_FIELD(EditorUIHierarchyPass, mIsSelectedNode, bool);
 	REGISTER_CLASS_FIELD(EditorUIHierarchyPass, mIsSelectedNodeNum, int);
 
@@ -386,6 +389,25 @@ namespace Editor
 	void EditorUIHierarchyPass::Ref_Create3DCube()
 	{
 		LOG_INFO("立方体");
+		Engine::Actor* actor = mCurrentScene->CreateEmptyActor("Cube");
+		Engine::MeshRendererComponent* meshComponent = actor->AddComponent<Engine::MeshRendererComponent>();
+		meshComponent->SetRefMesh(Engine::AssetManager::GetInstance()->GetDefaultAssetGuid(Engine::DefaultMesh_Box));
+	}
+
+	void EditorUIHierarchyPass::Ref_Create3DSphere()
+	{
+		LOG_INFO("球");
+		Engine::Actor* actor = mCurrentScene->CreateEmptyActor("Sphere");
+		Engine::MeshRendererComponent* meshComponent = actor->AddComponent<Engine::MeshRendererComponent>();
+		meshComponent->SetRefMesh(Engine::AssetManager::GetInstance()->GetDefaultAssetGuid(Engine::DefaultMesh_Sphere));
+	}
+
+	void EditorUIHierarchyPass::Ref_Create3DQuad()
+	{
+		LOG_INFO("平面");
+		Engine::Actor* actor = mCurrentScene->CreateEmptyActor("Quad");
+		Engine::MeshRendererComponent* meshComponent = actor->AddComponent<Engine::MeshRendererComponent>();
+		meshComponent->SetRefMesh(Engine::AssetManager::GetInstance()->GetDefaultAssetGuid(Engine::DefaultMesh_Quad));
 	}
 
 	void EditorUIHierarchyPass::ShowPopupWindow()

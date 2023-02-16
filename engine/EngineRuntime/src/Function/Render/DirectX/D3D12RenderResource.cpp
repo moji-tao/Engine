@@ -21,6 +21,17 @@ namespace Engine
 		shaderInfo.mPixelShader = psBlob;
 		mDefaultBasePassShader = std::make_unique<Shader>(shaderInfo, mRHI);
 
+		mNullSRV = mRHI->CreateStructuredBuffer("123", 3, 1);
+
+		SSAOCBParameter ssaoParameter;
+		ssaoParameter.OcclusionRadius = 0.03f;
+		ssaoParameter.OcclusionFadeStart = 0.01f;
+		ssaoParameter.OcclusionFadeEnd = 0.03f;
+		ssaoParameter.SurfaceEpsilon = 0.001f;
+		mRenderSSAOCBBuffer = mRHI->CreateConstantBuffer(&ssaoParameter, sizeof(ssaoParameter));
+
+		CreateNullTexture();
+
 		CreateInputLayout();
 	}
 
@@ -107,69 +118,168 @@ namespace Engine
 				material.Descriptor.mDepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 				material.Descriptor.mDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
 				material.Descriptor.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-				material.Descriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-				material.Descriptor.mRTVFormats[1] = DXGI_FORMAT_R8G8B8A8_SNORM;
-				material.Descriptor.mRTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-				material.Descriptor.mRTVFormats[3] = DXGI_FORMAT_R8G8B8A8_UNORM;
-				material.Descriptor.mRTVFormats[4] = DXGI_FORMAT_R16G16_FLOAT;
-				material.Descriptor.mNumRenderTargets = 5;
+				material.Descriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// Position
+				material.Descriptor.mRTVFormats[1] = DXGI_FORMAT_R8G8B8A8_SNORM;		// Normal
+				material.Descriptor.mRTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// BaseColor
+				material.Descriptor.mRTVFormats[3] = DXGI_FORMAT_R8G8B8A8_UNORM;		// MetallicRoughness
+				material.Descriptor.mRTVFormats[4] = DXGI_FORMAT_R8G8B8A8_UNORM;		// Emissive
+				material.Descriptor.mRTVFormats[5] = DXGI_FORMAT_R16G16_FLOAT;			// Velocity
+				material.Descriptor.mNumRenderTargets = 6;
 				material.Descriptor.mDepthStencilFormat = mRHI->GetViewportInfo().DepthStencilFormat;
 				material.Descriptor.m4xMsaaState = false;
 
-				if (false)
-				{
-					ASSERT(0);
-				}
-				else
-				{
-					material.Descriptor.mShader = mDefaultBasePassShader.get();
-				}
+				material.Descriptor.mShader = mDefaultBasePassShader.get();
 				// End
 				mGraphicsPSOManager->TryCreatePSO(material.Descriptor);
 
 				// 材质参数
-				if (refMaterial->RefDiffuseTexture.IsVaild())
-				{
-					TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefDiffuseTexture);
-					if (texture == nullptr)
-					{
-						LOG_ERROR("Material资源的漫反射纹理贴图没有找到路径 {0}", refMaterial->RefDiffuseTexture.Data());
-						continue;
-					}
+				ResourceMaterialData materialData;
 
-					if (mTextureMap.find(refMaterial->RefDiffuseTexture) == mTextureMap.end())
+				// 绑定漫反射纹理
+				do
+				{
+					materialData.AlbedoColor = refMaterial->Albedo;
+
+					if (refMaterial->RefAlbedoTexture.IsVaild())
 					{
-						D3D12TextureInfo info;
-						info.Type = texture->Info.mType;
-						info.Format = D3D12Texture::TransformationToD3DFormat(texture->Info.mFormat);
-						info.Width = texture->Info.mWidth;
-						info.Height = texture->Info.mHeight;
-						// TODO:纹理类型记得扩展
-						info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-						info.Depth = texture->Info.mDepth;
-						info.ArraySize = texture->Info.mArrayLayers;
-						info.MipCount = texture->Info.mMipLevels;
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefAlbedoTexture);
 						
-						D3D12TextureRef shared_ptr = mRHI->CreateTexture(info, TexCreate_SRV);
-						if (shared_ptr == nullptr)
+						if (texture == nullptr)
 						{
-							LOG_ERROR("D3D贴图资源创建失败 {0}", refMaterial->RefDiffuseTexture.Data());
-							continue;
+							materialData.HasAlbedoTexture = 0;
+							material.DiffuseTexture = mNullTextureResource;
+							break;
 						}
 
-						mRHI->UploadTextureData(shared_ptr, texture);
+						if (mTextureMap.find(refMaterial->RefAlbedoTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefAlbedoTexture, texture))
+							{
+								materialData.HasAlbedoTexture = 0;
+								material.DiffuseTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasAlbedoTexture = 1;
+						material.DiffuseTexture = mTextureMap[refMaterial->RefAlbedoTexture];
 
-						mTextureMap[refMaterial->RefDiffuseTexture] = shared_ptr;
 					}
-					material.DiffuseTexture = mTextureMap[refMaterial->RefDiffuseTexture];
+					else
+					{
+						materialData.HasAlbedoTexture = 0;
+						material.DiffuseTexture = mNullTextureResource;
+						break;
+					}
 
-				}
-				else
+				} while (false);
+
+				// 绑定法线纹理
+				do
 				{
-					LOG_ERROR("Material资源的漫反射纹理贴图不存在");
-					continue;
-				}
+					if (refMaterial->RefNormalTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefNormalTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasNormalTexture = 0;
+							material.NormalTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefNormalTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefNormalTexture, texture))
+							{
+								materialData.HasNormalTexture = 0;
+								material.NormalTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasNormalTexture = 1;
+						material.NormalTexture = mTextureMap[refMaterial->RefNormalTexture];
+
+					}
+					else
+					{
+						materialData.HasNormalTexture = 0;
+						material.NormalTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				// 绑定金属纹理
+				do
+				{
+					if (refMaterial->RefMetallicTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefMetallicTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasMetallicTexture = 0;
+							material.MetallicTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefMetallicTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefMetallicTexture, texture))
+							{
+								materialData.HasMetallicTexture = 0;
+								material.MetallicTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasMetallicTexture = 1;
+						material.MetallicTexture = mTextureMap[refMaterial->RefMetallicTexture];
+
+					}
+					else
+					{
+						materialData.HasMetallicTexture = 0;
+						material.MetallicTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				// 绑定粗糙度纹理
+				do
+				{
+					if (refMaterial->RefRoughnessTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefRoughnessTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasRoughnessTexture = 0;
+							material.RoughnessTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefRoughnessTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefRoughnessTexture, texture))
+							{
+								materialData.HasRoughnessTexture = 0;
+								material.RoughnessTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasRoughnessTexture = 1;
+						material.RoughnessTexture = mTextureMap[refMaterial->RefRoughnessTexture];
+
+					}
+					else
+					{
+						materialData.HasRoughnessTexture = 0;
+						material.RoughnessTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				materialData.Emissive = refMaterial->Emissive;
+
 				material.cbPass = mRenderCameraBuffer;
+
+				material.cbMaterialData = mRHI->CreateConstantBuffer(&materialData, sizeof(materialData));
 
 				// End
 
@@ -235,6 +345,8 @@ namespace Engine
 		mLightCommonData.DirectionalLightCount = (uint32_t)mDirectionalLightResource.size();
 		mLightCommonData.PointLightCount = (uint32_t)mPointLightResource.size();
 		mLightCommonData.SpotLightCount = (uint32_t)mSpotLightResource.size();
+		mLightCommonData.EnableSSAO = RenderSystem::GetInstance()->mEnableSSAO;
+		mLightCommonData.EnableAmbientLighting = RenderSystem::GetInstance()->mEnableAmbientLighting;
 		mLightCommonDataBuffer = mRHI->CreateConstantBuffer(&mLightCommonData, sizeof(mLightCommonData));
 	}
 
@@ -270,6 +382,11 @@ namespace Engine
 	D3D12ConstantBufferRef D3D12RenderResource::GetCbPassRef()
 	{
 		return mRenderCameraBuffer;
+	}
+
+	D3D12ConstantBufferRef D3D12RenderResource::GetSSAOCBRef()
+	{
+		return mRenderSSAOCBBuffer;
 	}
 
 	void D3D12RenderResource::UploadDefaultVertexResource()
@@ -341,6 +458,52 @@ namespace Engine
 		}
 	}
 
+	bool D3D12RenderResource::UploadTexture(const GUID& textureGuid, TextureData* texture)
+	{
+		D3D12TextureInfo info;
+		info.Type = texture->Info.mType;
+		info.Format = D3D12Texture::TransformationToD3DFormat(texture->Info.mFormat);
+		info.Width = texture->Info.mWidth;
+		info.Height = texture->Info.mHeight;
+		// TODO:纹理类型记得扩展
+		info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		info.Depth = texture->Info.mDepth;
+		info.ArraySize = texture->Info.mArrayLayers;
+		info.MipCount = texture->Info.mMipLevels;
+
+		D3D12TextureRef shared_ptr = mRHI->CreateTexture(info, TexCreate_SRV);
+		if (shared_ptr == nullptr)
+		{
+			LOG_ERROR("D3D贴图资源创建失败 {0}", textureGuid.Data());
+			return false;
+		}
+
+		mRHI->UploadTextureData(shared_ptr, texture);
+
+		mTextureMap[textureGuid] = shared_ptr;
+		return true;
+	}
+
+	void D3D12RenderResource::CreateNullTexture()
+	{
+		mNullTexture = LoadTextureForFile(EngineFileSystem::GetInstance()->GetActualPath("Resource/Texture/nullT.png"), false);
+
+		D3D12TextureInfo info;
+		info.Type = mNullTexture->Info.mType;
+		info.Format = D3D12Texture::TransformationToD3DFormat(mNullTexture->Info.mFormat);
+		info.Width = mNullTexture->Info.mWidth;
+		info.Height = mNullTexture->Info.mHeight;
+		// TODO:纹理类型记得扩展
+		info.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		info.Depth = mNullTexture->Info.mDepth;
+		info.ArraySize = mNullTexture->Info.mArrayLayers;
+		info.MipCount = mNullTexture->Info.mMipLevels;
+
+		mNullTextureResource = mRHI->CreateTexture(info, TexCreate_SRV);
+
+		mRHI->UploadTextureData(mNullTextureResource, mNullTexture.get());
+	}
+
 	void D3D12RenderResource::CreateInputLayout()
 	{
 		{
@@ -360,5 +523,19 @@ namespace Engine
 
 			mInputLayoutManager.AddInputLayout("BaseInputLayout", baseInputLayout);
 		}
+	}
+
+	void MaterialResource::BindShaderBindParameters(D3D12StructuredBufferRef cbRef) const
+	{
+
+		Descriptor.mShader->SetParameter("gInstanceData", cbRef->GetSRV());
+		Descriptor.mShader->SetParameter("cbPass", cbPass);
+		Descriptor.mShader->SetParameter("cbMaterialData", cbMaterialData);
+		Descriptor.mShader->SetParameter("BaseColorTexture", DiffuseTexture->GetSRV());
+		Descriptor.mShader->SetParameter("NormalTexture", NormalTexture->GetSRV());
+		Descriptor.mShader->SetParameter("MetallicTexture", MetallicTexture->GetSRV());
+		Descriptor.mShader->SetParameter("RoughnessTexture", RoughnessTexture->GetSRV());
+		Descriptor.mShader->BindParameters();
+
 	}
 }

@@ -81,10 +81,11 @@ namespace Engine
 		T* LoadResource(const void* data, size_t length)
 		{
 			return LoadResourceFromMemory<T>(data, length);
-
 		}
 
 		Object* LoadResource(const GUID& guid);
+
+		Object* LoadResource(const std::filesystem::path& resourcePath);
 
 		void UnLoadResource(const Object* resource);
 

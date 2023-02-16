@@ -38,6 +38,7 @@ namespace Editor
 		EditorUIPassBase* mHierarchyUI;
 		EditorUIPassBase* mSceneUI;
 		EditorUIPassBase* mInspectorUI;
+		EditorUIPassBase* mAssetAttributeUI;
 
 	private:
 		Engine::ImGuiDevice* mDevice = nullptr;

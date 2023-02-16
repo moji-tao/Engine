@@ -29,6 +29,8 @@ namespace Editor
 		bool GetAssetMetaFilePath(std::filesystem::path& result);
 
 		std::filesystem::path GetParentPath();
+
+		Engine::GUID GetAssetGuid();
 	};
 
 	class AssetsFileSystem final

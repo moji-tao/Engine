@@ -2,6 +2,10 @@
 #include "EngineRuntime/include/Core/Random/GUID.h"
 #include "EngineRuntime/include/Function/Render/RenderCamera.h"
 
+#define MAX_2DSHADOWMAP 10
+#define MAX_CubeSHADOWMAP 5
+#define SHADOWMAP_SIZE 4096
+
 namespace Engine
 {
 	struct ObjectConstants
@@ -38,9 +42,11 @@ namespace Engine
 
 	struct DirectionalLight
 	{
+		Matrix4x4 LightViewProj;
 		Vector4 Color;
 		Vector3 Direction;
 		float Intensity;
+		int32_t ShadowIndex;
 	};
 
 	struct PointLight
@@ -49,15 +55,32 @@ namespace Engine
 		Vector3 Position;
 		float Range;
 		float Intensity;
+		int32_t ShadowIndex;
 	};
 
 	struct SpotLight
 	{
+		Matrix4x4 LightViewProj;
 		Vector4 Color;
 		Vector3 Position;
 		float Light;
 		float Angle;
 		float Intensity;
+		int32_t ShadowIndex;
+	};
+
+	struct ShadowParameter
+	{
+		enum EMShadowMapType : uint32_t
+		{
+			emShadowMap2D,
+			emShadowMapCube,
+		};
+		Matrix4x4 View;
+		Matrix4x4 Proj;
+		Vector3 LightPosition;
+		float LightRange;
+		EMShadowMapType Type;
 	};
 
 	struct LightCommonData
@@ -65,6 +88,8 @@ namespace Engine
 		uint32_t DirectionalLightCount = 0;
 		uint32_t PointLightCount = 0;
 		uint32_t SpotLightCount = 0;
+		uint32_t EnableSSAO = 0;
+		uint32_t EnableAmbientLighting = 0;
 	};
 
 	class RenderResource
@@ -77,13 +102,21 @@ namespace Engine
 	public:
 		void UploadGameObjectRenderResource(const GUID& refMesh, std::vector<GUID> refMaterials, const ObjectConstants& gConstance);
 
-		void UploadDirectionalLight(const DirectionalLight& info);
+		void UploadDirectionalLight(DirectionalLight& info);
 
-		void UploadPointLight(const PointLight& info);
+		void UploadPointLight(PointLight& info);
 
-		void UploadSpotLight(const SpotLight& info);
+		void UploadSpotLight(SpotLight& info);
+
+		void UploadDirectionalLightAndShadow(DirectionalLight& info, ShadowParameter shadowParameter);
+
+		void UploadPointLightAndShadow(PointLight& info, ShadowParameter shadowParameter);
+
+		void UploadSpotLightAndShadow(SpotLight& info, ShadowParameter shadowParameter);
 
 		void PerFrameBuffer(const RenderCamera* camera, float deltaTile);
+
+		std::vector<ShadowParameter>& GetShadowParameters();
 
 		virtual void EndFrameBuffer();
 
@@ -107,5 +140,10 @@ namespace Engine
 		std::vector<PointLight> mPointLightResource;
 
 		std::vector<SpotLight> mSpotLightResource;
+
+		std::vector<ShadowParameter> mShaderParameter;
+
+		uint32_t m2DShadowMapCount = 0;
+		uint32_t mCubeShadowMapCount = 0;
 	};
 }

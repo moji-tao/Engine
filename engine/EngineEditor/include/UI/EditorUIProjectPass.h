@@ -41,6 +41,7 @@ namespace Editor
 		void Ref_CreateFolder();
 		void Ref_CreateLuaScript();
 		void Ref_CreateScene();
+		void Ref_CreateMaterial();
 		void Ref_ShowFolderInExplorer();
 		void Ref_Open();
 		void Ref_Delete();
@@ -97,6 +98,7 @@ namespace Editor
 			emCreateFolder,
 			emCreateLuaScript,
 			emCreateScene,
+			emCreateMaterial,
 		};
 
 		void CreateFolder();
@@ -104,5 +106,7 @@ namespace Editor
 		void CreateLuaScript();
 
 		void CreateScene();
+
+		void CreateMaterial();
 	};
 }

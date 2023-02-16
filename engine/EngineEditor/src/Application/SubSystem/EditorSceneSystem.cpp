@@ -20,8 +20,8 @@ namespace Editor
 		mEditorCamera.mZNear = 10000.0f;
 		*/
 		
-		mEditorCamera.mZFar = 1000.0f;
-		mEditorCamera.mZNear = 0.001f;
+		mEditorCamera.mZFar = 100000.0f;
+		mEditorCamera.mZNear = 1.0f;
 		
 		Engine::RenderSystem::GetInstance()->SetEditorRenderCamera(mEditorCamera);
 	}

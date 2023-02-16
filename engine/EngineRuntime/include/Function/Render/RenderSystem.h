@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "EngineRuntime/include/renderdoc_app.h"
 #include "EngineRuntime/include/Framework/Interface/IRuntimeModule.h"
 #include "EngineRuntime/include/Framework/Interface/ISingleton.h"
 #include "EngineRuntime/include/Function/Window/WindowUI.h"
@@ -43,6 +44,8 @@ namespace Engine
 	public:
 		size_t mFrameCount = 0;
 
+		RENDERDOC_API_1_1_2* rdoc_api = nullptr;//API接口
+
 	private:
 		std::unique_ptr<RHI> mRHI = nullptr;
 
@@ -61,5 +64,7 @@ namespace Engine
 
 	public:
 		bool mEnableTAA = false;
+		bool mEnableSSAO = true;
+		bool mEnableAmbientLighting = false;
 	};
 }

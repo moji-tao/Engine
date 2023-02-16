@@ -4,6 +4,7 @@
 #include "EngineRuntime/include/Function/Render/DirectX/RenderTarget.h"
 #include "EngineRuntime/include/Function/Render/DirectX/D3D12RenderResource.h"
 #include "EngineRuntime/include/Function/Render/DirectX/SceneCaptureCube.h"
+#include "EngineRuntime/include/Function/Render/DirectX/ShadowMap.h"
 
 namespace Engine
 {
@@ -42,9 +43,13 @@ namespace Engine
 		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 
 	private:
+		void ShadowsPass();
+
 		void DepthPrePass();
 
 		void BasePass();
+
+		void SSAOPass();
 
 		void DeferredLightingPass();
 
@@ -59,7 +64,16 @@ namespace Engine
 
 		void ResizeRenderTarget();
 
+		void ResizeSSAOBuffer();
+
 		void ResizeTAABuffer();
+
+	private:
+		void DrawCallScreen(ID3D12GraphicsCommandList* commandList);
+
+		void GenerateSingleShadowMap(const ShadowParameter& shadowParameter);
+
+		void GenerateOmnidirectionalShadowMap(ShadowParameter& shadowParameter);
 
 	private:
 		D3D12RHI* mRHI = nullptr;
@@ -76,11 +90,18 @@ namespace Engine
 		D3D12_RECT mScissorRect;
 
 	private:
-		//void CreateSceneCaptureCube();
+		void CreateSceneCaptureCube();
 
-		//void CreateIBLEnviromentMap();
+		// 环境贴图
+		void CreateIBLEnvironmentMap();
 
-		void CreateIBLEnviromentTexture();
+		// 环境光漫反射部分
+		void CreateIBLIrradianceMap();
+
+		// 环境光镜面反射部分
+		void CreateIBLPrefilterEnvironmentMap();
+
+		//void CreateIBLEnviromentTexture();
 
 	private:
 		// Z-PrePass
@@ -89,11 +110,24 @@ namespace Engine
 		D3D12TextureRef mDepthTestBuffer;
 
 	private:
+		// ShadowMap
+		std::unique_ptr<Shader> mOmnidirectionalShadowMapShader = nullptr;
+		GraphicsPSODescriptor mOmnidirectionalShadowMapPSODescriptor;
+		std::unique_ptr<Shader> mSingleShadowMapShader = nullptr;
+		GraphicsPSODescriptor mSingleShadowMapPSODescriptor;
+		std::unique_ptr<ShadowMap2D> mShadowMap2D[MAX_2DSHADOWMAP];
+		std::unique_ptr<ShadowMapCube> mShadowMapCube[MAX_CubeSHADOWMAP];
+		uint32_t mCurrentShadowMap2DIndex;
+		uint32_t mCurrentShadowMapCubeIndex;
+		D3D12ConstantBufferRef ShadowPassCBRef = nullptr;
+
+	private:
 		// BasePass
 		std::unique_ptr<RenderTarget2D> mPositionGBuffer;
 		std::unique_ptr<RenderTarget2D> mNormalGBuffer;
-		std::unique_ptr<RenderTarget2D> mColorGBuffer;
-		std::unique_ptr<RenderTarget2D> mMetallicGBuffer;
+		std::unique_ptr<RenderTarget2D> mBaseColorGBuffer;
+		std::unique_ptr<RenderTarget2D> mMetallicRoughnessGBuffer;
+		std::unique_ptr<RenderTarget2D> mEmissiveGBuffer;
 
 		// SkyBox
 		std::unique_ptr<Shader> mSkyBoxPassShader = nullptr;
@@ -101,12 +135,31 @@ namespace Engine
 
 	private:
 		// IBL
-		//std::unique_ptr<Shader> mIBLEnvironmentShader = nullptr;
-		//GraphicsPSODescriptor mIBLEnvironmentPSODescriptor;
-		//std::unique_ptr<SceneCaptureCube> mIBLEnvironmentMap;
-		//D3D12ConstantBufferRef mIBLEnviromentPassCBRef[6];
+		std::unique_ptr<Shader> mIBLEnvironmentShader = nullptr;
+		GraphicsPSODescriptor mIBLEnvironmentPSODescriptor;
+		std::unique_ptr<SceneCaptureCube> mIBLEnvironmentMap;
+		D3D12ConstantBufferRef mIBLEnvironmentPassCBRef[6];
+		D3D12TextureRef mIBLEquirectangularTexture = nullptr;
+
+		std::unique_ptr<Shader> mIBLIrradianceShader = nullptr;
+		GraphicsPSODescriptor mIBLIrradiancePSODescriptor;
+		std::unique_ptr<SceneCaptureCube> mIBLIrradianceMap;
+		D3D12ConstantBufferRef mIBLIrradiancePassCBRef[6];
+
+		static const uint32_t mIBLPrefilterMaxMipLevel = 5;
+		std::unique_ptr<Shader> mIBLPrefilterShader = nullptr;
+		GraphicsPSODescriptor mIBLPrefilterPSODescriptor;
+		std::vector<std::unique_ptr<SceneCaptureCube>> mIBLPrefilterMap;
+		D3D12ConstantBufferRef mIBLPrefilterPassCBRef[6 * mIBLPrefilterMaxMipLevel];
+
+		D3D12TextureRef mBRDFLUTTexture = nullptr;
+
 		//D3D12TextureRef mIBLEnviromentTexture = nullptr;
-		D3D12TextureRef mIBLEnviromentTexture = nullptr;
+
+	private:
+		std::unique_ptr<Shader> mSSAOShader = nullptr;
+		GraphicsPSODescriptor mSSAOPSODescriptor;
+		std::unique_ptr<RenderTarget2D> mSSAOTexture = nullptr;
 
 	private:
 		// DeferredLightingPass
@@ -126,5 +179,12 @@ namespace Engine
 		// PostProcessPass
 		std::unique_ptr<Shader> mPostProcessShader = nullptr;
 		GraphicsPSODescriptor mPostProcessPSODescriptor;
+	};
+
+	struct EnvironmentConstant
+	{
+		Matrix4x4 View = Matrix4x4::IDENTITY;
+		Matrix4x4 Proj = Matrix4x4::IDENTITY;
+		float Roughness;
 	};
 }

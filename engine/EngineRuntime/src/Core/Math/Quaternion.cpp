@@ -197,7 +197,7 @@ namespace Engine
 
 		rotation[0][0] = 1.0f - 2 * y * y - 2 * z * z;		// 1 - 2y^2 - 2z^2
 		rotation[0][1] = 2 * x * y + 2 * z * w;				// 2xy + 2zw
-		rotation[0][2] = 2 * x * z + 2 * y * w;				// 2xz + 2yw
+		rotation[0][2] = 2 * x * z - 2 * y * w;				// 2xz - 2yw
 		rotation[1][0] = 2 * x * y - 2 * z * w;				// 2xy - 2zw
 		rotation[1][1] = 1.0f - 2 * x * x - 2 * z * z;		// 1 - 2x^2 - 2z^2
 		rotation[1][2] = 2 * y * z + 2 * x * w;				// 2yz + 2xw

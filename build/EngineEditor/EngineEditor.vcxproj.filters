@@ -13,6 +13,9 @@
     <Filter Include="include\EditorTools">
       <UniqueIdentifier>{F002D7D8-5C64-B4E6-E5D1-FA985132EBA5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\EditorTools\Loader">
+      <UniqueIdentifier>{B613A17D-A223-4D4E-0BDD-B16CF70B3CE7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include\UI">
       <UniqueIdentifier>{1642B8DA-02FA-F927-6B01-D38357D89418}</UniqueIdentifier>
     </Filter>
@@ -33,6 +36,9 @@
     </Filter>
     <Filter Include="src\EditorTools">
       <UniqueIdentifier>{9494DBCE-0020-4993-0931-CC87753BA593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\EditorTools\Loader">
+      <UniqueIdentifier>{DAE4E4AA-C6DE-0DFD-AF4B-A40D9BE47369}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\UI">
       <UniqueIdentifier>{3A4B661C-26ED-90F2-0FA8-A446FBE81743}</UniqueIdentifier>
@@ -63,10 +69,13 @@
     <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\AssetTool.h">
       <Filter>include\EditorTools</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\LuaScriptTemplate.h">
-      <Filter>include\EditorTools</Filter>
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\Loader\MeshLoader.h">
+      <Filter>include\EditorTools\Loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\ModelLoader.h">
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\Loader\TextureLoader.h">
+      <Filter>include\EditorTools\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\EditorTools\LuaScriptTemplate.h">
       <Filter>include\EditorTools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUI.h">
@@ -111,6 +120,9 @@
     <ClInclude Include="..\..\engine\EngineEditor\include\UI\SubFrame\EditorRightMenu.h">
       <Filter>include\UI\SubFrame</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineEditor\include\UI\EditorUIAssetAttribute.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\engine\EngineEditor\src\Application\EngineEditor.cpp">
@@ -128,8 +140,11 @@
     <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\AssetTool.cpp">
       <Filter>src\EditorTools</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\ModelLoader.cpp">
-      <Filter>src\EditorTools</Filter>
+    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\Loader\MeshLoader.cpp">
+      <Filter>src\EditorTools\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\EditorTools\Loader\TextureLoader.cpp">
+      <Filter>src\EditorTools\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUI.cpp">
       <Filter>src\UI</Filter>
@@ -163,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineEditor\src\main.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineEditor\src\UI\EditorUIAssetAttribute.cpp">
+      <Filter>src\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

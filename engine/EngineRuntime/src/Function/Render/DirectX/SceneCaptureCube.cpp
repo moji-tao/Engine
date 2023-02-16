@@ -38,44 +38,24 @@ namespace Engine
 		/*
 		Vector3 Targets[6] =
 		{
-			Eye + Vector3(1.0f,  0.0f,  0.0f),	// +X 
-			Eye + Vector3(-1.0f, 0.0f,  0.0f),	// -X 
-			Eye + Vector3(0.0f,  1.0f,  0.0f),	// +Y 
-			Eye + Vector3(0.0f,  -1.0f, 0.0f),	// -Y 
-			Eye + Vector3(0.0f,  0.0f,  1.0f),	// +Z 
-			Eye + Vector3(0.0f,  0.0f, -1.0f)	// -Z 
+			Eye + Vector3(0.0f, 0.0f, +1.0f),	// +X 
+			Eye + Vector3(0.0f, 0.0f, -1.0f),	// -X
+			Eye + Vector3(0.0f, -1.0f, 0.0f),	// +Y
+			Eye + Vector3(0.0f, +1.0f, 0.0f),	// -Y 
+			Eye + Vector3(+1.0f, 0.0f, 0.0f),	// +X 
+			Eye + Vector3(-1.0f, 0.0f, 0.0f),	// -X 
 		};
 
 		Vector3 Ups[6] =
 		{
-			{0.0f, 1.0f, 0.0f},		// +X 
-			{0.0f, 1.0f, 0.0f},		// -X 
+			{0.0f, -1.0f, 0.0f},	// +X 
+			{0.0f, -1.0f, 0.0f},	// -X 
 			{0.0f, 0.0f, -1.0f},	// +Y 
 			{0.0f, 0.0f, +1.0f},	// -Y 
-			{0.0f, 1.0f, 0.0f},		// +Z 
-			{0.0f, 1.0f, 0.0f}		// -Z 
-		};
-		*/
-		
-		Vector3 Targets[6] =
-		{
-			Eye + Vector3(1.0f,  0.0f,  0.0f),	// +X 
-			Eye + Vector3(-1.0f, 0.0f,  0.0f),	// -X 
-			Eye + Vector3(0.0f,  0.0f,  1.0f),	// +Y 
-			Eye + Vector3(0.0f,  0.0f, -1.0f),	// -Y 
-			Eye + Vector3(0.0f,  -1.0f,  0.0f),	// +Z 
-			Eye + Vector3(0.0f,  1.0f, 0.0f)	// -Z 
+			{0.0f, -1.0f, 0.0f},	// +Z 
+			{0.0f, -1.0f, 0.0f}		// -Z 
 		};
 
-		Vector3 Ups[6] =
-		{
-			{0.0f, 0.0f, 1.0f},		// +X 
-			{0.0f, 0.0f, 1.0f},		// -X 
-			{0.0f, 1.0f, 0.0f},		// +Y 
-			{0.0f, -1.0f, 0.0f},	// -Y 
-			{0.0f, 0.0f, 1.0f},		// +Z 
-			{0.0f, 0.0f, 1.0f}		// -Z 
-		};
 		for (int i = 0; i < 6; ++i)
 		{
 			SceneViews[i].EyePos = Eye;
@@ -88,40 +68,40 @@ namespace Engine
 			SceneViews[i].Near = NearPlane;
 			SceneViews[i].Far = FarPlane;
 		}
-		
-		/*
+		*/
 		Vector3 Targets[6] =
 		{
-			Eye + Vector3(-1.0f,  0.0f,  0.0f),	// +X 
-			Eye + Vector3(1.0f, 0.0f,  0.0f),	// -X 
-			Eye + Vector3(0.0f,  0.0f,  1.0f),	// +Y 
-			Eye + Vector3(0.0f,  0.0f, -1.0f),	// -Y 
-			Eye + Vector3(0.0f,  -1.0f,  0.0f),	// +Z 
-			Eye + Vector3(0.0f,  1.0f, 0.0f)	// -Z 
+			Eye + Vector3(+1.0f, 0.0f, 0.0f),	// +X 
+			Eye + Vector3(-1.0f, 0.0f, 0.0f),	// -X
+			Eye + Vector3(0.0f, +1.0f, 0.0f),	// +Y
+			Eye + Vector3(0.0f, -1.0f, 0.0f),	// -Y 
+			Eye + Vector3(0.0f, 0.0f, +1.0f),	// +X 
+			Eye + Vector3(0.0f, 0.0f, -1.0f),	// -X 
 		};
 
 		Vector3 Ups[6] =
 		{
-			{0.0f, 0.0f, -1.0f},		// +X 
-			{0.0f, 0.0f, -1.0f},		// -X 
-			{0.0f, 1.0f, 0.0f},		// +Y 
-			{0.0f, -1.0f, 0.0f},	// -Y 
-			{0.0f, 0.0f, 1.0f},		// +Z 
-			{0.0f, 0.0f, 1.0f}		// -Z 
+			{0.0f, +1.0f, 0.0f},	// +X 
+			{0.0f, +1.0f, 0.0f},	// -X 
+			{0.0f, 0.0f, -1.0f},	// +Y 
+			{0.0f, 0.0f, +1.0f},	// -Y 
+			{0.0f, +1.0f, 0.0f},	// +Z 
+			{0.0f, +1.0f, 0.0f}		// -Z 
 		};
+
 		for (int i = 0; i < 6; ++i)
 		{
 			SceneViews[i].EyePos = Eye;
-			SceneViews[i].View = Math::MakeLookAtMatrix(Eye, Targets[i], Ups[i]).Transpose();
+			SceneViews[i].View = Math::MakeLookAtMatrix(Eye, Targets[i], Ups[i]);
 
 			float Fov = 0.5f * Math_PI;
 			float AspectRatio = 1.0f; //Square
-			SceneViews[i].Proj = Math::MakePerspectiveMatrix(Radian(Fov), AspectRatio, NearPlane, FarPlane).Transpose();
+			SceneViews[i].Proj = Math::MakePerspectiveMatrix(Radian(Fov), AspectRatio, NearPlane, FarPlane);
 
 			SceneViews[i].Near = NearPlane;
 			SceneViews[i].Far = FarPlane;
 		}
-		*/
+
 	}
 
 	uint32_t SceneCaptureCube::GetCubeMapSize()

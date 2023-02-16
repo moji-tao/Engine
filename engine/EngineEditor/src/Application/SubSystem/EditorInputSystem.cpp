@@ -242,6 +242,7 @@ namespace Editor
 			{
 				//LOG_INFO("右键释放");
 				mEditorCameraMoveMode = false;
+				mEditorCommand = 0;
 			}
 			else if (key == GLFW_MOUSE_BUTTON_LEFT)
 			{

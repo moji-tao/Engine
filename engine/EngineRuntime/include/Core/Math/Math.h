@@ -81,15 +81,9 @@ namespace Engine
 
 		static Radian Atan2(float y_v, float x_v);
 
-		//static Matrix4x4 MakeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix = nullptr);
-
-		//static Matrix4x4 MakeLookAtMatrix(const Vector3& eye_position, const Vector3& target_position, const Vector3& up_dir);
-
-		//static Matrix4x4 MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
-
 		static Matrix4x4 MakeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar);
 
-		// new
+		static Matrix4x4 MakeOrthographicProjectionMatrix(float wigth, float height, float znear, float zfar);
 
 		static Matrix3x3 CreateRotationY(Radian radian);
 
@@ -98,10 +92,7 @@ namespace Engine
 		static Matrix4x4 MakeLookAtMatrix(const Vector3& position, const Vector3& right, const Vector3& up, const Vector3& forward);
 
 		static Matrix4x4 MakePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
-
-		// new
-
-
+		
 		template<class T>
 		static constexpr T Max(const T& A, const T& B)
 		{

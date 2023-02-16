@@ -15,7 +15,7 @@ namespace Editor
 		{
 			Engine::TransformComponent* transformComponent = dynamic_cast<Engine::TransformComponent*>(component);
 			ASSERT(transformComponent != nullptr);
-
+			
 			Engine::Vector3& position = transformComponent->GetLocalPosition();
 			Engine::Vector3& scale = transformComponent->GetLocalScale();
 			Engine::Quaternion& quaternion = transformComponent->GetLocalQuaternion();
@@ -31,19 +31,6 @@ namespace Editor
 			DrawVec3Control("Scale", scale);
 
 			quaternion = Engine::Quaternion(Engine::Degree(eural[2]), Engine::Degree(eural[0]), Engine::Degree(eural[1]));
-
-			/*
-			ImGui::Text("Position (X: %f, Y: %f, Z: %f)", position.x, position.y, position.z);
-			ImGui::Text("Rotation (X: %f, Y: %f, Z: %f, W: %f)", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-			ImGui::Text("Scale    (X: %f, Y: %f, Z: %f)", scale.x, scale.y, scale.z);
-
-			auto mat = transformComponent->GetLocalMatrix();
-			ImGui::Text("%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
-				mat[0][0], mat[0][1], mat[0][2], mat[0][3],
-				mat[1][0], mat[1][1], mat[1][2], mat[1][3],
-				mat[2][0], mat[2][1], mat[2][2], mat[2][3],
-				mat[3][0], mat[3][1], mat[3][2], mat[3][3]);
-				*/
 		};
 
 		mComponentUIMap["MeshRendererComponent"] = [this](Engine::Component* component)
@@ -91,7 +78,13 @@ namespace Editor
 			{
 				for (int i = 0; i < refMateruals.size(); ++i)
 				{
-					ImGui::LabelText(("Material " + std::to_string(i) + "##Inspector").c_str(), "%s", refMateruals[i].Data());
+					std::string value = "空";
+					if (refMateruals[i].IsVaild())
+					{
+						auto ph = Engine::AssetManager::GetInstance()->GetAssetPathFormAssetGuid(refMateruals[i]);
+						value = ph.filename().generic_string();
+					}
+					ImGui::LabelText(("Material " + std::to_string(i) + "##Inspector").c_str(), "%s", value.c_str());
 					
 					if (ImGui::BeginDragDropTarget())
 					{
@@ -140,6 +133,8 @@ namespace Editor
 			ImGui::DragFloat("##DirectionalLight_Intensity_Drag", &directionalLightComponent->mIntensity, 0.01f, 0.0f, 0.0f, "光强", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::SameLine();
 			ImGui::InputFloat("##DirectionalLight_Intensity_Input", &directionalLightComponent->mIntensity);
+
+			ImGui::Checkbox("阴影##DirectionalLight_ShowShadow", &directionalLightComponent->mShadow);
 		};
 	}
 

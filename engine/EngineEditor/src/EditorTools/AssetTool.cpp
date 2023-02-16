@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "EngineEditor/include/EditorTools/AssetTool.h"
-#include "EngineEditor/include/EditorTools/ModelLoader.h"
+#include "EngineEditor/include/EditorTools/Loader/TextureLoader.h"
+#include "EngineEditor/include/EditorTools/Loader/MeshLoader.h"
 #include "EngineRuntime/include/Core/Meta/Serializer.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
@@ -10,12 +11,14 @@ namespace Editor
 
 	AssetTool::AssetTool()
 	{
-		std::shared_ptr<ModelLoader> modelLoader = std::make_shared<ModelLoader>();
-		mExtensionMap[".fbx"] = modelLoader;
-
+		mExtensionMap[".png"] = TextureLoader::Load;
+		mExtensionMap[".jpg"] = TextureLoader::Load;
+		mExtensionMap[".tga"] = TextureLoader::Load;
+		mExtensionMap[".hdr"] = TextureLoader::LoadHDR;
+		mExtensionMap[".fbx"] = MeshLoader::Load;
 	}
 
-	bool AssetTool::LoadAsset(const std::filesystem::path& oldPath, const std::filesystem::path& loadFolder, AssetFile* folder)
+	bool AssetTool::LoadAsset(const std::filesystem::path& oldPath, AssetFile* folder)
 	{
 		std::string extension = oldPath.extension().generic_string();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
@@ -27,9 +30,9 @@ namespace Editor
 			return false;
 		}
 
-		it->second->Load(oldPath, loadFolder, folder);
+		Engine::GUID guid = it->second(oldPath, folder);
 
-		return true;
+		return guid.IsVaild();
 	}
 }
 

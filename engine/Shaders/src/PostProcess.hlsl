@@ -39,10 +39,10 @@ float4 PS(VertexOut pixelIn) : SV_TARGET
 {
     float3 color = ColorTexture.Sample(PointClampSampler, pixelIn.TexC).rgb;
 
-    //color = ACESToneMapping(color, 1.0f); 
+    color = ACESToneMapping(color, 1.0f); 
 
-	//float Gamma = 2.2f;
-    //float3 CorrectColor = pow(abs(color), 1.0f / Gamma);	
+	float Gamma = 2.2f;
+    float3 CorrectColor = pow(abs(color), 1.0f / Gamma);	
 	
-	return float4(color, 1.0f);
+	return float4(CorrectColor, 1.0f);
 }

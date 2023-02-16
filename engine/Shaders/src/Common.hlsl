@@ -31,6 +31,7 @@ cbuffer cbPass : register(b0)
 
 struct MaterialData
 {
+    /*
 	float4   DiffuseAlbedo;
 	float3   FresnelR0;
 	float    Roughness;
@@ -38,8 +39,18 @@ struct MaterialData
 	
     float3 EmissiveColor;
 	uint ShadingModel;
+    */
+	uint HasAlbedoTexture;
+	uint HasNormalTexture;
+	uint HasMetallicTexture;
+	uint HasRoughnessTexture;
+
+	float4 AlbedoColor;
+    float3 Emissive;
+	float Metallic;
+	float Roughness;
 };
-//ConstantBuffer<MaterialData> cbMaterialData;
+ConstantBuffer<MaterialData> cbMaterialData;
 
 struct InstanceData
 {

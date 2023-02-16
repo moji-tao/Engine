@@ -58,23 +58,18 @@ namespace Editor
 
 		ImGuizmo::SetDrawlist();
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, currentWindowSize.x, currentWindowSize.y);
-
+		
 		Engine::Actor* ac = mMessageBox->GetInspectorShowActor();
-		if (ac != mSelectActor)
-		{
-			if (ac != nullptr)
-			{
-				mActorMat = ac->GetComponent<Engine::TransformComponent>()->GetGlobalMatrix();
-			}
 
-			mSelectActor = ac;
-		}
+		mSelectActor = ac;
 
 		if (mSelectActor != nullptr)
 		{
+			mActorMat = ac->GetComponent<Engine::TransformComponent>()->GetGlobalMatrix();
+
 			ImGuizmo::Manipulate(mEditorConstants->View.Ptr(),
 				mEditorConstants->Proj.Ptr(),
-				ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::WORLD, mActorMat.Ptr());
+				ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, mActorMat.Ptr());
 
 			if (ImGuizmo::IsUsing())
 			{
