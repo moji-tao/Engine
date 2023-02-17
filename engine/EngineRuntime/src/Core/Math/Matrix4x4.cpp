@@ -153,81 +153,14 @@ namespace Engine
 
 	void Matrix4x4::SetTrans(const Vector3& v)
 	{
-		m_Value[0][3] = v[0];
-		m_Value[1][3] = v[1];
-		m_Value[2][3] = v[2];
+		m_Value[3][0] = v[0];
+		m_Value[3][1] = v[1];
+		m_Value[3][2] = v[2];
 	}
 
 	Vector3 Matrix4x4::GetTrans() const
 	{
-		return Vector3(m_Value[0][3], m_Value[1][3], m_Value[2][3]);
-	}
-
-	Matrix4x4 Matrix4x4::BuildViewportMatrix(uint32_t width, uint32_t height)
-	{
-		return Matrix4x4(
-			0.5f * (float)width,
-			0.0f,
-			0.0f,
-			0.5f * (float)width,
-			0.0f,
-			-0.5f * (float)height,
-			0.0f,
-			0.5f * (float)height,
-			0.0f,
-			0.0f,
-			-1.0f,
-			1.0f,
-			0.0f,
-			0.0f,
-			0.0f,
-			1.0f);
-	}
-
-	Matrix4x4 Matrix4x4::MirrorMatrix(Vector4 mirror_plane)
-	{
-		Matrix4x4 result;
-		result.m_Value[0][0] = -2 * mirror_plane[0] * mirror_plane[0] + 1;
-		result.m_Value[1][0] = -2 * mirror_plane[0] * mirror_plane[1];
-		result.m_Value[2][0] = -2 * mirror_plane[0] * mirror_plane[2];
-		result.m_Value[3][0] = 0;
-
-		result.m_Value[0][1] = -2 * mirror_plane[1] * mirror_plane[0];
-		result.m_Value[1][1] = -2 * mirror_plane[1] * mirror_plane[1] + 1;
-		result.m_Value[2][1] = -2 * mirror_plane[1] * mirror_plane[2];
-		result.m_Value[3][1] = 0;
-
-		result.m_Value[0][2] = -2 * mirror_plane[2] * mirror_plane[0];
-		result.m_Value[1][2] = -2 * mirror_plane[2] * mirror_plane[1];
-		result.m_Value[2][2] = -2 * mirror_plane[2] * mirror_plane[2] + 1;
-		result.m_Value[3][2] = 0;
-
-		result.m_Value[0][3] = -2 * mirror_plane[3] * mirror_plane[0];
-		result.m_Value[1][3] = -2 * mirror_plane[3] * mirror_plane[1];
-		result.m_Value[2][3] = -2 * mirror_plane[3] * mirror_plane[2];
-		result.m_Value[3][3] = 1;
-
-		return result;
-	}
-
-	Matrix4x4 Matrix4x4::RotationMatrix(Vector3 normal)
-	{
-		Vector3 up = Vector3(0, 0, 1);
-		if (fabs(normal[2]) > 0.999f)
-		{
-			up = Vector3(0, 1, 0);
-		}
-
-		Vector3 left = up.CrossProduct(normal);
-		up = normal.CrossProduct(left);
-
-		left.Normalize();
-		up.Normalize();
-
-		Matrix4x4 result = Matrix4x4::IDENTITY;
-		result.SetData(Matrix3x3(left, up, normal));
-
-		return result.Transpose();
+		return Vector3(m_Value[3][0], m_Value[3][1], m_Value[3][2]);
 	}
 
 	void Matrix4x4::MakeTrans(const Vector3& v)
@@ -240,13 +173,13 @@ namespace Engine
 		m_Value[1][1] = 1.0f;
 		m_Value[1][2] = 0.0f;
 		m_Value[1][3] = 0.0f;
-		m_Value[2][0] = v[0];
-		m_Value[2][1] = v[1];
-		m_Value[2][2] = v[2];
+		m_Value[2][0] = 0.0f;
+		m_Value[2][1] = 0.0f;
+		m_Value[2][2] = 1.0f;
 		m_Value[2][3] = 0.0f;
-		m_Value[3][0] = 0.0f;
-		m_Value[3][1] = 0.0f;
-		m_Value[3][2] = 0.0f;
+		m_Value[3][0] = v[0];
+		m_Value[3][1] = v[1];
+		m_Value[3][2] = v[2];
 		m_Value[3][3] = 1.0f;
 	}
 
@@ -260,13 +193,13 @@ namespace Engine
 		m_Value[1][1] = 1.0f;
 		m_Value[1][2] = 0.0f;
 		m_Value[1][3] = 0.0f;
-		m_Value[2][0] = tx;
-		m_Value[2][1] = ty;
-		m_Value[2][2] = tz;
+		m_Value[2][0] = 0.0f;
+		m_Value[2][1] = 0.0f;
+		m_Value[2][2] = 1.0f;
 		m_Value[2][3] = 0.0f;
-		m_Value[3][0] = 0.0f;
-		m_Value[3][1] = 0.0f;
-		m_Value[3][2] = 0.0f;
+		m_Value[3][0] = tx;
+		m_Value[3][1] = ty;
+		m_Value[3][2] = tz;
 		m_Value[3][3] = 1.0f;
 	}
 
@@ -274,9 +207,9 @@ namespace Engine
 	{
 		Matrix4x4 r = Matrix4x4::IDENTITY;
 
-		r.m_Value[2][0] = v[0];
-		r.m_Value[2][1] = v[1];
-		r.m_Value[2][2] = v[2];
+		r.m_Value[3][0] = v[0];
+		r.m_Value[3][1] = v[1];
+		r.m_Value[3][2] = v[2];
 
 		return r;
 	}
@@ -285,9 +218,9 @@ namespace Engine
 	{
 		Matrix4x4 r = Matrix4x4::IDENTITY;
 
-		r.m_Value[2][0] = t_x;
-		r.m_Value[2][1] = t_y;
-		r.m_Value[2][2] = t_z;
+		r.m_Value[3][0] = t_x;
+		r.m_Value[3][1] = t_y;
+		r.m_Value[3][2] = t_z;
 
 		return r;
 	}
@@ -332,16 +265,6 @@ namespace Engine
 		m3x3[2][0] = m_Value[2][0];
 		m3x3[2][1] = m_Value[2][1];
 		m3x3[2][2] = m_Value[2][2];
-	}
-
-	void Matrix4x4::ExtractAxes(Vector3& out_x, Vector3& out_y, Vector3& out_z) const
-	{
-		out_x = Vector3(m_Value[0][0], m_Value[1][0], m_Value[2][0]);
-		out_x.Normalize();
-		out_y = Vector3(m_Value[0][1], m_Value[1][1], m_Value[2][1]);
-		out_y.Normalize();
-		out_z = Vector3(m_Value[0][2], m_Value[1][2], m_Value[2][2]);
-		out_z.Normalize();
 	}
 
 	bool Matrix4x4::HasScale() const
@@ -402,38 +325,6 @@ namespace Engine
 
 	void Matrix4x4::MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
 	{
-		/*
-		// Ordering:
-		//    1. Scale
-		//    2. Rotate
-		//    3. Translate
-
-		Matrix3x3 rot3x3;
-		orientation.GetRotationMatrix(rot3x3);
-
-		// Set up final matrix with scale, rotation and translation
-		m_Value[0][0] = scale[0] * rot3x3[0][0];
-		m_Value[0][1] = scale[0] * rot3x3[0][1];
-		m_Value[0][2] = scale[0] * rot3x3[0][2];
-		m_Value[0][3] = 0;
-
-		m_Value[1][0] = scale[1] * rot3x3[1][0];
-		m_Value[1][1] = scale[1] * rot3x3[1][1];
-		m_Value[1][2] = scale[1] * rot3x3[1][2];
-		m_Value[1][3] = 0;
-
-		m_Value[2][0] = scale[2] * rot3x3[2][0];
-		m_Value[2][1] = scale[2] * rot3x3[2][1];
-		m_Value[2][2] = scale[2] * rot3x3[2][2];
-		m_Value[2][3] = 0;
-
-		// No projection term
-		m_Value[3][0] = position[0];
-		m_Value[3][1] = position[1];
-		m_Value[3][2] = position[2];
-		m_Value[3][3] = 1;
-		*/
-
 		Matrix3x3 rot3x3;
 		orientation.GetRotationMatrix(rot3x3);
 

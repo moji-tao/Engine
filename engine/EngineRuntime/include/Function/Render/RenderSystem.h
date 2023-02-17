@@ -66,5 +66,9 @@ namespace Engine
 		bool mEnableTAA = false;
 		bool mEnableSSAO = true;
 		bool mEnableAmbientLighting = false;
+
+	public:
+		uint32_t mDrawCall;
+		uint32_t mDrawCallK;
 	};
 }

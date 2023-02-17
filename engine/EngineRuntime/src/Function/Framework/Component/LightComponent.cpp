@@ -6,7 +6,7 @@ namespace Engine
 	IMPLEMENT_RTTI(LightComponent, Component);
 
 	LightComponent::LightComponent()
-		:mColor(Colors::AntiqueWhite), mIntensity(1.0f)
+		:mColor(Colors::AntiqueWhite), mIntensity(1.0f), mShadow(false)
 	{ }
 
 	LightComponent::~LightComponent()
@@ -17,6 +17,8 @@ namespace Engine
 		stream << mColor;
 
 		stream << mIntensity;
+
+		stream << mShadow;
 	}
 
 	bool LightComponent::Deserialize(SerializerDataFrame& stream)
@@ -24,6 +26,8 @@ namespace Engine
 		stream >> mColor;
 
 		stream >> mIntensity;
+
+		stream >> mShadow;
 
 		return true;
 	}
@@ -35,6 +39,8 @@ namespace Engine
 		mColor = bluePrint->mColor;
 
 		mIntensity = bluePrint->mIntensity;
+
+		mShadow = bluePrint->mShadow;
 	}
 
 }

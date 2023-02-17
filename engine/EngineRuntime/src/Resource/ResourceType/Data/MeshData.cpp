@@ -20,6 +20,8 @@ namespace Engine
 	{
 		stream << Vertices;
 		stream << Indices;
+		stream << mBoundingBox.mMin;
+		stream << mBoundingBox.mMax;
 		stream << MaterialIndex;
 		stream << mGuid;
 	}
@@ -28,6 +30,8 @@ namespace Engine
 	{
 		stream >> Vertices;
 		stream >> Indices;
+		stream >> mBoundingBox.mMin;
+		stream >> mBoundingBox.mMax;
 		stream >> MaterialIndex;
 		stream >> mGuid;
 
@@ -284,6 +288,19 @@ namespace Engine
 		numSubdivisions = std::min<uint32_t>(numSubdivisions, 6u);
 		for (uint32_t i = 0; i < numSubdivisions; ++i)
 			sub_mesh.Subdivide();
+
+		sub_mesh.mBoundingBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+		sub_mesh.mBoundingBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		for (uint32_t i = 0; i < sub_mesh.Vertices.size(); i++)
+		{
+			sub_mesh.mBoundingBox.mMax.x = Math::Max(sub_mesh.mBoundingBox.mMax.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMax.y = Math::Max(sub_mesh.mBoundingBox.mMax.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMax.z = Math::Max(sub_mesh.mBoundingBox.mMax.z, sub_mesh.Vertices[i].Position.z);
+
+			sub_mesh.mBoundingBox.mMin.x = Math::Min(sub_mesh.mBoundingBox.mMin.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMin.y = Math::Min(sub_mesh.mBoundingBox.mMin.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMin.z = Math::Min(sub_mesh.mBoundingBox.mMin.z, sub_mesh.Vertices[i].Position.z);
+		}
 	}
 
 	void Mesh::CreateSphere(Mesh& mesh, float radius, uint32_t sliceCount, uint32_t stackCount)
@@ -392,6 +409,19 @@ namespace Engine
 			sub_mesh.Indices.push_back(baseIndex + i);
 			sub_mesh.Indices.push_back(baseIndex + i + 1);
 		}
+
+		sub_mesh.mBoundingBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+		sub_mesh.mBoundingBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		for (uint32_t i = 0; i < sub_mesh.Vertices.size(); i++)
+		{
+			sub_mesh.mBoundingBox.mMax.x = Math::Max(sub_mesh.mBoundingBox.mMax.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMax.y = Math::Max(sub_mesh.mBoundingBox.mMax.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMax.z = Math::Max(sub_mesh.mBoundingBox.mMax.z, sub_mesh.Vertices[i].Position.z);
+
+			sub_mesh.mBoundingBox.mMin.x = Math::Min(sub_mesh.mBoundingBox.mMin.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMin.y = Math::Min(sub_mesh.mBoundingBox.mMin.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMin.z = Math::Min(sub_mesh.mBoundingBox.mMin.z, sub_mesh.Vertices[i].Position.z);
+		}
 	}
 
 	void Mesh::CreateCylinder(Mesh& mesh, float bottomRadius, float topRadius, float height, uint32_t sliceCount, uint32_t stackCount)
@@ -483,6 +513,19 @@ namespace Engine
 
 		sub_mesh.BuildCylinderTopCap(bottomRadius, topRadius, height, sliceCount, stackCount);
 		sub_mesh.BuildCylinderBottomCap(bottomRadius, topRadius, height, sliceCount, stackCount);
+
+		sub_mesh.mBoundingBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+		sub_mesh.mBoundingBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		for (uint32_t i = 0; i < sub_mesh.Vertices.size(); i++)
+		{
+			sub_mesh.mBoundingBox.mMax.x = Math::Max(sub_mesh.mBoundingBox.mMax.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMax.y = Math::Max(sub_mesh.mBoundingBox.mMax.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMax.z = Math::Max(sub_mesh.mBoundingBox.mMax.z, sub_mesh.Vertices[i].Position.z);
+
+			sub_mesh.mBoundingBox.mMin.x = Math::Min(sub_mesh.mBoundingBox.mMin.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMin.y = Math::Min(sub_mesh.mBoundingBox.mMin.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMin.z = Math::Min(sub_mesh.mBoundingBox.mMin.z, sub_mesh.Vertices[i].Position.z);
+		}
 	}
 
 	void Mesh::CreateGrid(Mesh& mesh, float width, float depth, uint32_t m, uint32_t n)
@@ -547,6 +590,19 @@ namespace Engine
 				k += 6; // next quad
 			}
 		}
+
+		sub_mesh.mBoundingBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+		sub_mesh.mBoundingBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		for (uint32_t i = 0; i < sub_mesh.Vertices.size(); i++)
+		{
+			sub_mesh.mBoundingBox.mMax.x = Math::Max(sub_mesh.mBoundingBox.mMax.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMax.y = Math::Max(sub_mesh.mBoundingBox.mMax.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMax.z = Math::Max(sub_mesh.mBoundingBox.mMax.z, sub_mesh.Vertices[i].Position.z);
+
+			sub_mesh.mBoundingBox.mMin.x = Math::Min(sub_mesh.mBoundingBox.mMin.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMin.y = Math::Min(sub_mesh.mBoundingBox.mMin.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMin.z = Math::Min(sub_mesh.mBoundingBox.mMin.z, sub_mesh.Vertices[i].Position.z);
+		}
 	}
 
 	void Mesh::CreateQuad(Mesh& mesh, float x, float y, float w, float h, float depth)
@@ -589,6 +645,19 @@ namespace Engine
 		sub_mesh.Indices[3] = 0;
 		sub_mesh.Indices[4] = 2;
 		sub_mesh.Indices[5] = 3;
+
+		sub_mesh.mBoundingBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+		sub_mesh.mBoundingBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		for (uint32_t i = 0; i < sub_mesh.Vertices.size(); i++)
+		{
+			sub_mesh.mBoundingBox.mMax.x = Math::Max(sub_mesh.mBoundingBox.mMax.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMax.y = Math::Max(sub_mesh.mBoundingBox.mMax.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMax.z = Math::Max(sub_mesh.mBoundingBox.mMax.z, sub_mesh.Vertices[i].Position.z);
+
+			sub_mesh.mBoundingBox.mMin.x = Math::Min(sub_mesh.mBoundingBox.mMin.x, sub_mesh.Vertices[i].Position.x);
+			sub_mesh.mBoundingBox.mMin.y = Math::Min(sub_mesh.mBoundingBox.mMin.y, sub_mesh.Vertices[i].Position.y);
+			sub_mesh.mBoundingBox.mMin.z = Math::Min(sub_mesh.mBoundingBox.mMin.z, sub_mesh.Vertices[i].Position.z);
+		}
 	}
 
 	void MeshMeta::Load(const std::filesystem::path& metaPath)

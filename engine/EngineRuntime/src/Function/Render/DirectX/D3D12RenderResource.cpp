@@ -62,46 +62,7 @@ namespace Engine
 
 		// Update GameObject
 
-		std::unordered_map<MaterialData*, std::unordered_map<SubMesh*, std::vector<ObjectConstants>>> cccc;
-
-		for (auto& [refMesh, refMaterials, constant] : mResource)
-		{
-			if (!refMesh.IsVaild())
-			{
-				continue;
-			}
-			Mesh* mesh = AssetManager::GetInstance()->LoadResource<Mesh>(refMesh);
-
-			if (mesh == nullptr)
-			{
-				LOG_ERROR("引用的Mesh资源不存在 {0}", refMesh.Data());
-				continue;
-			}
-
-			std::vector<SubMesh>& subMeshes = mesh->Meshes;
-
-			int end = Math::Min(subMeshes.size(), refMaterials.size());
-
-			for (int i = 0; i < end; ++i)
-			{
-				if (!refMaterials[i].IsVaild())
-				{
-					continue;
-				}
-
-				MaterialData* material = AssetManager::GetInstance()->LoadResource<MaterialData>(refMaterials[i]);
-
-				if (material == nullptr)
-				{
-					LOG_ERROR("引用的Material资源不存在 {0}", refMaterials[i].Data());
-					continue;
-				}
-
-				cccc[material][&subMeshes[i]].push_back(constant);
-			}
-		}
-
-		for (const auto& value : cccc)
+		for (const auto& value : mCameraRenderResource)
 		{
 			const MaterialData* refMaterial = value.first;
 			const auto& pairs = value.second;
@@ -314,7 +275,6 @@ namespace Engine
 				mBasePassBatchs.emplace_back(material, subMesh, structured_buffer_ref, c.size());
 			}
 		}
-
 
 		// Update Light
 		if (mDirectionalLightResource.size() > 0)

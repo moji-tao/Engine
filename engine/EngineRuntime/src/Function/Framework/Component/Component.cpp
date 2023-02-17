@@ -3,6 +3,7 @@
 #include "EngineRuntime/include/Function/Framework/Component/TransformComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/MeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/PointLightComponent.h"
 
 namespace Engine
 {
@@ -35,4 +36,7 @@ namespace Engine
 
 	IMPLEMENT_RTTI(DirectionalLightComponent, LightComponent);
 	REGISTER_COMPONENT(DirectionalLightComponent);
+
+	IMPLEMENT_RTTI(PointLightComponent, LightComponent);
+	REGISTER_COMPONENT(PointLightComponent);
 }

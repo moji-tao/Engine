@@ -134,12 +134,12 @@ namespace Engine
 
 		for (int i = 0; i < MAX_2DSHADOWMAP; ++i)
 		{
-			mShadowMap2D[i] = std::make_unique<ShadowMap2D>(SHADOWMAP_SIZE, mRHI);
+			mShadowMap2D[i] = std::make_unique<ShadowMap2D>(SHADOWMAP2D_SIZE, mRHI);
 		}
 
 		for (int i = 0; i < MAX_CubeSHADOWMAP; ++i)
 		{
-			mShadowMapCube[i] = std::make_unique<ShadowMapCube>(SHADOWMAP_SIZE, mRHI);
+			mShadowMapCube[i] = std::make_unique<ShadowMapCube>(SHADOWMAPCUBE_SIZE, mRHI);
 		}
 	}
 
@@ -584,6 +584,7 @@ namespace Engine
 			commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
 
 			commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+			++RenderSystem::GetInstance()->mDrawCall;
 		}
 	}
 
@@ -637,6 +638,7 @@ namespace Engine
 			commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
 
 			commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+			++RenderSystem::GetInstance()->mDrawCall;
 		}
 		
 		{
@@ -674,6 +676,7 @@ namespace Engine
 			commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
 
 			commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+			++RenderSystem::GetInstance()->mDrawCall;
 		}
 		
 		mRHI->TransitionResource(mPositionGBuffer->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
@@ -973,6 +976,7 @@ namespace Engine
 		commandList->IASetPrimitiveTopology(subMesh.PrimitiveType);
 
 		commandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+		++RenderSystem::GetInstance()->mDrawCall;
 	}
 
 	void D3D12DeferredRenderPipeline::GenerateSingleShadowMap(const ShadowParameter& shadowParameter)
@@ -980,6 +984,8 @@ namespace Engine
 		auto commandList = mRHI->GetDevice()->GetCommandList();
 
 		auto& shadowMap = mShadowMap2D[mCurrentShadowMap2DIndex];
+
+		mRHI->TransitionResource(shadowMap->GetTarget()->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 		commandList->RSSetViewports(1, &shadowMap->GetViewport());
 		commandList->RSSetScissorRects(1, &shadowMap->GetScissorRect());
@@ -1010,8 +1016,10 @@ namespace Engine
 			commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
 
 			commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+			++RenderSystem::GetInstance()->mDrawCall;
 		}
 
+		mRHI->TransitionResource(shadowMap->GetTarget()->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 
 	void D3D12DeferredRenderPipeline::GenerateOmnidirectionalShadowMap(ShadowParameter& shadowParameter)
@@ -1020,10 +1028,15 @@ namespace Engine
 
 		auto& shadowMap = mShadowMapCube[mCurrentShadowMapCubeIndex];
 
+		mRHI->TransitionResource(shadowMap->GetTarget()->GetResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
 		commandList->RSSetViewports(1, &shadowMap->GetViewport());
 		commandList->RSSetScissorRects(1, &shadowMap->GetScissorRect());
 
-		shadowMap->SetView(shadowParameter.LightPosition); 
+		shadowMap->SetView(shadowParameter.LightPosition, 0.001f, shadowParameter.LightRange);
+
+		shadowParameter.Proj = shadowMap->GetSceneProj();
+
 		for (int i = 0; i < 6; ++i)
 		{
 			commandList->ClearDepthStencilView(shadowMap->GetTarget()->GetDSV(i)->GetDescriptorHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -1032,9 +1045,9 @@ namespace Engine
 
 			const auto& batchs = mRenderResource->GetBasePassBatchs();
 
-			Shader* shader = mSingleShadowMapPSODescriptor.mShader;
-
-			ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mSingleShadowMapPSODescriptor);
+			Shader* shader = mOmnidirectionalShadowMapPSODescriptor.mShader;
+			
+			ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mOmnidirectionalShadowMapPSODescriptor);
 			commandList->SetPipelineState(pipeline_state);
 			commandList->SetGraphicsRootSignature(shader->mRootSignature.Get());
 
@@ -1053,9 +1066,11 @@ namespace Engine
 				commandList->IASetPrimitiveTopology(subMeshResource.PrimitiveType);
 
 				commandList->DrawIndexedInstanced(subMeshResource.IndexCount, InstanceCount, subMeshResource.StartIndexLocation, subMeshResource.BaseVertexLocation, 0);
+				++RenderSystem::GetInstance()->mDrawCall;
 			}
 		}
 
+		mRHI->TransitionResource(shadowMap->GetTarget()->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
 	}
 	
 	void D3D12DeferredRenderPipeline::CreateSceneCaptureCube()

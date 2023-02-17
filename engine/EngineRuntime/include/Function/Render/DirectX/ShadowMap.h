@@ -28,9 +28,11 @@ namespace Engine
 	public:
 		ShadowMapCube(uint32_t shadowSize, D3D12RHI* rhi);
 
-		void SetView(const Vector3& eyePosition);
+		void SetView(const Vector3& eyePosition, float zNear, float zFar);
 
 		Matrix4x4 GetSceneView(uint32_t i);
+
+		Matrix4x4 GetSceneProj();
 
 		RenderTargetCube* GetTarget();
 
@@ -42,6 +44,8 @@ namespace Engine
 		std::unique_ptr<RenderTargetCube> mRenderTarget = nullptr;
 
 		Matrix4x4 mViewMat[6];
+
+		Matrix4x4 mProjMat;
 
 		D3D12_VIEWPORT mViewport;
 

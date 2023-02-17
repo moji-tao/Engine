@@ -78,6 +78,9 @@ namespace Engine
 
 		++mFrameCount;
 
+		mDrawCallK = mDrawCall;
+		mDrawCall = 0;
+
 		return true;
 	}
 

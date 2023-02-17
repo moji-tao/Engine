@@ -95,6 +95,17 @@ float3 GetPrefilteredColor(float Roughness, float3 ReflectDir)
 	return PrefilteredColor;
 }
 
+float PointLightDistanceAttenuation(float3 worldPos, float3 lightPos, float lightRange)
+{
+    float3 vec = worldPos - lightPos;
+    float dis2 = dot(vec, vec);
+    float invRange = rcp(max(lightRange, 0.001f));
+    float m = Square(saturate(1 - Square(dis2 * invRange * invRange)));
+    float l = dis2 + 1;
+
+    return m / l;
+}
+
 float4 PS(VertexOut pixelIn) : SV_TARGET
 {
     float3 baseColor = ColorGBuffer.Sample(PointClampSampler, pixelIn.TexC).rgb;
@@ -152,9 +163,23 @@ float4 PS(VertexOut pixelIn) : SV_TARGET
             outColor += DirectLighting(radiance, -light.Direction, normal, normalize(gEyePosW - worldPos), metallic, roughness, baseColor) * visibility;
         }
 
+        [unroll(5)]
         for (i = 0; i < gPointLightCount; ++i)
         {
             PointLight light = PointLightList[i];
+
+            float visibility = 1.0f;
+
+            if (light.ShadowMapIndex != -1)
+            {
+                float3 lightToPoint = worldPos - light.Position;
+                visibility = OmnidirectionalShadowVisibility(lightToPoint, light.ShadowMapIndex, light.Range);
+            }
+
+            float3 radiance = light.Color.rgb * light.Intensity * PointLightDistanceAttenuation(worldPos, light.Position, light.Range);
+            float3 lightDir = normalize(light.Position - worldPos);
+
+            outColor += DirectLighting(radiance, lightDir, normal, normalize(gEyePosW - worldPos), metallic, roughness, baseColor) * visibility;
         }
 
         for (i = 0; i < gSpotLightCount; ++i)

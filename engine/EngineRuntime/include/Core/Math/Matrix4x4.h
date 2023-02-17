@@ -44,12 +44,6 @@ namespace Engine
 
 		Vector3 GetTrans() const;
 
-		Matrix4x4 BuildViewportMatrix(uint32_t width, uint32_t height);
-
-		static Matrix4x4 MirrorMatrix(Vector4 mirror_plane);
-
-		static Matrix4x4 RotationMatrix(Vector3 normal);
-
 		void MakeTrans(const Vector3& v); //
 
 		void MakeTrans(float tx, float ty, float tz); //
@@ -65,8 +59,6 @@ namespace Engine
 		static Matrix4x4 BuildScaleMatrix(float s_x, float s_y, float s_z);
 
 		void Extract3x3Matrix(Matrix3x3& m3x3) const;
-
-		void ExtractAxes(Vector3& out_x, Vector3& out_y, Vector3& out_z) const;
 
 		bool HasScale() const;
 

@@ -372,6 +372,12 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Render\DirectX\ShadowMap.h">
       <Filter>include\Function\Render\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Collision.h">
+      <Filter>include\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\PointLightComponent.h">
+      <Filter>include\Function\Framework\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Alloter\MemoryPool.cpp">
@@ -562,6 +568,12 @@
     </ClCompile>
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Render\DirectX\ShadowMap.cpp">
       <Filter>src\Function\Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Collision.cpp">
+      <Filter>src\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\PointLightComponent.cpp">
+      <Filter>src\Function\Framework\Component</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

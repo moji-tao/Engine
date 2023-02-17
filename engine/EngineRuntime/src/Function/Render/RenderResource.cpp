@@ -1,6 +1,8 @@
+#include "EngineRuntime/include/Core/Math/Math.h"
 #include "EngineRuntime/include/Function/Render/RenderResource.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Render/TAASampler.h"
+#include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
 namespace Engine
 {
@@ -43,7 +45,7 @@ namespace Engine
 		}
 	}
 
-	void RenderResource::UploadPointLightAndShadow(PointLight& info, ShadowParameter shadowParameter)
+	void RenderResource::UploadPointLightAndShadow(PointLight& info)
 	{
 		if (mCubeShadowMapCount == MAX_CubeSHADOWMAP)
 		{
@@ -53,6 +55,10 @@ namespace Engine
 		{
 			info.ShadowIndex = (int32_t)mCubeShadowMapCount;
 			mPointLightResource.emplace_back(info);
+
+			ShadowParameter shadowParameter;
+			shadowParameter.LightPosition = info.Position;
+			shadowParameter.LightRange = info.Range;
 			shadowParameter.Type = ShadowParameter::emShadowMapCube;
 			mShaderParameter.push_back(shadowParameter);
 			++mCubeShadowMapCount;
@@ -79,7 +85,11 @@ namespace Engine
 	{
 		UpdateMainPassCB(camera, deltaTile);
 
+		UpdateCameraFrustum();
+
 		UpdateObjectCBs();
+
+
 	}
 
 	std::vector<ShadowParameter>& RenderResource::GetShadowParameters()
@@ -89,7 +99,7 @@ namespace Engine
 
 	void RenderResource::EndFrameBuffer()
 	{
-		mResource.clear();
+		mCameraRenderResource.clear();
 		mDirectionalLightResource.clear();
 		mPointLightResource.clear();
 		mSpotLightResource.clear();
@@ -105,6 +115,94 @@ namespace Engine
 
 	void RenderResource::UpdateObjectCBs()
 	{
+		for (auto& [refMesh, refMaterials, constant] : mResource)
+		{
+			if (!refMesh.IsVaild())
+			{
+				continue;
+			}
+			Mesh* mesh = AssetManager::GetInstance()->LoadResource<Mesh>(refMesh);
+
+			if (mesh == nullptr)
+			{
+				LOG_ERROR("引用的Mesh资源不存在 {0}", refMesh.Data());
+				continue;
+			}
+
+			std::vector<SubMesh>& subMeshes = mesh->Meshes;
+
+			int end = Math::Min(subMeshes.size(), refMaterials.size());
+
+			for (int i = 0; i < end; ++i)
+			{
+				if (!refMaterials[i].IsVaild())
+				{
+					continue;
+				}
+
+				MaterialData* material = AssetManager::GetInstance()->LoadResource<MaterialData>(refMaterials[i]);
+
+				if (material == nullptr)
+				{
+					LOG_ERROR("引用的Material资源不存在 {0}", refMaterials[i].Data());
+					continue;
+				}
+
+				// 视锥体剔除
+
+				//subMeshes[i].
+
+				//subMeshes[i].mBoundingBox.mMin
+
+				BoundingBox box;
+				subMeshes[i].mBoundingBox.Transform(box, constant.World);
+
+				if (mCameraFrustum.Contains(box) == BoundingFrustum::DISJOINT)
+				{
+					continue;
+				}
+
+				// End
+
+				mCameraRenderResource[material][&subMeshes[i]].push_back(constant);
+			}
+		}
+
+		mResource.clear();
+	}
+
+	void RenderResource::UpdateCameraFrustum()
+	{
+		Vector4 homogenousPoints[8] =
+		{
+			Vector4(-1.0f, +1.0f, 1.0f, 1.0f),	// 远平面左上点 0
+			Vector4(-1.0f, -1.0f, 1.0f, 1.0f),	// 远平面左下点 1
+			Vector4(+1.0f, +1.0f, 1.0f, 1.0f),	// 远平面右上点 2
+			Vector4(+1.0f, -1.0f, 1.0f, 1.0f),	// 远平面右下点 3
+			Vector4(-1.0f, +1.0f, 0.0f, 1.0f),	// 近平面左上点 4
+			Vector4(-1.0f, -1.0f, 0.0f, 1.0f),	// 近平面左下点 5
+			Vector4(+1.0f, +1.0f, 0.0f, 1.0f),	// 近平面右上点 6
+			Vector4(+1.0f, -1.0f, 0.0f, 1.0f),	// 近平面右下点 7
+		};
+
+		for (int i = 0; i < 8; ++i)
+		{
+			homogenousPoints[i] = homogenousPoints[i] * mMainCameraPassCB.InvViewProj;
+			homogenousPoints[i] /= homogenousPoints[i].w;
+		}
+
+		mCameraFrustum.mRight.mNormal = Vector3(homogenousPoints[3] - homogenousPoints[2]).CrossProduct(Vector3(homogenousPoints[2] - homogenousPoints[6])).GetNormalised();
+		mCameraFrustum.mRight.mPoint = Vector3(homogenousPoints[2]);
+		mCameraFrustum.mLeft.mNormal = Vector3(homogenousPoints[5] - homogenousPoints[4]).CrossProduct(Vector3(homogenousPoints[4] - homogenousPoints[0])).GetNormalised();
+		mCameraFrustum.mLeft.mPoint = Vector3(homogenousPoints[4]);
+		mCameraFrustum.mTop.mNormal = Vector3(homogenousPoints[2] - homogenousPoints[0]).CrossProduct(Vector3(homogenousPoints[0] - homogenousPoints[4])).GetNormalised();
+		mCameraFrustum.mTop.mPoint = Vector3(homogenousPoints[0]);
+		mCameraFrustum.mBottom.mNormal = Vector3(homogenousPoints[5] - homogenousPoints[1]).CrossProduct(Vector3(homogenousPoints[1] - homogenousPoints[3])).GetNormalised();
+		mCameraFrustum.mBottom.mPoint = Vector3(homogenousPoints[1]);
+		mCameraFrustum.mNear.mNormal = Vector3(homogenousPoints[6] - homogenousPoints[4]).CrossProduct(Vector3(homogenousPoints[4] - homogenousPoints[5])).GetNormalised();
+		mCameraFrustum.mNear.mPoint = Vector3(homogenousPoints[4]);
+		mCameraFrustum.mFar.mNormal = Vector3(homogenousPoints[1] - homogenousPoints[0]).CrossProduct(Vector3(homogenousPoints[0] - homogenousPoints[2])).GetNormalised();
+		mCameraFrustum.mFar.mPoint = Vector3(homogenousPoints[0]);
 
 	}
 

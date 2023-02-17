@@ -27,6 +27,10 @@ namespace Engine
 
 	Vector3::Vector3(const Vector2& vec) : x(vec.x), y(vec.y), z(0.0f) { }
 
+	Vector3::Vector3(const Vector4& vec)
+		:x(vec.x), y(vec.y), z(vec.z)
+	{ }
+
 	float* Vector3::ptr()
 	{
 		return &x;

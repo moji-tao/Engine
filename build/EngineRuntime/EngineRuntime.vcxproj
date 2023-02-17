@@ -101,6 +101,7 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Base\macro.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Log\LogSystem.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Angle.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Collision.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Color.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Math.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Core\Math\Matrix3x3.h" />
@@ -123,6 +124,7 @@
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\DirectionalLightComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\LightComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\MeshRendererComponent.h" />
+    <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\PointLightComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Component\TransformComponent.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Level\Level.h" />
     <ClInclude Include="..\..\engine\EngineRuntime\include\Function\Framework\Object\Actor.h" />
@@ -176,6 +178,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Alloter\MemoryPool.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Log\LogSystem.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Angle.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Collision.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Color.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Math.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Core\Math\Matrix3x3.cpp" />
@@ -195,6 +198,7 @@
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\DirectionalLightComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\LightComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\MeshRendererComponent.cpp" />
+    <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\PointLightComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Component\TransformComponent.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Level\Level.cpp" />
     <ClCompile Include="..\..\engine\EngineRuntime\src\Function\Framework\Object\Actor.cpp" />

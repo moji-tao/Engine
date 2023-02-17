@@ -4,6 +4,7 @@
 #include "EngineRuntime/include/Function/Framework/Component/MeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/TransformComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/PointLightComponent.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
 namespace Editor
@@ -128,13 +129,31 @@ namespace Editor
 			Engine::DirectionalLightComponent* directionalLightComponent = dynamic_cast<Engine::DirectionalLightComponent*>(component);
 			ASSERT(directionalLightComponent != nullptr);
 
-			ImGui::ColorEdit4("Color", directionalLightComponent->mColor.ptr());
+			ImGui::ColorEdit4("Color##DirectionalLight_Color", directionalLightComponent->mColor.ptr());
 			
 			ImGui::DragFloat("##DirectionalLight_Intensity_Drag", &directionalLightComponent->mIntensity, 0.01f, 0.0f, 0.0f, "光强", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::SameLine();
 			ImGui::InputFloat("##DirectionalLight_Intensity_Input", &directionalLightComponent->mIntensity);
 
 			ImGui::Checkbox("阴影##DirectionalLight_ShowShadow", &directionalLightComponent->mShadow);
+		};
+
+		mComponentUIMap["PointLightComponent"] = [this](Engine::Component* component)
+		{
+			Engine::PointLightComponent* pointLightComponent = dynamic_cast<Engine::PointLightComponent*>(component);
+			ASSERT(pointLightComponent != nullptr);
+
+			ImGui::ColorEdit4("Color##PointLightComponent_Color", pointLightComponent->mColor.ptr());
+
+			ImGui::DragFloat("##PointLightComponent_Intensity_Drag", &pointLightComponent->mIntensity, 0.01f, 0.001f, 0.0f, "光强", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::SameLine();
+			ImGui::InputFloat("##PointLightComponent_Intensity_Input", &pointLightComponent->mIntensity);
+
+			ImGui::DragFloat("##PointLightComponent_Range_Drag", &pointLightComponent->mRange, 0.01f, 0.001f, 0.0f, "半径", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::SameLine();
+			ImGui::InputFloat("##PointLightComponent_Range_Input", &pointLightComponent->mRange);
+
+			ImGui::Checkbox("阴影##PointLightComponent_ShowShadow", &pointLightComponent->mShadow);
 		};
 	}
 

@@ -29,14 +29,6 @@ namespace Engine
 
 		resource->UploadGameObjectRenderResource(mRefMesh, mRefMaterials, constans);
 
-		{
-			Vector3 po, sc;
-			Quaternion r;
-			constans.World.Decomposition(po, sc, r);
-			{
-				po.x = po.x;
-			}
-		}
 	}
 
 	GUID MeshRendererComponent::GetRefMeshGUID()

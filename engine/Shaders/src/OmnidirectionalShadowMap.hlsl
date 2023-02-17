@@ -36,6 +36,12 @@ VertexOut VS(VertexIn vertexIn, uint instanceID : SV_InstanceID)
     return vertexOut;
 }
 
+[maxvertexcount(10)]
+void GS(triangle VertexOut gin[3], inout TriangleStream<VertexOut> triStream)
+{
+    
+}
+
 float PS(VertexOut pixelIn) : SV_Depth
 {
     float lightDis = length(pixelIn.PosW - lightPosition);

@@ -1,8 +1,7 @@
-#include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
-
 #include "EngineRuntime/include/Core/Math/Math.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
 #include "EngineRuntime/include/Function/Framework/Object/Actor.h"
+#include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
 #include "EngineRuntime/include/Function/Render/RenderResource.h"
 
 namespace Engine
@@ -34,7 +33,7 @@ namespace Engine
 		{
 			ShadowParameter shadowParameter;
 
-			float rad = 100.0f;
+			float rad = 5.0f;
 			Vector3 lightPos = -info.Direction * rad;
 			Vector3 target = Vector3::ZERO;
 			Vector3 lightUp = Vector3::UNIT_Y;

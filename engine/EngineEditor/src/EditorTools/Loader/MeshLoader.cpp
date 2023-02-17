@@ -91,7 +91,7 @@ namespace Editor
 		{
 			LOG_INFO("有骨骼数据");
 		}
-
+		
 		if (scene->mRootNode != nullptr)
 		{
 			actor.SetActorName(fileName);
@@ -105,7 +105,7 @@ namespace Editor
 			fileSystem->CreateAssetFile(dstFolder, (fileName + ".prefab"), frame, meta);
 			LOG_INFO("导入预制体 {0}, 保存路径 {1}", fileName.c_str(), dstFolder->GetAssetFilePath().generic_string().c_str());
 		}
-
+		
 		importer.FreeScene();
 
 		return mesh.GetGuid();
@@ -117,6 +117,7 @@ namespace Editor
 		for (unsigned i = 0; i < num; ++i)
 		{
 			aiMesh& m_mesh = *scene->mMeshes[i];
+			
 			mesh.Meshes.push_back(SubMesh());
 			SubMesh& subMesh = mesh.Meshes.back();
 			subMesh.Vertices.resize(m_mesh.mNumVertices);
@@ -158,6 +159,12 @@ namespace Editor
 					subMesh.Indices.push_back(face.mIndices[k]);
 				}
 			}
+			subMesh.mBoundingBox.mMin.x = m_mesh.mAABB.mMin.x;
+			subMesh.mBoundingBox.mMin.y = m_mesh.mAABB.mMin.y;
+			subMesh.mBoundingBox.mMin.z = m_mesh.mAABB.mMin.z;
+			subMesh.mBoundingBox.mMax.x = m_mesh.mAABB.mMax.x;
+			subMesh.mBoundingBox.mMax.y = m_mesh.mAABB.mMax.y;
+			subMesh.mBoundingBox.mMax.z = m_mesh.mAABB.mMax.z;
 			subMesh.MaterialIndex = m_mesh.mMaterialIndex;
 			subMesh.mGuid = Engine::GUID::Get();
 		}

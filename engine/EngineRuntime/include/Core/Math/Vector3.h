@@ -5,6 +5,7 @@
 namespace Engine
 {
 	class Quaternion;
+	class Vector4;
 
 	class Vector3
 	{
@@ -16,6 +17,8 @@ namespace Engine
 		explicit Vector3(const float coords[3]);
 
 		explicit Vector3(const Vector2& vec);
+
+		explicit Vector3(const Vector4& vec);
 
 		float* ptr();
 

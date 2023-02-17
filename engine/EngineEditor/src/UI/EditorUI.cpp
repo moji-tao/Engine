@@ -248,6 +248,7 @@ namespace Editor
 			ImGui::Checkbox("SSAO", &Engine::RenderSystem::GetInstance()->mEnableSSAO);
 			ImGui::Checkbox("AmbientLighting", &Engine::RenderSystem::GetInstance()->mEnableAmbientLighting);
 
+			ImGui::Text("DrawCall: %d", Engine::RenderSystem::GetInstance()->mDrawCallK);
 			ImGui::End();
 
 		}

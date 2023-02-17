@@ -2,6 +2,7 @@
 #include <vector>
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Vector2.h"
+#include "EngineRuntime/include/Core/Math/Collision.h"
 #include "EngineRuntime/include/Core/Meta/Object.h"
 #include "EngineRuntime/include/Framework/Interface/ISerializable.h"
 
@@ -52,6 +53,7 @@ namespace Engine
 	public:
 		std::vector<Vertex> Vertices;
 		std::vector<unsigned int> Indices;
+		BoundingBox mBoundingBox;
 		uint32_t MaterialIndex;
 		GUID mGuid;
 	};

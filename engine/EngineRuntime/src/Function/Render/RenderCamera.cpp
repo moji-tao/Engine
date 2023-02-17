@@ -96,7 +96,7 @@ namespace Engine
 		*/
 
 		mPosition = position;
-		mForward = (position - target);
+		mForward = (target - position);
 		mForward.Normalize();
 		mRight = up.CrossProduct(mForward);
 		mRight.Normalize();

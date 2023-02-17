@@ -37,8 +37,9 @@ namespace Engine
 		mScissorRect = { 0, 0, (int)(shadowSize), (int)(shadowSize) };
 	}
 
-	void ShadowMapCube::SetView(const Vector3& eyePosition)
+	void ShadowMapCube::SetView(const Vector3& eyePosition, float zNear, float zFar)
 	{
+		/*
 		Vector3 Targets[6] =
 		{
 			eyePosition + Vector3(+1.0f, 0.0f, 0.0f),	// +X 
@@ -58,16 +59,45 @@ namespace Engine
 			{0.0f, +1.0f, 0.0f},	// +Z 
 			{0.0f, +1.0f, 0.0f}		// -Z 
 		};
+		*/
+		
+		Vector3 Targets[6] =
+		{
+			eyePosition + Vector3(1.0f,  0.0f,  0.0f), // +X 
+			eyePosition + Vector3(-1.0f, 0.0f,  0.0f), // -X 
+			eyePosition + Vector3(0.0f,  1.0f,  0.0f), // +Y 
+			eyePosition + Vector3(0.0f,  -1.0f, 0.0f), // -Y 
+			eyePosition + Vector3(0.0f,  0.0f,  1.0f), // +Z 
+			eyePosition + Vector3(0.0f,  0.0f, -1.0f)  // -Z 
+		};
+
+		Vector3 Ups[6] =
+		{
+			{0.0f, 1.0f, 0.0f},  // +X 
+			{0.0f, 1.0f, 0.0f},  // -X 
+			{0.0f, 0.0f, -1.0f}, // +Y 
+			{0.0f, 0.0f, +1.0f}, // -Y 
+			{0.0f, 1.0f, 0.0f},	 // +Z 
+			{0.0f, 1.0f, 0.0f}	 // -Z 
+		};
 		
 		for (int i = 0; i < 6; ++i)
 		{
 			mViewMat[i] = Math::MakeLookAtMatrix(eyePosition, Targets[i], Ups[i]);
 		}
+		float Fov = 0.5f * Math_PI;
+		float AspectRatio = 1.0f; //Square
+		mProjMat = Math::MakePerspectiveMatrix(Radian(Fov), AspectRatio, zNear, zFar);
 	}
 
 	Matrix4x4 ShadowMapCube::GetSceneView(uint32_t i)
 	{
 		return mViewMat[i];
+	}
+
+	Matrix4x4 ShadowMapCube::GetSceneProj()
+	{
+		return mProjMat;
 	}
 
 	RenderTargetCube* ShadowMapCube::GetTarget()

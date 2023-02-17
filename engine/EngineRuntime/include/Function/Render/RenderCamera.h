@@ -5,6 +5,7 @@
 #include "EngineRuntime/include/Core/Math/Vector2.h"
 #include "EngineRuntime/include/Core/Math/Vector3.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
+#include "EngineRuntime/include/Core/Math/Collision.h"
 
 namespace Engine
 {

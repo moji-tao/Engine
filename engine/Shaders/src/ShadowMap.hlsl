@@ -4,8 +4,8 @@
 #define MAX_SHADOW_MAP_2D_NUM  10
 Texture2D ShadowMaps2D[MAX_SHADOW_MAP_2D_NUM];
 
-#define MAX_SHADOW_MAP_CUBE_NUM  10
-Texture2D ShadowMapsCube[MAX_SHADOW_MAP_CUBE_NUM];
+#define MAX_SHADOW_MAP_CUBE_NUM  5
+TextureCube ShadowMapsCube[MAX_SHADOW_MAP_CUBE_NUM];
 
 float PCF(float z, uint shadowMapIndex, float2 shadowMapUV, int radians)
 {
@@ -34,7 +34,7 @@ float PCF(float z, uint shadowMapIndex, float2 shadowMapUV, int radians)
     
     //return ShadowMaps2D[shadowMapIndex].SampleCmpLevelZero(ShadowSampler, shadowMapUV, z);
 
-    float sz = ShadowMaps2D[shadowMapIndex].Sample(LinearWrapSampler, shadowMapUV).r;
+    float sz = ShadowMaps2D[shadowMapIndex].Sample(LinearClampSampler, shadowMapUV).r;
     if ((z - 0.0001f) <= sz)
     {
         res = 1.0f;
@@ -45,6 +45,7 @@ float PCF(float z, uint shadowMapIndex, float2 shadowMapUV, int radians)
     }
 
     return res;
+    
 }
 
 float ShadowVisibility(float4 pos, uint shadowMapIndex, float3 lightDir, float3 normal)
@@ -56,4 +57,19 @@ float ShadowVisibility(float4 pos, uint shadowMapIndex, float3 lightDir, float3 
     float offsetZ = max(0.005f, 0.05f * dot(normal, -lightDir));
 
     return PCF(pos.z, shadowMapIndex, shadowMapUV, 1);
+}
+
+float OmnidirectionalShadowVisibility(float3 lightToPoint, uint shadowMapIndex, float range)
+{
+    float depth = ShadowMapsCube[shadowMapIndex].Sample(PointClampSampler, normalize(lightToPoint)).r;
+
+    depth *= range;
+
+    float currentDepth = length(lightToPoint);
+
+    float visibility;
+
+    visibility = ((currentDepth - 0.05f) < depth) ? 1.0f : 0.0f;
+
+    return visibility;
 }
