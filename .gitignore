@@ -5,6 +5,7 @@ FodyWeavers.xsd
 /bin/*
 /lib/*
 /build/*
+/build
 /bin/*.dll
 /bin/*.exe
 /bin/*.pdb

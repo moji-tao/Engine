@@ -677,6 +677,26 @@ namespace Engine
 
 				TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), rtvDesc, textureResource));
 			}
+
+			{
+				D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+				rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+				rtvDesc.Texture2DArray.MipSlice = 0;
+				rtvDesc.Texture2DArray.PlaneSlice = 0;
+				rtvDesc.Texture2DArray.FirstArraySlice = 0;
+				rtvDesc.Texture2DArray.ArraySize = 6;
+
+				if (TextureInfo.RTVFormat == DXGI_FORMAT_UNKNOWN)
+				{
+					rtvDesc.Format = TextureInfo.Format;
+				}
+				else
+				{
+					rtvDesc.Format = TextureInfo.RTVFormat;
+				}
+
+				TextureRef->AddRTV(std::make_unique<D3D12RenderTargetView>(GetDevice(), rtvDesc, textureResource));
+			}
 		}
 
 		// 创建DSV
@@ -708,6 +728,26 @@ namespace Engine
 				DSVDesc.Texture2DArray.MipSlice = 0;
 				DSVDesc.Texture2DArray.FirstArraySlice = (UINT)i;
 				DSVDesc.Texture2DArray.ArraySize = 1;
+
+				if (TextureInfo.DSVFormat == DXGI_FORMAT_UNKNOWN)
+				{
+					DSVDesc.Format = TextureInfo.Format;
+				}
+				else
+				{
+					DSVDesc.Format = TextureInfo.DSVFormat;
+				}
+
+				TextureRef->AddDSV(std::make_unique<D3D12DepthStencilView>(GetDevice(), DSVDesc, textureResource));
+			}
+
+			{
+				D3D12_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
+				DSVDesc.Flags = D3D12_DSV_FLAG_NONE;
+				DSVDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+				DSVDesc.Texture2DArray.MipSlice = 0;
+				DSVDesc.Texture2DArray.FirstArraySlice = 0;
+				DSVDesc.Texture2DArray.ArraySize = 6;
 
 				if (TextureInfo.DSVFormat == DXGI_FORMAT_UNKNOWN)
 				{

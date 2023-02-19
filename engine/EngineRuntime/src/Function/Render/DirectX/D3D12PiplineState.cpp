@@ -57,6 +57,12 @@ namespace Engine
 		Shader* shader = descriptor.mShader;
 		psoDesc.pRootSignature = shader->mRootSignature.Get();
 		psoDesc.VS = CD3DX12_SHADER_BYTECODE(shader->mShaderInfo.mVertexShader->GetData(), shader->mShaderInfo.mVertexShader->GetSize());
+
+		if (descriptor.mShader->mShaderInfo.mGeometryShader != nullptr)
+		{
+			psoDesc.GS = CD3DX12_SHADER_BYTECODE(shader->mShaderInfo.mGeometryShader->GetData(), shader->mShaderInfo.mGeometryShader->GetSize());
+		}
+
 		psoDesc.PS = CD3DX12_SHADER_BYTECODE(shader->mShaderInfo.mPixelShader->GetData(), shader->mShaderInfo.mPixelShader->GetSize());
 
 		psoDesc.RasterizerState = descriptor.mRasterizerDesc;

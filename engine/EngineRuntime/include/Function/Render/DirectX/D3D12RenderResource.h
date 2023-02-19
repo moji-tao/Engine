@@ -75,8 +75,10 @@ namespace Engine
 		void UpdateRenderResource();
 
 		void TryCreatePSO(const GraphicsPSODescriptor& descriptor);
+		void TryCreatePSO(const ComputePSODescriptor& descriptor);
 
 		ID3D12PipelineState* GetPSO(const GraphicsPSODescriptor& descriptor);
+		ID3D12PipelineState* GetPSO(const ComputePSODescriptor& descriptor);
 
 		const std::vector<std::tuple<MaterialResource, SubMeshResource, D3D12StructuredBufferRef, uint32_t>>& GetBasePassBatchs() const;
 
@@ -141,5 +143,6 @@ namespace Engine
 		InputLayoutManager mInputLayoutManager;
 
 		std::unique_ptr<GraphicsPSOManager> mGraphicsPSOManager;
+		std::unique_ptr<ComputePSOManager> mComputePSOManager;
 	};
 }

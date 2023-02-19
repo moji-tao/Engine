@@ -176,6 +176,11 @@ namespace Engine
 			GetShaderParameters(mShaderInfo.mVertexShader, ShaderType::VERTEX_SHADER);
 		}
 
+		if (mShaderInfo.mGeometryShader != nullptr)
+		{
+			GetShaderParameters(mShaderInfo.mGeometryShader, ShaderType::GEOMETRY_SHADER);
+		}
+
 		if(mShaderInfo.mPixelShader != nullptr)
 		{
 			GetShaderParameters(mShaderInfo.mPixelShader, ShaderType::PIXEL_SHADER);
@@ -258,6 +263,10 @@ namespace Engine
 
 				mSamplerParams.push_back(Param);
 			}
+			else
+			{
+				ASSERT(0);
+			}
 
 		}
 	}
@@ -268,6 +277,10 @@ namespace Engine
 		if (Type == ShaderType::VERTEX_SHADER)
 		{
 			shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		}
+		else if (Type == ShaderType::GEOMETRY_SHADER)
+		{
+			shaderVisibility = D3D12_SHADER_VISIBILITY_GEOMETRY;
 		}
 		else if (Type == ShaderType::PIXEL_SHADER)
 		{

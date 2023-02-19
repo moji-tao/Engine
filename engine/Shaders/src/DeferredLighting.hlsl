@@ -4,11 +4,12 @@
 
 struct DirectionalLight
 {
-    float4x4 LightViewProj;
+    float4x4 LightViewProj[4];
 	float4 Color;
 	float3 Direction;
     float Intensity;
-    int ShadowMapIndex;
+    int ShadowMapIndex[4];
+	float Layer[4];
 };
 
 struct PointLight
@@ -151,11 +152,36 @@ float4 PS(VertexOut pixelIn) : SV_TARGET
 
             float visibility = 1.0f;
 
-            if (light.ShadowMapIndex != -1)
+            if (light.ShadowMapIndex[0] != -1)
             {
-                float4 shadowPosH = mul(light.LightViewProj, float4(worldPos, 1.0f));
+                float4 viewPos = mul(gView, float4(worldPos, 1.0f));
+                float layer = abs(viewPos.z - gNearZ) / (gFarZ - gNearZ);
+                int shadowMapIndex;
+                float4x4 viewProj;
+                if (layer <= light.Layer[0])
+                {
+                    shadowMapIndex = light.ShadowMapIndex[0];
+                    viewProj = light.LightViewProj[0];
+                }
+                else if (layer <= light.Layer[1])
+                {
+                    shadowMapIndex = light.ShadowMapIndex[1];
+                    viewProj = light.LightViewProj[1];
+                }
+                else if (layer <= light.Layer[2])
+                {
+                    shadowMapIndex = light.ShadowMapIndex[2];
+                    viewProj = light.LightViewProj[2];
+                }
+                else
+                {
+                    shadowMapIndex = light.ShadowMapIndex[3];
+                    viewProj = light.LightViewProj[3];
+                }
+
+                float4 shadowPosH = mul(viewProj, float4(worldPos, 1.0f));
                 
-                visibility = ShadowVisibility(shadowPosH, light.ShadowMapIndex, light.Direction, normal);
+                visibility = ShadowVisibility(shadowPosH, shadowMapIndex, light.Direction, normal);
             }
 
             float3 radiance = light.Color.rgb * light.Intensity;

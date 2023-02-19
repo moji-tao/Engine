@@ -1,12 +1,8 @@
 #include "Common.hlsl"
 
-cbuffer cbLight
+cbuffer cbLightView
 {
-    float4x4 lightView;
-    float4x4 lightProj;
-    float3 lightPosition;
-    float lightRange;
-    uint lightType;
+    float4x4 gLightViewProj;
 }
 
 StructuredBuffer<InstanceData> gInstanceData : register(t0);
@@ -29,7 +25,7 @@ VertexOut VS(VertexIn vertexIn, uint instanceID : SV_InstanceID)
 {
     VertexOut vertexOut;
     float4 PosW = mul(gInstanceData[instanceID].gWorld, float4(vertexIn.PosL, 1.0f));
-    vertexOut.PosH = mul(lightProj, mul(lightView, PosW));
+    vertexOut.PosH = mul(gLightViewProj, PosW);
 
     return vertexOut;
 }

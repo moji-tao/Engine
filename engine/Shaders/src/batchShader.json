@@ -108,6 +108,11 @@
 		},
 		{
 			"ShaderName": "OmnidirectionalShadowMap",
+			"EntryPoint": "GS",
+			"Version": "gs_5_1"
+		},
+		{
+			"ShaderName": "OmnidirectionalShadowMap",
 			"EntryPoint": "PS",
 			"Version": "ps_5_1"
 		},
@@ -120,6 +125,16 @@
 			"ShaderName": "SingleShadowMap",
 			"EntryPoint": "PS",
 			"Version": "ps_5_1"
+		},
+		{
+			"ShaderName": "Blur",
+			"EntryPoint": "HorzCS",
+			"Version": "cs_5_1"
+		},
+		{
+			"ShaderName": "Blur",
+			"EntryPoint": "VertCS",
+			"Version": "cs_5_1"
 		}
 	]
 }

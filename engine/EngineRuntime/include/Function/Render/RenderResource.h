@@ -46,11 +46,12 @@ namespace Engine
 
 	struct DirectionalLight
 	{
-		Matrix4x4 LightViewProj;
+		Matrix4x4 LightViewProj[4];
 		Vector4 Color;
 		Vector3 Direction;
 		float Intensity;
-		int32_t ShadowIndex;
+		int32_t ShadowIndex[4] = { -1,-1,-1,-1 };
+		float Layer[4] = { 0.07f, 0.14f, 0.26f, 0.53f };
 	};
 
 	struct PointLight
@@ -77,14 +78,46 @@ namespace Engine
 	{
 		enum EMShadowMapType : uint32_t
 		{
-			emShadowMap2D,
-			emShadowMapCube,
+			emDirectionalShadowMap,
+			emSpotShadowMap,
+			emPointShadowMap,
 		};
-		Matrix4x4 View;
+		Matrix4x4 ViewProj;
+		Vector3 LightPosition;
+		float LightRange;
+		uint32_t ShadowMapSize;
+		EMShadowMapType Type;
+	};
+
+	struct LightActorParameter
+	{
+		Vector4 Color;
+		float Intensity;
+		bool ShowShadow;
+	};
+
+	struct DirectionalLightActorParameter : public LightActorParameter
+	{
+		Vector3 Direction;
+	};
+
+	struct PointLightActorParameter : public LightActorParameter
+	{
+		Vector3 Position;
+		float Range;
+	};
+
+	struct OmnidirectionalShadowParameter
+	{
+		Matrix4x4 View[6];
 		Matrix4x4 Proj;
 		Vector3 LightPosition;
 		float LightRange;
-		EMShadowMapType Type;
+	};
+
+	struct DirectionalShadowParameter
+	{
+		Matrix4x4 ViewProj;
 	};
 
 	struct LightCommonData
@@ -94,6 +127,13 @@ namespace Engine
 		uint32_t SpotLightCount = 0;
 		uint32_t EnableSSAO = 0;
 		uint32_t EnableAmbientLighting = 0;
+	};
+
+	struct BlurSettingsConstants
+	{
+		int gBlurRadius;
+
+		float w[11];
 	};
 
 	class RenderResource
@@ -106,17 +146,21 @@ namespace Engine
 	public:
 		void UploadGameObjectRenderResource(const GUID& refMesh, std::vector<GUID> refMaterials, const ObjectConstants& gConstance);
 
-		void UploadDirectionalLight(DirectionalLight& info);
+		//void UploadDirectionalLight(DirectionalLight& info);
 
-		void UploadPointLight(PointLight& info);
+		//void UploadPointLight(PointLight& info);
 
-		void UploadSpotLight(SpotLight& info);
+		//void UploadSpotLight(SpotLight& info);
 
-		void UploadDirectionalLightAndShadow(DirectionalLight& info, ShadowParameter shadowParameter);
+		//void UploadDirectionalLightAndShadow(DirectionalLight& info, ShadowParameter shadowParameter);
 
-		void UploadPointLightAndShadow(PointLight& info);
+		//void UploadPointLightAndShadow(PointLight& info);
 
-		void UploadSpotLightAndShadow(SpotLight& info, ShadowParameter shadowParameter);
+		//void UploadSpotLightAndShadow(SpotLight& info, ShadowParameter shadowParameter);
+
+		void UploadDirectionalLight(const DirectionalLightActorParameter& parameter);
+
+		void UploadPointLight(const PointLightActorParameter& parameter);
 
 		void PerFrameBuffer(const RenderCamera* camera, float deltaTile);
 
@@ -132,6 +176,8 @@ namespace Engine
 		void UpdateCameraFrustum();
 
 		void UpdateMainPassCB(const RenderCamera* camera, float deltaTile);
+
+		void UpdateLight();
 
 	protected:
 		CameraPassConstants mMainCameraPassCB;
@@ -150,12 +196,15 @@ namespace Engine
 
 		std::vector<SpotLight> mSpotLightResource;
 
-		std::vector<ShadowParameter> mShaderParameter;
+		std::vector<ShadowParameter> mShadowParameter;
 
 		uint32_t m2DShadowMapCount = 0;
 		uint32_t mCubeShadowMapCount = 0;
 
 	private:
 		BoundingFrustum mCameraFrustum;
+
+		std::vector<DirectionalLightActorParameter> mCurrentTickDirectionalLight;
+		std::vector<PointLightActorParameter> mCurrentTickPointLight;
 	};
 }

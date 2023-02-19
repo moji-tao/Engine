@@ -5,6 +5,7 @@
 namespace Engine
 {
 	ShadowMap2D::ShadowMap2D(uint32_t shadowSize, D3D12RHI* rhi)
+		:mSize(shadowSize)
 	{
 		mRenderTarget = std::make_unique<RenderTarget2D>(rhi, true, shadowSize, shadowSize, DXGI_FORMAT_R24G8_TYPELESS);
 
@@ -28,7 +29,13 @@ namespace Engine
 		return mScissorRect;
 	}
 
+	uint32_t ShadowMap2D::GetShadowMapSize()
+	{
+		return mSize;
+	}
+
 	ShadowMapCube::ShadowMapCube(uint32_t shadowSize, D3D12RHI* rhi)
+		:mSize(shadowSize)
 	{
 		mRenderTarget = std::make_unique<RenderTargetCube>(rhi, true, shadowSize, DXGI_FORMAT_R24G8_TYPELESS);
 
@@ -113,5 +120,10 @@ namespace Engine
 	const D3D12_RECT& ShadowMapCube::GetScissorRect()
 	{
 		return mScissorRect;
+	}
+
+	uint32_t ShadowMapCube::GetShadowMapSize()
+	{
+		return mSize;
 	}
 }

@@ -9,6 +9,7 @@ namespace Engine
 		:mRHI(rhi)
 	{
 		mGraphicsPSOManager = std::make_unique<GraphicsPSOManager>(mRHI, &mInputLayoutManager);
+		mComputePSOManager = std::make_unique<ComputePSOManager>(mRHI);
 
 		ShaderInfo shaderInfo;
 		std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/BasePassVS.cso");
@@ -38,6 +39,7 @@ namespace Engine
 	D3D12RenderResource::~D3D12RenderResource()
 	{
 		mGraphicsPSOManager = nullptr;
+		mComputePSOManager = nullptr;
 		mConstantMap.clear();
 		mStructuredMap.clear();
 		mRWStructuredMap.clear();
@@ -315,9 +317,19 @@ namespace Engine
 		mGraphicsPSOManager->TryCreatePSO(descriptor);
 	}
 
+	void D3D12RenderResource::TryCreatePSO(const ComputePSODescriptor& descriptor)
+	{
+		mComputePSOManager->TryCreatePSO(descriptor);
+	}
+
 	ID3D12PipelineState* D3D12RenderResource::GetPSO(const GraphicsPSODescriptor& descriptor)
 	{
 		return mGraphicsPSOManager->GetPSO(descriptor);
+	}
+
+	ID3D12PipelineState* D3D12RenderResource::GetPSO(const ComputePSODescriptor& descriptor)
+	{
+		return mComputePSOManager->GetPSO(descriptor);
 	}
 
 	const std::vector<std::tuple<MaterialResource, SubMeshResource, D3D12StructuredBufferRef, uint32_t>>& D3D12RenderResource::GetBasePassBatchs() const

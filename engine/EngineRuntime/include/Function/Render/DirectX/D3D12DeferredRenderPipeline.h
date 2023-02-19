@@ -71,7 +71,7 @@ namespace Engine
 	private:
 		void DrawCallScreen(ID3D12GraphicsCommandList* commandList);
 
-		void GenerateSingleShadowMap(const ShadowParameter& shadowParameter);
+		void GenerateDirectionalShadowMap(const ShadowParameter& shadowParameter);
 
 		void GenerateOmnidirectionalShadowMap(ShadowParameter& shadowParameter);
 
@@ -157,9 +157,18 @@ namespace Engine
 		//D3D12TextureRef mIBLEnviromentTexture = nullptr;
 
 	private:
+		// SSAO
 		std::unique_ptr<Shader> mSSAOShader = nullptr;
 		GraphicsPSODescriptor mSSAOPSODescriptor;
 		std::unique_ptr<RenderTarget2D> mSSAOTexture = nullptr;
+
+		std::unique_ptr<Shader> mVertBlurShader = nullptr;
+		ComputePSODescriptor mVertBlurPSODescriptor;
+		std::unique_ptr<Shader> mHorzBlurShader = nullptr;
+		ComputePSODescriptor mHorzBlurPSODescriptor;
+		D3D12TextureRef mBlur1SSAOTexture = nullptr;
+		D3D12TextureRef mBlur2SSAOTexture = nullptr;
+		D3D12ConstantBufferRef mSSAOBlurCBRef = nullptr;
 
 	private:
 		// DeferredLightingPass

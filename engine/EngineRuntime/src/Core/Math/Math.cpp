@@ -268,6 +268,10 @@ namespace Engine
 		Vector3 R2 = target - eyeposition;
 		R2.Normalize();
 		Vector3 R0 = up.CrossProduct(R2);
+		if (R0.IsZero())
+		{
+			return Matrix4x4::IDENTITY;
+		}
 		R0.Normalize();
 		Vector3 R1 = R2.CrossProduct(R0);
 

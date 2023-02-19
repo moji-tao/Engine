@@ -247,6 +247,7 @@ namespace Editor
 			ImGui::Checkbox("TAA", &Engine::RenderSystem::GetInstance()->mEnableTAA);
 			ImGui::Checkbox("SSAO", &Engine::RenderSystem::GetInstance()->mEnableSSAO);
 			ImGui::Checkbox("AmbientLighting", &Engine::RenderSystem::GetInstance()->mEnableAmbientLighting);
+			ImGui::Checkbox("Culling", &Engine::RenderSystem::GetInstance()->mEnableCulling);
 
 			ImGui::Text("DrawCall: %d", Engine::RenderSystem::GetInstance()->mDrawCallK);
 			ImGui::End();

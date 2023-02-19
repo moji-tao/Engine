@@ -13,25 +13,24 @@ namespace Engine
 
 	void PointLightComponent::Tick(float deltaTime)
 	{
+		if (!mIsEnable)
+		{
+			return;
+		}
+
 		auto transform_component = mParentObject->GetComponent<TransformComponent>();
 		RenderResource* resource = RenderSystem::GetInstance()->GetRenderResource();
 
 		ASSERT(resource != nullptr && transform_component != nullptr);
 
-		PointLight info;
-		info.Color = mColor;
-		info.Intensity = mIntensity;
-		info.Position = transform_component->GetGlobalPosition();
-		info.Range = mRange;
+		PointLightActorParameter parameter;
+		parameter.Color = mColor;
+		parameter.Intensity = mIntensity;
+		parameter.ShowShadow = mShadow;
+		parameter.Position = transform_component->GetGlobalPosition();
+		parameter.Range = mRange;
 
-		if (mShadow)
-		{
-			resource->UploadPointLightAndShadow(info);
-		}
-		else
-		{
-			resource->UploadPointLight(info);
-		}
+		resource->UploadPointLight(parameter);
 	}
 
 	void PointLightComponent::Serialize(SerializerDataFrame& stream) const

@@ -55,6 +55,17 @@ namespace Engine
 		Plane& mBottom = mPlane[3];
 		Plane& mNear = mPlane[4];
 		Plane& mFar = mPlane[5];
+
+		Vector3 mPoint[8];
+		Vector3& mLeftTopFar = mPoint[0];
+		Vector3& mLeftBottomFar = mPoint[1];
+		Vector3& mRightTopFar = mPoint[2];
+		Vector3& mRightBottomFar = mPoint[3];
+		Vector3& mLeftTopNear = mPoint[4];
+		Vector3& mLeftBottomNear = mPoint[5];
+		Vector3& mRightTopNear = mPoint[6];
+		Vector3& mRightBottomNear = mPoint[7];
+
 	public:
 		enum ContainmentType
 		{
@@ -72,8 +83,13 @@ namespace Engine
 
 	struct Ray
 	{
+		Ray(const Vector3& start, const Vector3& dir);
+
 		Vector3 mStart;
 		Vector3 mDirectional;
+
+	public:
+		float Distance(const Vector3& point);
 	};
 
 	class Collision

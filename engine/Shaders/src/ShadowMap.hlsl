@@ -22,18 +22,43 @@ float PCF(float z, uint shadowMapIndex, float2 shadowMapUV, int radians)
         float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
         float2(-dx, dx), float2(0.0f, dx), float2(dx, dx)
     };
+    */
+    
+    const float2 offsets[25] = 
+    {
+        float2(2 * -dx, 2 * -dx), float2(-dx, 2 * -dx), float2(0.0f, 2 * -dx), float2(dx, 2 * -dx), float2(2 * dx, 2 * -dx),
+        float2(2 * -dx, -dx), float2(-dx, -dx), float2(0.0f, -dx), float2(dx, -dx), float2(2 * dx, -dx),
+        float2(2 * -dx, 0.0f), float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f), float2(2 * dx, 0.0f),
+        float2(2 * -dx, dx), float2(-dx, dx), float2(0.0f, dx), float2(dx, dx), float2(2 * dx, dx),
+        float2(2 * -dx, 2 * dx), float2(-dx, 2 * dx), float2(0.0f, 2 * dx), float2(dx, 2 * dx), float2(2 * dx, 2 * dx),
+    };
 
     [unroll]
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 25; ++i)
     {
         res += ShadowMaps2D[shadowMapIndex].SampleCmpLevelZero(ShadowSampler, shadowMapUV + offsets[i], z);
     }
 
-    return res / 9.0f;
-    */
-    
-    //return ShadowMaps2D[shadowMapIndex].SampleCmpLevelZero(ShadowSampler, shadowMapUV, z);
+    return res / 25.0f;
 
+/*
+    [unroll]
+    for (int i = 0; i < 25; ++i)
+    {
+        float sz = ShadowMaps2D[shadowMapIndex].Sample(LinearClampSampler, shadowMapUV + offsets[i]).r;
+        if ((z) <= sz)
+        {
+            res += 1.0f;
+        }
+        else
+        {
+            res += 0.3f;
+        }
+    }
+    return res / 25.0f;
+*/
+    //return ShadowMaps2D[shadowMapIndex].SampleCmpLevelZero(ShadowSampler, shadowMapUV, z);
+/*
     float sz = ShadowMaps2D[shadowMapIndex].Sample(LinearClampSampler, shadowMapUV).r;
     if ((z - 0.0001f) <= sz)
     {
@@ -45,7 +70,7 @@ float PCF(float z, uint shadowMapIndex, float2 shadowMapUV, int radians)
     }
 
     return res;
-    
+*/
 }
 
 float ShadowVisibility(float4 pos, uint shadowMapIndex, float3 lightDir, float3 normal)

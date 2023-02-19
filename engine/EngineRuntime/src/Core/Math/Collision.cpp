@@ -27,7 +27,11 @@ namespace Engine
 			{
 				++k;
 			}
-			if (k == 2)
+			if (k == 1)
+			{
+				return ContainmentType::INTERSECTS;
+			}
+			else if (k == 2)
 			{
 				return ContainmentType::DISJOINT;
 			}
@@ -42,6 +46,14 @@ namespace Engine
 
 	BoundingFrustum::ContainmentType BoundingFrustum::Contains(const BoundingSphere& sphere) const
 	{
+		for (int i = 0; i < 6; ++i)
+		{
+			float distance = mPlane[i].Distance(sphere.mCenter);
+			if (distance < sphere.mRadius)
+			{
+				return ContainmentType::INTERSECTS;
+			}
+		}
 		return ContainmentType::CONTAINS;
 	}
 
@@ -62,5 +74,14 @@ namespace Engine
 
 		out.mMax = Vector3(maxPoint);
 		out.mMin = Vector3(minPoint);
+	}
+
+	Ray::Ray(const Vector3& start, const Vector3& dir)
+		:mStart(start), mDirectional(dir)
+	{ }
+
+	float Ray::Distance(const Vector3& point)
+	{
+		return (point - mStart).CrossProduct(mDirectional).Length();
 	}
 }

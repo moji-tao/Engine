@@ -8,6 +8,7 @@ namespace Engine
 	enum class ShaderType
 	{
 		VERTEX_SHADER,
+		GEOMETRY_SHADER,
 		PIXEL_SHADER,
 		COMPUTE_SHADER
 	};
@@ -47,6 +48,8 @@ namespace Engine
 	struct ShaderInfo
 	{
 		std::shared_ptr<Blob> mVertexShader;
+
+		std::shared_ptr<Blob> mGeometryShader;
 
 		std::shared_ptr<Blob> mPixelShader;
 

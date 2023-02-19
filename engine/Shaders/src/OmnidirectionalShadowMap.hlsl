@@ -1,12 +1,11 @@
 #include "Common.hlsl"
 
-cbuffer cbLight
+cbuffer cbLightView
 {
-    float4x4 lightView;
-    float4x4 lightProj;
-    float3 lightPosition;
-    float lightRange;
-    uint lightType;
+    float4x4 gLightView[6];
+    float4x4 gLightProj;
+    float3 gLightPosition;
+    float gLightRange;
 }
 
 StructuredBuffer<InstanceData> gInstanceData : register(t0);
@@ -22,31 +21,50 @@ struct VertexIn
 
 struct VertexOut
 {
-	float4 PosH     : SV_POSITION;
-    float3 PosW     : POSITION;
+	float4 PosW     : POSITION;
 };
 
 VertexOut VS(VertexIn vertexIn, uint instanceID : SV_InstanceID)
 {
     VertexOut vertexOut;
     float4 PosW = mul(gInstanceData[instanceID].gWorld, float4(vertexIn.PosL, 1.0f));
-    vertexOut.PosH = mul(lightProj, mul(lightView, PosW));
-    vertexOut.PosW = PosW.xyz;
+    vertexOut.PosW = PosW;
 
     return vertexOut;
 }
 
-[maxvertexcount(10)]
-void GS(triangle VertexOut gin[3], inout TriangleStream<VertexOut> triStream)
+struct GeometryOut
 {
-    
+	float4 PosH     : SV_POSITION;
+    float3 PosW     : POSITION;
+    uint RTIndex    : SV_RenderTargetArrayIndex;
+};
+
+[maxvertexcount(18)]
+void GS(triangle VertexOut gin[3], inout TriangleStream<GeometryOut> triStream)
+{
+    for (int i = 0; i < 6; ++i)
+    {
+        GeometryOut geometryOut;
+
+        geometryOut.RTIndex = i;
+
+        for (int j = 0; j < 3; ++j)
+        {
+            geometryOut.PosH = mul(gLightProj, mul(gLightView[i], gin[j].PosW));
+            geometryOut.PosW = gin[j].PosW.xyz;
+
+            triStream.Append(geometryOut);
+        }
+        triStream.RestartStrip();
+    }
 }
 
-float PS(VertexOut pixelIn) : SV_Depth
+float PS(GeometryOut pixelIn) : SV_Depth
 {
-    float lightDis = length(pixelIn.PosW - lightPosition);
+    float lightDis = length(pixelIn.PosW - gLightPosition);
 
-    lightDis /= lightRange;
+    lightDis /= gLightRange;
 
     return lightDis;
 }

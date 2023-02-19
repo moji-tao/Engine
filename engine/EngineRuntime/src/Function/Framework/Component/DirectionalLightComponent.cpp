@@ -15,12 +15,18 @@ namespace Engine
 
 	void DirectionalLightComponent::Tick(float deltaTime)
 	{
+		if (!mIsEnable)
+		{
+			return;
+		}
+
 		auto transform_component = mParentObject->GetComponent<TransformComponent>();
 		
 		RenderResource* resource = RenderSystem::GetInstance()->GetRenderResource();
 
 		ASSERT(resource != nullptr && transform_component != nullptr);
 
+		/*
 		DirectionalLight info;
 
 		Quaternion globalQuaternion = transform_component->GetGlobalQuaternion();
@@ -58,6 +64,16 @@ namespace Engine
 		{
 			resource->UploadDirectionalLight(info);
 		}
+		*/
+		Quaternion globalQuaternion = transform_component->GetGlobalQuaternion();
+
+		DirectionalLightActorParameter parameter;
+		parameter.Color = mColor;
+		parameter.Intensity = mIntensity;
+		parameter.ShowShadow = mShadow;
+		parameter.Direction = globalQuaternion * Vector3::UNIT_Z;
+
+		resource->UploadDirectionalLight(parameter);
 	}
 
 	void DirectionalLightComponent::Serialize(SerializerDataFrame& stream) const
