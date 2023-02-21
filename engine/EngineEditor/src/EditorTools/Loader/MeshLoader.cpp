@@ -176,6 +176,7 @@ namespace Editor
 		unsigned childrenNum = node->mNumChildren;
 		Matrix4x4 m;
 		memcpy(&m, &node->mTransformation, sizeof(m));
+		m = m.Transpose();
 		Vector3 position;
 		Vector3 scale;
 		Quaternion rotation;
