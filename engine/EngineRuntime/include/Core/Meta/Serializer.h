@@ -73,7 +73,7 @@ namespace Engine
 			UNORDERED_MAP,
 			SET,
 			UNORDERED_SET,
-			CUSTOM
+			CUSTOM,
 		};
 
 	public:

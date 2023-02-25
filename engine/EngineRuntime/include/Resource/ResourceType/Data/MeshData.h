@@ -26,6 +26,12 @@ namespace Engine
 		Vector3 Bitangent;
 		// 纹理坐标
 		Vector2 TexCoords;
+		// 骨骼索引
+		uint32_t BoneIndices[4];
+		// 骨骼权重
+		Vector4 BoneWeights;
+		// 骨骼数
+		uint32_t BoneNum;
 	};
 
 	class SubMesh : public ISerializable

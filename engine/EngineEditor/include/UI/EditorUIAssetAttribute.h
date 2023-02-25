@@ -1,5 +1,6 @@
 #pragma once
 #include "EngineEditor/include/UI/EditorUIPassBase.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/SkeletonData.h"
 
 namespace Editor
 {
@@ -18,6 +19,7 @@ namespace Editor
 	private:
 		void ShowDragGuidAsset(Engine::GUID& guid, const std::string& name);
 
+		void ShowSkeleton(Engine::Joint* joint);
 
 	private:
 		Engine::GUID mShowAssetGuid;

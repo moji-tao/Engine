@@ -1,11 +1,12 @@
 #include "Common.hlsl"
 
 StructuredBuffer<InstanceData> gInstanceData : register(t0);
+StructuredBuffer<float4x4> gBoneTransforms : register(t1);
 
-Texture2D BaseColorTexture  : register(t1);
-Texture2D NormalTexture     : register(t2);
-Texture2D MetallicTexture   : register(t3);
-Texture2D RoughnessTexture  : register(t4);
+Texture2D BaseColorTexture : register(t2);
+Texture2D NormalTexture : register(t3);
+Texture2D MetallicTexture : register(t4);
+Texture2D RoughnessTexture : register(t5);
 
 struct VertexIn
 {
@@ -14,6 +15,9 @@ struct VertexIn
     float3 TangentL : TANGENT;
     float3 BitangentL : BITANGENT;
     float2 TexC : TEXCOORD;
+    uint4  BoneIndices : BONEINDICES; 
+    float4 BoneWeights : BONEWEIGHTS; 
+    uint BoneNum : BONENUM; 
 };
 
 struct VertexOut
@@ -42,10 +46,34 @@ VertexOut VS(VertexIn vertexIn, uint instanceID : SV_InstanceID)
 {
     VertexOut vertexOut;
 
-    // 转换到世界坐标
-    float4 worldPos = mul(gInstanceData[instanceID].gWorld, float4(vertexIn.PosL, 1.0f));
-    float4 preWorldPos = mul(gInstanceData[instanceID].gPreWorld, float4(vertexIn.PosL, 1.0f));
-        
+    float4 worldPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 preWorldPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float3 normal = float3(0.0f, 0.0f, 0.0f);
+    float3 tangent = float3(0.0f, 0.0f, 0.0f);
+    if (gInstanceData[instanceID].gBoneSum == 0)
+    {
+        // 转换到世界坐标
+        worldPos = mul(gInstanceData[instanceID].gWorld, float4(vertexIn.PosL, 1.0f));
+        preWorldPos = mul(gInstanceData[instanceID].gPreWorld, float4(vertexIn.PosL, 1.0f));
+        normal = vertexIn.NormalL;
+        tangent = vertexIn.TangentL;
+    }
+    else
+    {
+        for (uint i = 0; i < vertexIn.BoneNum; ++i)
+        {
+            worldPos += vertexIn.BoneWeights[i] * mul(gBoneTransforms[vertexIn.BoneIndices[i]], float4(vertexIn.PosL, 1.0f));
+            preWorldPos += vertexIn.BoneWeights[i] * mul(gBoneTransforms[vertexIn.BoneIndices[i]], float4(vertexIn.PosL, 1.0f));
+
+            normal += vertexIn.BoneWeights[i] * mul((float3x3)gBoneTransforms[vertexIn.BoneIndices[i]], vertexIn.NormalL);
+            tangent += vertexIn.BoneWeights[i] * mul((float3x3)gBoneTransforms[vertexIn.BoneIndices[i]], vertexIn.TangentL);
+        }
+
+        worldPos = mul(gInstanceData[instanceID].gWorld, worldPos);
+        preWorldPos = mul(gInstanceData[instanceID].gPreWorld, preWorldPos);
+    }
+
+
     vertexOut.PosW = worldPos.xyz;
 
     vertexOut.PosH = mul(gJitterViewProj, worldPos);
@@ -54,11 +82,11 @@ VertexOut VS(VertexIn vertexIn, uint instanceID : SV_InstanceID)
     vertexOut.PrevPosH = mul(gPrevViewProj, preWorldPos);
 
     //vertexOut.NormalW = mul((float3x3)transpose(gInstanceData[instanceID].gInvWorld), vertexIn.NormalL);
-    vertexOut.NormalW = mul((float3x3)gInstanceData[instanceID].gWorld, vertexIn.NormalL);
+    vertexOut.NormalW = mul((float3x3)gInstanceData[instanceID].gWorld, normal);
 
     vertexOut.TexC = vertexIn.TexC;
     //vertexOut.TangentW = mul((float3x3)transpose(gInstanceData[instanceID].gInvWorld), vertexIn.TangentL);
-    vertexOut.TangentW = mul((float3x3)gInstanceData[instanceID].gWorld, vertexIn.TangentL);
+    vertexOut.TangentW = mul((float3x3)gInstanceData[instanceID].gWorld, tangent);
 
     return vertexOut;
 }

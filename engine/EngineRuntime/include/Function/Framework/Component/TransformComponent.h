@@ -46,6 +46,8 @@ namespace Engine
 
 		Matrix4x4 GetLocalMatrix() const;
 
+		Matrix4x4 GetLastLocalMatrix() const;
+
 		Matrix4x4 GetGlobalMatrix() const;
 
 		Matrix4x4 GetLastGlobalMatrix() const;

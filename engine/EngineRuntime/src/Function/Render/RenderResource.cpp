@@ -6,9 +6,14 @@
 
 namespace Engine
 {
-	void RenderResource::UploadGameObjectRenderResource(const GUID& refMesh, std::vector<GUID> refMaterials, const ObjectConstants& gConstance)
+	void RenderResource::UploadGameObjectRenderResource(const GUID& refMesh, const std::vector<GUID>& refMaterials, const ObjectConstants& gConstance)
 	{
-		mResource.emplace_back(refMesh, refMaterials, gConstance);
+		mNoSkeletonResource.emplace_back(refMesh, refMaterials, gConstance);
+	}
+
+	void RenderResource::UploadSkeletonGameObjectRenderResource(const GUID& refMesh, const std::vector<GUID>& refMaterials, const ObjectConstants& gConstance, std::vector<Matrix4x4>& gBoneTrans)
+	{
+		mSkeletonResource.emplace_back(refMesh, refMaterials, gConstance, std::move(gBoneTrans));
 	}
 
 	/*
@@ -111,7 +116,8 @@ namespace Engine
 
 	void RenderResource::EndFrameBuffer()
 	{
-		mCameraRenderResource.clear();
+		mCameraRenderNoSkeletonResource.clear();
+		mCameraRenderSkeletonResource.clear();
 		mDirectionalLightResource.clear();
 		mPointLightResource.clear();
 		mSpotLightResource.clear();
@@ -127,7 +133,7 @@ namespace Engine
 
 	void RenderResource::UpdateObjectCBs()
 	{
-		for (auto& [refMesh, refMaterials, constant] : mResource)
+		for (auto& [refMesh, refMaterials, constant] : mNoSkeletonResource)
 		{
 			if (!refMesh.IsVaild())
 			{
@@ -176,14 +182,73 @@ namespace Engine
 						continue;
 					}
 				}
-				
+
 				// End
 
-				mCameraRenderResource[material][&subMeshes[i]].push_back(constant);
+				mCameraRenderNoSkeletonResource[material][&subMeshes[i]].push_back(constant);
+
 			}
 		}
+		mNoSkeletonResource.clear();
 
-		mResource.clear();
+
+		for (auto& [refMesh, refMaterials, constant, boneTrans] : mSkeletonResource)
+		{
+			if (!refMesh.IsVaild())
+			{
+				continue;
+			}
+			Mesh* mesh = AssetManager::GetInstance()->LoadResource<Mesh>(refMesh);
+
+			if (mesh == nullptr)
+			{
+				LOG_ERROR("引用的Mesh资源不存在 {0}", refMesh.Data());
+				continue;
+			}
+
+			std::vector<SubMesh>& subMeshes = mesh->Meshes;
+
+			int end = Math::Min(subMeshes.size(), refMaterials.size());
+
+
+			for (int i = 0; i < end; ++i)
+			{
+				if (!refMaterials[i].IsVaild())
+				{
+					continue;
+				}
+
+				MaterialData* material = AssetManager::GetInstance()->LoadResource<MaterialData>(refMaterials[i]);
+
+				if (material == nullptr)
+				{
+					LOG_ERROR("引用的Material资源不存在 {0}", refMaterials[i].Data());
+					continue;
+				}
+
+				// 视锥体剔除
+
+				//subMeshes[i].
+
+				//subMeshes[i].mBoundingBox.mMin
+
+				if (RenderSystem::GetInstance()->mEnableCulling)
+				{
+					BoundingBox box;
+					subMeshes[i].mBoundingBox.Transform(box, constant.World);
+
+					if (mCameraFrustum.Contains(box) == BoundingFrustum::DISJOINT)
+					{
+						continue;
+					}
+				}
+
+				// End
+
+				mCameraRenderSkeletonResource[material][&subMeshes[i]].emplace_back(constant, boneTrans);
+			}
+		}
+		mSkeletonResource.clear();
 	}
 
 	void RenderResource::UpdateCameraFrustum()

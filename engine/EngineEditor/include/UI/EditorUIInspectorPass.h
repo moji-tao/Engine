@@ -16,8 +16,6 @@ namespace Editor
 	public:
 		virtual void ShowUI() override;
 
-		void DrawVec3Control(const std::string& label, Engine::Vector3& values);
-
 	private:
 		Engine::Actor* mActor = nullptr;
 		Engine::Actor* mLastActor = nullptr;
@@ -32,5 +30,11 @@ namespace Editor
 	private:
 		//MeshRender
 		char mRefMeshName[512];
+
+		// 
+		char mRefSkeletonName[512];
+
+		// 
+		char mRefAnimationName[512];
 	};
 }

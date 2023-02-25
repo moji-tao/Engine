@@ -197,7 +197,7 @@ namespace Engine
 
 		if (it == mComponentsMap.end())
 		{
-			LOG_ERROR("{0} 游戏对象没有 {1} 组件", mObjectName.c_str(), componentName.c_str());
+			//LOG_ERROR("{0} 游戏对象没有 {1} 组件", mObjectName.c_str(), componentName.c_str());
 			return nullptr;
 		}
 

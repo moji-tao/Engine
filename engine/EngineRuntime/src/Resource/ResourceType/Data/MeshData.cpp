@@ -7,11 +7,11 @@
 namespace Engine
 {
 	Vertex::Vertex(const Vector3& position, const Vector3& normal, const Vector3& tangent, const Vector2& texCoords)
-		:Position(position), Normal(normal), Tangent(tangent), TexCoords(texCoords)
+		:Position(position), Normal(normal), Tangent(tangent), TexCoords(texCoords), BoneWeights(Vector4::ZERO), BoneNum(0)
 	{ }
 
 	Vertex::Vertex(float px, float py, float pz, float nx, float ny, float nz, float tx, float ty, float tz, float u, float v)
-		:Position(px,py,pz), Normal(nx,ny,nz), Tangent(tx,ty,tz), TexCoords(u,v)
+		:Position(px,py,pz), Normal(nx,ny,nz), Tangent(tx,ty,tz), TexCoords(u,v), BoneWeights(Vector4::ZERO), BoneNum(0)
 	{ }
 
 	IMPLEMENT_RTTI(Mesh, Object);

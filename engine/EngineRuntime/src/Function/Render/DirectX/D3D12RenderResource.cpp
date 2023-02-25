@@ -64,7 +64,7 @@ namespace Engine
 
 		// Update GameObject
 
-		for (const auto& value : mCameraRenderResource)
+		for (const auto& value : mCameraRenderNoSkeletonResource)
 		{
 			const MaterialData* refMaterial = value.first;
 			const auto& pairs = value.second;
@@ -273,8 +273,230 @@ namespace Engine
 				subMesh.StartIndexLocation = 0;
 				subMesh.BaseVertexLocation = 0;
 
-				D3D12StructuredBufferRef structured_buffer_ref = mRHI->CreateStructuredBuffer(c.data(), sizeof(ObjectConstants), c.size());
-				mBasePassBatchs.emplace_back(material, subMesh, structured_buffer_ref, c.size());
+				ModleResource modleResource;
+				modleResource.gInstanceDataD3D12StructuredBufferRef = mRHI->CreateStructuredBuffer(c.data(), sizeof(ObjectConstants), c.size());
+				modleResource.gBoneTransformsD3D12StructuredBufferRef = mNullSRV;
+
+				mBasePassBatchs.emplace_back(material, subMesh, modleResource, c.size());
+			}
+		}
+
+		for (const auto& value : mCameraRenderSkeletonResource)
+		{
+			const MaterialData* refMaterial = value.first;
+			const auto& pairs = value.second;
+			for (const auto& vv : pairs)
+			{
+				const SubMesh* refSubMesh = vv.first;
+				std::vector<std::pair<ObjectConstants, std::vector<Matrix4x4>>> c = vv.second;
+
+				MaterialResource material;
+
+				// 加载Shader 创建PSO
+				material.Descriptor.mInputLayoutName = "BaseInputLayout";
+				material.Descriptor.mRasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+				material.Descriptor.mDepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+				material.Descriptor.mDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+				material.Descriptor.mDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+				material.Descriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// Position
+				material.Descriptor.mRTVFormats[1] = DXGI_FORMAT_R8G8B8A8_SNORM;		// Normal
+				material.Descriptor.mRTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// BaseColor
+				material.Descriptor.mRTVFormats[3] = DXGI_FORMAT_R8G8B8A8_UNORM;		// MetallicRoughness
+				material.Descriptor.mRTVFormats[4] = DXGI_FORMAT_R8G8B8A8_UNORM;		// Emissive
+				material.Descriptor.mRTVFormats[5] = DXGI_FORMAT_R16G16_FLOAT;			// Velocity
+				material.Descriptor.mNumRenderTargets = 6;
+				material.Descriptor.mDepthStencilFormat = mRHI->GetViewportInfo().DepthStencilFormat;
+				material.Descriptor.m4xMsaaState = false;
+
+				material.Descriptor.mShader = mDefaultBasePassShader.get();
+				// End
+				mGraphicsPSOManager->TryCreatePSO(material.Descriptor);
+
+				// 材质参数
+				ResourceMaterialData materialData;
+
+				// 绑定漫反射纹理
+				do
+				{
+					materialData.AlbedoColor = refMaterial->Albedo;
+
+					if (refMaterial->RefAlbedoTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefAlbedoTexture);
+
+						if (texture == nullptr)
+						{
+							materialData.HasAlbedoTexture = 0;
+							material.DiffuseTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefAlbedoTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefAlbedoTexture, texture))
+							{
+								materialData.HasAlbedoTexture = 0;
+								material.DiffuseTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasAlbedoTexture = 1;
+						material.DiffuseTexture = mTextureMap[refMaterial->RefAlbedoTexture];
+
+					}
+					else
+					{
+						materialData.HasAlbedoTexture = 0;
+						material.DiffuseTexture = mNullTextureResource;
+						break;
+					}
+
+				} while (false);
+
+				// 绑定法线纹理
+				do
+				{
+					if (refMaterial->RefNormalTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefNormalTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasNormalTexture = 0;
+							material.NormalTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefNormalTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefNormalTexture, texture))
+							{
+								materialData.HasNormalTexture = 0;
+								material.NormalTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasNormalTexture = 1;
+						material.NormalTexture = mTextureMap[refMaterial->RefNormalTexture];
+
+					}
+					else
+					{
+						materialData.HasNormalTexture = 0;
+						material.NormalTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				// 绑定金属纹理
+				do
+				{
+					if (refMaterial->RefMetallicTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefMetallicTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasMetallicTexture = 0;
+							material.MetallicTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefMetallicTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefMetallicTexture, texture))
+							{
+								materialData.HasMetallicTexture = 0;
+								material.MetallicTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasMetallicTexture = 1;
+						material.MetallicTexture = mTextureMap[refMaterial->RefMetallicTexture];
+
+					}
+					else
+					{
+						materialData.HasMetallicTexture = 0;
+						material.MetallicTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				// 绑定粗糙度纹理
+				do
+				{
+					if (refMaterial->RefRoughnessTexture.IsVaild())
+					{
+						TextureData* texture = AssetManager::GetInstance()->LoadResource<TextureData>(refMaterial->RefRoughnessTexture);
+						if (texture == nullptr)
+						{
+							materialData.HasRoughnessTexture = 0;
+							material.RoughnessTexture = mNullTextureResource;
+							break;
+						}
+
+						if (mTextureMap.find(refMaterial->RefRoughnessTexture) == mTextureMap.end())
+						{
+							if (!UploadTexture(refMaterial->RefRoughnessTexture, texture))
+							{
+								materialData.HasRoughnessTexture = 0;
+								material.RoughnessTexture = mNullTextureResource;
+								break;
+							}
+						}
+						materialData.HasRoughnessTexture = 1;
+						material.RoughnessTexture = mTextureMap[refMaterial->RefRoughnessTexture];
+
+					}
+					else
+					{
+						materialData.HasRoughnessTexture = 0;
+						material.RoughnessTexture = mNullTextureResource;
+						break;
+					}
+				} while (false);
+
+				materialData.Emissive = refMaterial->Emissive;
+
+				material.cbPass = mRenderCameraBuffer;
+
+				material.cbMaterialData = mRHI->CreateConstantBuffer(&materialData, sizeof(materialData));
+
+				// End
+
+				SubMeshResource subMesh;
+
+				// 加载模型资源
+				if (mVertexMap.find(refSubMesh->mGuid) == mVertexMap.end())
+				{
+					D3D12VertexBufferRef vertexBuffer = mRHI->CreateVertexBuffer(refSubMesh->Vertices.data(), sizeof(Vertex) * refSubMesh->Vertices.size());
+					D3D12IndexBufferRef indexBuffer = mRHI->CreateIndexBuffer(refSubMesh->Indices.data(), sizeof(unsigned) * refSubMesh->Indices.size());
+
+					mVertexMap[refSubMesh->mGuid] = vertexBuffer;
+					mIndexMap[refSubMesh->mGuid] = indexBuffer;
+				}
+				// End
+
+				subMesh.VertexByteStride = sizeof(Vertex);
+				subMesh.VertexBufferByteSize = subMesh.VertexByteStride * refSubMesh->Vertices.size();
+				subMesh.IndexFormat = DXGI_FORMAT_R32_UINT;
+				subMesh.IndexBufferByteSize = sizeof(unsigned) * refSubMesh->Indices.size();
+				subMesh.PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+				subMesh.VertexBufferRef = mVertexMap[refSubMesh->mGuid];
+				subMesh.IndexBufferRef = mIndexMap[refSubMesh->mGuid];
+
+				subMesh.IndexCount = refSubMesh->Indices.size();
+				subMesh.StartIndexLocation = 0;
+				subMesh.BaseVertexLocation = 0;
+
+				for (size_t i = 0; i < c.size(); i++)
+				{
+					ModleResource modleResource;
+					modleResource.gInstanceDataD3D12StructuredBufferRef = mRHI->CreateStructuredBuffer(&c[i].first, sizeof(ObjectConstants), 1);
+					//modleResource.gBoneTransformsD3D12StructuredBufferRef = mRHI->CreateStructuredBuffer(c[i].second.data(), sizeof(Matrix4x4) * c[i].second.size(), 1);
+					modleResource.gBoneTransformsD3D12StructuredBufferRef = mRHI->CreateStructuredBuffer(c[i].second.data(), sizeof(Matrix4x4), c[i].second.size());
+					mBasePassBatchs.emplace_back(material, subMesh, modleResource, 1);
+				}
 			}
 		}
 
@@ -332,7 +554,7 @@ namespace Engine
 		return mComputePSOManager->GetPSO(descriptor);
 	}
 
-	const std::vector<std::tuple<MaterialResource, SubMeshResource, D3D12StructuredBufferRef, uint32_t>>& D3D12RenderResource::GetBasePassBatchs() const
+	const std::vector<std::tuple<MaterialResource, SubMeshResource, ModleResource, uint32_t>>& D3D12RenderResource::GetBasePassBatchs() const
 	{
 		return mBasePassBatchs;
 	}
@@ -478,6 +700,7 @@ namespace Engine
 
 	void D3D12RenderResource::CreateInputLayout()
 	{
+		/*
 		{
 			std::vector<D3D12_INPUT_ELEMENT_DESC> baseInputLayout =
 			{
@@ -495,12 +718,38 @@ namespace Engine
 
 			mInputLayoutManager.AddInputLayout("BaseInputLayout", baseInputLayout);
 		}
+		*/
+		{
+			std::vector<D3D12_INPUT_ELEMENT_DESC> baseInputLayout =
+			{
+				// Vector3 坐标
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector3 法线
+				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector3 切线
+				{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector3 副切线
+				{ "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector2 纹理坐标
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector4 骨骼索引
+				{ "BONEINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// Vector4 骨骼权重
+				{ "BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				// uint 骨骼数
+				{ "BONENUM", 0, DXGI_FORMAT_R32_UINT, 0, 88, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			};
+
+			mInputLayoutManager.AddInputLayout("BaseInputLayout", baseInputLayout);
+		}
+
 	}
 
-	void MaterialResource::BindShaderBindParameters(D3D12StructuredBufferRef cbRef) const
+	void MaterialResource::BindShaderBindParameters(const ModleResource& modleResource) const
 	{
 
-		Descriptor.mShader->SetParameter("gInstanceData", cbRef->GetSRV());
+		Descriptor.mShader->SetParameter("gInstanceData", modleResource.gInstanceDataD3D12StructuredBufferRef->GetSRV());
+		Descriptor.mShader->SetParameter("gBoneTransforms", modleResource.gBoneTransformsD3D12StructuredBufferRef->GetSRV());
 		Descriptor.mShader->SetParameter("cbPass", cbPass);
 		Descriptor.mShader->SetParameter("cbMaterialData", cbMaterialData);
 		Descriptor.mShader->SetParameter("BaseColorTexture", DiffuseTexture->GetSRV());

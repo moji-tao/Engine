@@ -8,7 +8,7 @@ namespace Engine
 	MeshRendererComponent::MeshRendererComponent()
 		:Component()
 	{
-		mOrder = 1;
+		mOrder = 100;
 	}
 
 	MeshRendererComponent::~MeshRendererComponent()
@@ -26,9 +26,9 @@ namespace Engine
 		transform_component->GetRenderMatrix(constans.World, constans.PreWorld);
 
 		constans.InvWorld = constans.World.Inverse();
+		constans.BoneSum = 0;
 
 		resource->UploadGameObjectRenderResource(mRefMesh, mRefMaterials, constans);
-
 	}
 
 	GUID MeshRendererComponent::GetRefMeshGUID()

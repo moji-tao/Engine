@@ -17,6 +17,7 @@ namespace Engine
 		Matrix4x4 World = Matrix4x4::IDENTITY;
 		Matrix4x4 InvWorld = Matrix4x4::IDENTITY;
 		Matrix4x4 PreWorld = World;
+		uint32_t BoneSum;
 	};
 
 	struct CameraPassConstants
@@ -144,19 +145,9 @@ namespace Engine
 		virtual ~RenderResource() = default;
 
 	public:
-		void UploadGameObjectRenderResource(const GUID& refMesh, std::vector<GUID> refMaterials, const ObjectConstants& gConstance);
+		void UploadGameObjectRenderResource(const GUID& refMesh, const std::vector<GUID>& refMaterials, const ObjectConstants& gConstance);
 
-		//void UploadDirectionalLight(DirectionalLight& info);
-
-		//void UploadPointLight(PointLight& info);
-
-		//void UploadSpotLight(SpotLight& info);
-
-		//void UploadDirectionalLightAndShadow(DirectionalLight& info, ShadowParameter shadowParameter);
-
-		//void UploadPointLightAndShadow(PointLight& info);
-
-		//void UploadSpotLightAndShadow(SpotLight& info, ShadowParameter shadowParameter);
+		void UploadSkeletonGameObjectRenderResource(const GUID& refMesh, const std::vector<GUID>& refMaterials, const ObjectConstants& gConstance, std::vector<Matrix4x4>& gBoneTrans);
 
 		void UploadDirectionalLight(const DirectionalLightActorParameter& parameter);
 
@@ -183,9 +174,13 @@ namespace Engine
 		CameraPassConstants mMainCameraPassCB;
 
 		// Mesh Material Constants
-		std::vector<std::tuple<GUID, std::vector<GUID>, ObjectConstants>> mResource;
+		std::vector<std::tuple<GUID, std::vector<GUID>, ObjectConstants>> mNoSkeletonResource;
 
-		std::unordered_map<MaterialData*, std::unordered_map<SubMesh*, std::vector<ObjectConstants>>> mCameraRenderResource;
+		std::unordered_map<MaterialData*, std::unordered_map<SubMesh*, std::vector<ObjectConstants>>> mCameraRenderNoSkeletonResource;
+
+		std::unordered_map<MaterialData*, std::unordered_map<SubMesh*, std::vector<std::pair<ObjectConstants, std::vector<Matrix4x4>>>>> mCameraRenderSkeletonResource;
+
+		std::vector<std::tuple<GUID, std::vector<GUID>, ObjectConstants, std::vector<Matrix4x4>>> mSkeletonResource;
 
 	protected:
 		LightCommonData mLightCommonData;

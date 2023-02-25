@@ -653,9 +653,10 @@ namespace Engine
 		commandList->SetPipelineState(pipeline_state);
 		commandList->SetGraphicsRootSignature(mZPrePassShader->mRootSignature.Get());
 			
-		for (const auto& [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+		for (const auto& [materialResource, subMeshResource, modleResource, InstanceCount] : batchs)
 		{
-			mZPrePassShader->SetParameter("gInstanceData", cD3D12StructuredBufferRef->GetSRV());
+			mZPrePassShader->SetParameter("gInstanceData", modleResource.gInstanceDataD3D12StructuredBufferRef->GetSRV());
+			mZPrePassShader->SetParameter("gBoneTransforms", modleResource.gBoneTransformsD3D12StructuredBufferRef->GetSRV());
 			mZPrePassShader->SetParameter("cbPass", cbPassRef);
 			mZPrePassShader->BindParameters();
 
@@ -702,7 +703,7 @@ namespace Engine
 
 		const auto& batchs = mRenderResource->GetBasePassBatchs();
 
-		for (const auto & [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+		for (const auto & [materialResource, subMeshResource, modleResource, InstanceCount] : batchs)
 		{
 			const GraphicsPSODescriptor& Descriptor = materialResource.Descriptor;
 			ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(Descriptor);
@@ -711,7 +712,7 @@ namespace Engine
 
 			commandList->SetGraphicsRootSignature(Descriptor.mShader->mRootSignature.Get());
 
-			materialResource.BindShaderBindParameters(cD3D12StructuredBufferRef);
+			materialResource.BindShaderBindParameters(modleResource);
 
 			mRHI->SetVertexBuffer(subMeshResource.VertexBufferRef, 0, subMeshResource.VertexByteStride, subMeshResource.VertexBufferByteSize);
 			mRHI->SetIndexBuffer(subMeshResource.IndexBufferRef, 0, subMeshResource.IndexFormat, subMeshResource.IndexBufferByteSize);
@@ -1165,9 +1166,10 @@ namespace Engine
 
 		ShadowPassCBRef = mRHI->CreateConstantBuffer(&cbGPara, sizeof(cbGPara));
 
-		for (const auto& [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+		for (const auto& [materialResource, subMeshResource, modleResource, InstanceCount] : batchs)
 		{
-			shader->SetParameter("gInstanceData", cD3D12StructuredBufferRef->GetSRV());
+			shader->SetParameter("gInstanceData", modleResource.gInstanceDataD3D12StructuredBufferRef->GetSRV());
+			shader->SetParameter("gBoneTransforms", modleResource.gBoneTransformsD3D12StructuredBufferRef->GetSRV());
 			shader->SetParameter("cbLightView", ShadowPassCBRef);
 			shader->BindParameters();
 
@@ -1224,9 +1226,10 @@ namespace Engine
 
 		ShadowPassCBRef = mRHI->CreateConstantBuffer(&cbGPara, sizeof(cbGPara));
 
-		for (const auto& [materialResource, subMeshResource, cD3D12StructuredBufferRef, InstanceCount] : batchs)
+		for (const auto& [materialResource, subMeshResource, modleResource, InstanceCount] : batchs)
 		{
-			shader->SetParameter("gInstanceData", cD3D12StructuredBufferRef->GetSRV());
+			shader->SetParameter("gInstanceData", modleResource.gInstanceDataD3D12StructuredBufferRef->GetSRV());
+			shader->SetParameter("gBoneTransforms", modleResource.gBoneTransformsD3D12StructuredBufferRef->GetSRV());
 			shader->SetParameter("cbLightView", ShadowPassCBRef);
 			shader->BindParameters();
 

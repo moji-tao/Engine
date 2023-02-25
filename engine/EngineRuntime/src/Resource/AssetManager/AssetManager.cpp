@@ -4,6 +4,7 @@
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Framework/Object/Actor.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
+#include "EngineRuntime/include/Resource/ResourceType/Data/AnimationClip.h"
 
 namespace Engine
 {
@@ -159,6 +160,14 @@ namespace Engine
 		else if (ext == ".prefab")
 		{
 			return LoadResourceFromFile<Actor>(resourcePath);
+		}
+		else if (ext == ".skeleton")
+		{
+			return LoadResourceFromFile<SkeletonData>(resourcePath);
+		}
+		else if (ext == ".animation")
+		{
+			return LoadResourceFromFile<AnimationClip>(resourcePath);
 		}
 		else
 		{

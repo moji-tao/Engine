@@ -1,4 +1,6 @@
 #include "EngineEditor/include/UI/EditorUIAssetAttribute.h"
+
+#include "EngineEditor/include/UI/ImGuiExtensions/DrawVec3Control.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 
 namespace Editor
@@ -89,6 +91,16 @@ namespace Editor
 					frame.Save(pathses);
 				}
 			}
+
+			if (resource->GetType().mName == "SkeletonData")
+			{
+				ImGui::Text("骨骼属性");
+				Engine::SkeletonData* skeleton = Engine::DynamicCast<Engine::SkeletonData>(resource);
+
+				Engine::Joint* joint = skeleton->GetRootJoint();
+
+				ShowSkeleton(joint);
+			}
 		} while (false);
 
 		ImGui::End();
@@ -127,6 +139,29 @@ namespace Editor
 					LOG_ERROR("该文件不可以转换为贴图 {0}", file->mName.c_str());
 				}
 			}
+		}
+	}
+
+	void EditorUIAssetAttributePass::ShowSkeleton(Engine::Joint* joint)
+	{
+		bool node_open = ImGui::TreeNodeEx(joint->mJointName.c_str(), ImGuiTreeNodeFlags_OpenOnArrow);
+
+		if (node_open)
+		{
+			ImGui::DrawVec3Control("Position", joint->mTransform.position);
+			if (ImGui::Button("重置##AssetAttribute_Skeleton_Reset"))
+			{
+				joint->mTransform.position = Engine::Vector3::ZERO;
+				joint->mTransform.scale = Engine::Vector3::UNIT_SCALE;
+				joint->mTransform.rotation = Engine::Quaternion::IDENTITY;
+			}
+
+			for (Engine::Joint* child : joint->mChildrens)
+			{
+				ShowSkeleton(child);
+			}
+
+			ImGui::TreePop();
 		}
 	}
 }

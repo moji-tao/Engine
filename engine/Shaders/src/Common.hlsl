@@ -4,7 +4,7 @@
 #include "Utlis.hlsl"
 #include "Sampler.hlsl"
 
-cbuffer cbPass : register(b0)
+cbuffer cbPass
 {
     float4x4 gView;
     float4x4 gInvView;
@@ -57,6 +57,8 @@ struct InstanceData
     float4x4 gWorld;
     float4x4 gInvWorld;
     float4x4 gPreWorld;
+
+    uint gBoneSum;
 };
 
 #endif //__SHADER_COMMON__

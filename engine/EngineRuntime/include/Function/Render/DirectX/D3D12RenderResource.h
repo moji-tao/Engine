@@ -38,6 +38,12 @@ namespace Engine
 		float Roughness;
 	};
 
+	struct ModleResource
+	{
+		D3D12StructuredBufferRef gInstanceDataD3D12StructuredBufferRef;
+		D3D12StructuredBufferRef gBoneTransformsD3D12StructuredBufferRef;
+	};
+
 	struct SSAOCBParameter
 	{
 		float OcclusionRadius;
@@ -50,7 +56,7 @@ namespace Engine
 	{
 		GraphicsPSODescriptor Descriptor;
 
-		void BindShaderBindParameters(D3D12StructuredBufferRef cbRef) const;
+		void BindShaderBindParameters(const ModleResource& modleResource) const;
 
 		D3D12TextureRef DiffuseTexture;
 		D3D12TextureRef NormalTexture;
@@ -80,7 +86,7 @@ namespace Engine
 		ID3D12PipelineState* GetPSO(const GraphicsPSODescriptor& descriptor);
 		ID3D12PipelineState* GetPSO(const ComputePSODescriptor& descriptor);
 
-		const std::vector<std::tuple<MaterialResource, SubMeshResource, D3D12StructuredBufferRef, uint32_t>>& GetBasePassBatchs() const;
+		const std::vector<std::tuple<MaterialResource, SubMeshResource, ModleResource, uint32_t>>& GetBasePassBatchs() const;
 
 		D3D12VertexBufferRef GetMeshVertexBufferRef(const GUID& guid);
 
@@ -115,7 +121,7 @@ namespace Engine
 
 	private:
 		//GameObject
-		std::vector<std::tuple<MaterialResource, SubMeshResource, D3D12StructuredBufferRef, uint32_t>> mBasePassBatchs;
+		std::vector<std::tuple<MaterialResource, SubMeshResource, ModleResource, uint32_t>> mBasePassBatchs;
 
 		//Camera
 		D3D12ConstantBufferRef mRenderCameraBuffer;

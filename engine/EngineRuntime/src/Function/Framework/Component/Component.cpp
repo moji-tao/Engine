@@ -4,6 +4,8 @@
 #include "EngineRuntime/include/Function/Framework/Component/MeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/PointLightComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/SkeletonMeshRendererComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
 
 namespace Engine
 {
@@ -34,9 +36,15 @@ namespace Engine
 	IMPLEMENT_RTTI(MeshRendererComponent, Component);
 	REGISTER_COMPONENT(MeshRendererComponent);
 
+	IMPLEMENT_RTTI(SkeletonMeshRendererComponent, Component);
+	REGISTER_COMPONENT(SkeletonMeshRendererComponent);
+
 	IMPLEMENT_RTTI(DirectionalLightComponent, LightComponent);
 	REGISTER_COMPONENT(DirectionalLightComponent);
 
 	IMPLEMENT_RTTI(PointLightComponent, LightComponent);
 	REGISTER_COMPONENT(PointLightComponent);
+
+	IMPLEMENT_RTTI(AnimationComponent, Component);
+	REGISTER_COMPONENT(AnimationComponent);
 }
