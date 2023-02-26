@@ -15,7 +15,9 @@ namespace Engine
 		virtual void Tick(float deltaTime) override;
 
 	public:
-		bool GetCurrentTickBoneOffsetMat(const std::string& boneName , Matrix4x4& mat);
+		bool GetCurrentTickBoneOffsetMat(const std::string& boneName, Matrix4x4& mat);
+
+		bool GetCurrentTickBoneOffsetTransform(const std::string& boneName , Transform& transform);
 
 		GUID GetAnimationGuid();
 

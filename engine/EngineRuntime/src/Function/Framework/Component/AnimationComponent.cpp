@@ -1,5 +1,4 @@
 #include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
-
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
 #include "EngineRuntime/include/Resource/ResourceType/Data/AnimationClip.h"
 
@@ -60,6 +59,28 @@ namespace Engine
 		}
 
 		if (!animationClip->GetBoneKeyMat(boneName, mCurrentTickAnimationTime, mat))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	bool AnimationComponent::GetCurrentTickBoneOffsetTransform(const std::string& boneName, Transform& transform)
+	{
+		if (!mRefAnimationRes.IsVaild())
+		{
+			return false;
+		}
+
+		AnimationClip* animationClip = AssetManager::GetInstance()->LoadResource<AnimationClip>(mRefAnimationRes);
+
+		if (animationClip == nullptr)
+		{
+			return false;
+		}
+
+		if (!animationClip->GetBoneKeyTransform(boneName, mCurrentTickAnimationTime, transform))
 		{
 			return false;
 		}

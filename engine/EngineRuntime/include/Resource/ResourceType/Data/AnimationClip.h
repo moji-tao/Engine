@@ -13,7 +13,9 @@ namespace Engine
 		virtual ~AnimationClip() override;
 
 	public:
-		bool GetBoneKeyMat(const std::string& boneName, double keyFrame, Matrix4x4& mat);
+		bool GetBoneKeyMat(const std::string& boneName, double second, Matrix4x4& mat);
+
+		bool GetBoneKeyTransform(const std::string& boneName, double second, Transform& transform);
 
 		void AddBoneKey(const std::string& boneName, double keyTime, const Transform& transform);
 
@@ -40,6 +42,8 @@ namespace Engine
 
 	private:
 		void GetKeyFrameLerp(double keyFrameTime, const std::map<double, Transform>& keyFrameMap, Matrix4x4& mat);
+
+		void GetKeyFrameLerp(double keyFrameTime, const std::map<double, Transform>& keyFrameMap, Transform& transform);
 
 	public:
 		virtual void Serialize(SerializerDataFrame& stream) const override;

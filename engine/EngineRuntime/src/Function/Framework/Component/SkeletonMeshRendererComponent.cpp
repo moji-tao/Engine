@@ -3,6 +3,7 @@
 #include <queue>
 
 #include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/AnimatorComponent.h"
 #include "EngineRuntime/include/Function/Framework/Object/Actor.h"
 #include "EngineRuntime/include/Function/Render/RenderResource.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
@@ -53,13 +54,21 @@ namespace Engine
 				std::vector<Matrix4x4> vec;
 				std::vector<Matrix4x4> localToModel;
 				AnimationComponent* animationComponent = mParentObject->GetComponent<AnimationComponent>();
+				AnimatorComponent* animatorComponent = mParentObject->GetComponent<AnimatorComponent>();
 
 				vec.resize(skeleton->GetJointCount());
 				localToModel.resize(skeleton->GetJointCount());
 
 				Matrix4x4 offsetMat = Matrix4x4::IDENTITY;
 
-				if (animationComponent != nullptr)
+				if (animatorComponent != nullptr)
+				{
+					if (!animatorComponent->GetCurrentTickBoneOffsetMat(joint->mJointName, offsetMat))
+					{
+						offsetMat = joint->mTransform.getMatrix();
+					}
+				}
+				else if (animationComponent != nullptr)
 				{
 					if (!animationComponent->GetCurrentTickBoneOffsetMat(joint->mJointName, offsetMat))
 					{
@@ -95,7 +104,14 @@ namespace Engine
 					ASSERT(front->mParent != nullptr && vec[front->mParent->mJointNum] != Matrix4x4::ZERO);
 
 					offsetMat = Matrix4x4::IDENTITY;
-					if (animationComponent != nullptr)
+					if (animatorComponent != nullptr)
+					{
+						if (!animatorComponent->GetCurrentTickBoneOffsetMat(front->mJointName, offsetMat))
+						{
+							offsetMat = front->mTransform.getMatrix();
+						}
+					}
+					else if (animationComponent != nullptr)
 					{
 						if (!animationComponent->GetCurrentTickBoneOffsetMat(front->mJointName, offsetMat))
 						{

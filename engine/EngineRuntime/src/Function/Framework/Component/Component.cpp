@@ -6,6 +6,7 @@
 #include "EngineRuntime/include/Function/Framework/Component/PointLightComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/SkeletonMeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/AnimatorComponent.h"
 
 namespace Engine
 {
@@ -47,4 +48,7 @@ namespace Engine
 
 	IMPLEMENT_RTTI(AnimationComponent, Component);
 	REGISTER_COMPONENT(AnimationComponent);
+
+	IMPLEMENT_RTTI(AnimatorComponent, Component);
+	REGISTER_COMPONENT(AnimatorComponent);
 }

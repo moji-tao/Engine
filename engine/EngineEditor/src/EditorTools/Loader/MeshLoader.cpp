@@ -43,12 +43,18 @@ namespace Editor
 		const aiScene* scene = importer.ReadFileFromMemory(modelFile->GetData(), modelFile->GetSize(),
 			aiProcess_Triangulate | aiProcess_GenBoundingBoxes | aiProcess_ConvertToLeftHanded |
 			aiProcess_SortByPType | aiProcess_CalcTangentSpace | aiProcess_LimitBoneWeights | aiProcess_PopulateArmatureData);
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // 如果不是0
+		/*
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 		{
 			LOG_ERROR("错误::ASSIMP:: {0}", importer.GetErrorString());
 			return Engine::GUID();
 		}
-
+		*/
+		if (scene == nullptr)
+		{
+			LOG_ERROR("错误::ASSIMP:: {0}", importer.GetErrorString());
+			return Engine::GUID();
+		}
 		Mesh mesh;
 		Actor actor;
 		Joint rootJoint;
@@ -89,8 +95,14 @@ namespace Editor
 			{
 				aiAnimation& animation = *scene->mAnimations[i];
 				AnimationClip animationClip;
-
-				animationClip.SetAnimationClipName(animation.mName.C_Str());
+				if (scene->mNumAnimations == 1)
+				{
+					animationClip.SetAnimationClipName(fileName);
+				}
+				else
+				{
+					animationClip.SetAnimationClipName(animation.mName.C_Str());
+				}
 
 				LOG_INFO("动画时长: {0}  TicksPerSecond: {1}", animation.mDuration, animation.mTicksPerSecond);
 				animationClip.SetAnimationTime(animation.mDuration);

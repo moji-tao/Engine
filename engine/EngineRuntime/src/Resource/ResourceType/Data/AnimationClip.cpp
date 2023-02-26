@@ -16,11 +16,16 @@ namespace Engine
 	AnimationClip::~AnimationClip()
     { }
 
-	bool AnimationClip::GetBoneKeyMat(const std::string& boneName, double keyFrame, Matrix4x4& mat)
+	bool AnimationClip::GetBoneKeyMat(const std::string& boneName, double second, Matrix4x4& mat)
     {
-        ASSERT(keyFrame >= 0.0);
+        ASSERT(second >= 0.0);
 
-        keyFrame *= mTicksPerSecond;
+        double keyFrame = second * mTicksPerSecond;
+
+        while (keyFrame >= mAnimationLength)
+        {
+            keyFrame -= mAnimationLength;
+        }
 
         auto it = mAnimation.find(boneName);
 
@@ -33,6 +38,31 @@ namespace Engine
         std::map<double, Transform>& bonePoseKeys = it->second;
 
         GetKeyFrameLerp(keyFrame, bonePoseKeys, mat);
+
+        return true;
+    }
+
+    bool AnimationClip::GetBoneKeyTransform(const std::string& boneName, double second, Transform& transform)
+    {
+        ASSERT(second >= 0.0);
+
+        double keyFrame = second * mTicksPerSecond;
+
+        while (keyFrame >= mAnimationLength)
+        {
+            keyFrame -= mAnimationLength;
+        }
+
+        auto it = mAnimation.find(boneName);
+
+        if (it == mAnimation.end())
+        {
+            return false;
+        }
+
+        std::map<double, Transform>& bonePoseKeys = it->second;
+
+        GetKeyFrameLerp(keyFrame, bonePoseKeys, transform);
 
         return true;
     }
@@ -109,6 +139,45 @@ namespace Engine
         Quaternion rotation = Quaternion::nLerp(t, bg->second.rotation, ed->second.rotation, true);
 
         mat.MakeTransform(position, scale, rotation);
+    }
+
+    void AnimationClip::GetKeyFrameLerp(double keyFrameTime, const std::map<double, Transform>& keyFrameMap, Transform& transform)
+    {
+        auto bg = keyFrameMap.lower_bound(keyFrameTime);
+
+        if (bg == keyFrameMap.end())
+        {
+            // 传入key超出了范围
+            //LOG_WARN("时间帧超出范围 {0}", keyFrameTime);
+            --bg;
+            transform = bg->second;
+            return;
+        }
+
+        if (keyFrameTime == bg->first)
+        {
+            // 时间刚好等于关键帧 返回it->second
+            transform = bg->second;
+            return;
+        }
+
+        if (bg == keyFrameMap.begin())
+        {
+            // key 小于第一个 返回单位矩阵
+            transform.position = Vector3::ZERO;
+            transform.scale = Vector3::UNIT_SCALE;
+            transform.rotation = Quaternion::IDENTITY;
+            return;
+        }
+
+        auto ed = bg--;
+
+        double t = (keyFrameTime - bg->first) / (ed->first - bg->first);
+
+        transform.position = Math::Lerp(bg->second.position, ed->second.position, t);
+        transform.scale = Math::Lerp(bg->second.scale, ed->second.scale, t);
+        transform.rotation = Quaternion::nLerp(t, bg->second.rotation, ed->second.rotation, true);
+
     }
 
 	void AnimationClip::Serialize(SerializerDataFrame& stream) const

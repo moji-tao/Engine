@@ -3,6 +3,7 @@
 #include "EngineEditor/include/UI/ImGuiExtensions/DrawVec3Control.h"
 #include "EngineRuntime/include/Core/Math/Angle.h"
 #include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/AnimatorComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/MeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/TransformComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/DirectionalLightComponent.h"
@@ -315,6 +316,70 @@ namespace Editor
 					{
 						LOG_ERROR("该文件不可以转换为AnimationClip {0}", file->mName.c_str());
 					}
+				}
+			}
+		};
+
+		mComponentUIMap["AnimatorComponent"] = [this](Engine::Component* component)
+		{
+			Engine::AnimatorComponent* animatorComponent = dynamic_cast<Engine::AnimatorComponent*>(component);
+			ASSERT(animatorComponent != nullptr);
+
+			ImGui::DragFloat("权重##AnimatorComponent_Weight", &animatorComponent->mWeight, 0.01f);
+
+			std::vector<std::pair<Engine::GUID, float>>& animations = animatorComponent->GetAnimationBlending();
+
+			ImGui::Text("Animation");
+			bool b = false;
+			for (size_t i = 0; i < animations.size(); i++)
+			{
+				std::string value = "空";
+				if (animations[i].first.IsVaild())
+				{
+					auto ph = Engine::AssetManager::GetInstance()->GetAssetPathFormAssetGuid(animations[i].first);
+					value = ph.filename().generic_string();
+				}
+				ImGui::LabelText(("AnimatorBlending " + std::to_string(i) + "##Inspector_AnimatorComponent").c_str(), "%s", value.c_str());
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(UIProjectFileDrag))
+					{
+						AssetFile* file = *(AssetFile**)payload->Data;
+						std::filesystem::path fileName(file->mName);
+						if (fileName.extension() == ".animation")
+						{
+							std::filesystem::path filePath = file->GetAssetFilePath();
+							Engine::AnimationClip* animationClip = Engine::AssetManager::GetInstance()->LoadResource<Engine::AnimationClip>(filePath);
+							animatorComponent->SetAnimation(i, animationClip->GetGuid());
+						}
+						else
+						{
+							LOG_ERROR("该文件不可以转换为AnimationClip {0}", file->mName.c_str());
+						}
+					}
+				}
+
+				if (ImGui::DragFloat(("动画权重 " + std::to_string(i) + "##AnimatorComponent_Weight").c_str(), &animations[i].second, 0.01f))
+				{
+					b = true;
+				}
+			}
+			if (b)
+			{
+				animatorComponent->SortAnimation();
+			}
+
+			if (ImGui::Button("追加动画"))
+			{
+				animatorComponent->AddAnimation();
+			}
+			if (animations.size() != 0)
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("删除动画"))
+				{
+					animatorComponent->RemoveAnimation();
 				}
 			}
 		};
