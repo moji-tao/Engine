@@ -13,7 +13,13 @@ namespace Engine
 		virtual ~LightComponent() override;
 
 	public:
+		virtual void Awake() override = 0;
+
 		virtual void Tick(float deltaTime) override = 0;
+
+		virtual void OnDestroy() override = 0;
+
+		virtual void OnEnable() override = 0;
 
 	public:
 		virtual void Serialize(SerializerDataFrame& stream) const override;

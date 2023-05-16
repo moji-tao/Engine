@@ -7,10 +7,13 @@ IncludeDir["Boost"] = g_WorkSpaceRootFolder .. "engine/3rd/Boost"
 IncludeDir["jsoncpp"] = g_WorkSpaceRootFolder .. "engine/3rd/jsoncpp/include"
 IncludeDir["yamlcpp"] = g_WorkSpaceRootFolder .. "engine/3rd/yamlcpp/include"
 IncludeDir["spdlog"] = g_WorkSpaceRootFolder .. "engine/3rd/spdlog/include"
+IncludeDir["Lua"] = g_WorkSpaceRootFolder .. "engine/3rd/Lua/src"
+IncludeDir["sol2"] = g_WorkSpaceRootFolder .. "engine/3rd/sol2/include"
 
 include(g_WorkSpaceRootFolder .. "engine/3rd/glfw/premake5.lua")
 include(g_WorkSpaceRootFolder .. "engine/3rd/ImGui/premake5.lua")
 include(g_WorkSpaceRootFolder .. "engine/3rd/spdlog/premake5.lua")
 include(g_WorkSpaceRootFolder .. "engine/3rd/jsoncpp/premake5.lua")
 include(g_WorkSpaceRootFolder .. "engine/3rd/yamlcpp/premake5.lua")
+include(g_WorkSpaceRootFolder .. "engine/3rd/Lua/premake5.lua")
 

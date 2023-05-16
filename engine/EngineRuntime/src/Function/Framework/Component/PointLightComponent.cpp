@@ -11,6 +11,10 @@ namespace Engine
 	PointLightComponent::~PointLightComponent()
 	{ }
 
+	void PointLightComponent::Awake()
+	{
+	}
+
 	void PointLightComponent::Tick(float deltaTime)
 	{
 		if (!mIsEnable)
@@ -31,6 +35,14 @@ namespace Engine
 		parameter.Range = mRange;
 
 		resource->UploadPointLight(parameter);
+	}
+
+	void PointLightComponent::OnDestroy()
+	{
+	}
+
+	void PointLightComponent::OnEnable()
+	{
 	}
 
 	void PointLightComponent::Serialize(SerializerDataFrame& stream) const

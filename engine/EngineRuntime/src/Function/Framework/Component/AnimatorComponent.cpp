@@ -15,6 +15,10 @@ namespace Engine
 	AnimatorComponent::~AnimatorComponent()
 	{ }
 
+	void AnimatorComponent::Awake()
+	{
+	}
+
 	void AnimatorComponent::Tick(float deltaTime)
 	{
 		size_t mAnimCount = mAnimationBlending.size();
@@ -54,6 +58,14 @@ namespace Engine
 			mFirstWeight = 0.0f;
 			mSecondWeight = 1.0f;
 		}
+	}
+
+	void AnimatorComponent::OnDestroy()
+	{
+	}
+
+	void AnimatorComponent::OnEnable()
+	{
 	}
 
 	std::vector<std::pair<GUID, float>>& AnimatorComponent::GetAnimationBlending()

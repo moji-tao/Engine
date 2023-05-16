@@ -140,6 +140,8 @@ namespace Engine
 
 		std::unordered_map<GUID, std::filesystem::path> mFilesPath;
 
+		//std::unordered_map<>
+
 	private:
 		GUID mDefaultBoxMeshGuid;
 		GUID mDefaultCylinderMeshGuid;

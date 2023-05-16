@@ -12,7 +12,13 @@ namespace Engine
 		virtual ~AnimationComponent() override;
 
 	public:
+		virtual void Awake() override;
+
 		virtual void Tick(float deltaTime) override;
+
+		virtual void OnDestroy() override;
+
+		virtual void OnEnable() override;
 
 	public:
 		bool GetCurrentTickBoneOffsetMat(const std::string& boneName, Matrix4x4& mat);

@@ -67,6 +67,7 @@ namespace Engine
 		bool mEnableSSAO = true;
 		bool mEnableAmbientLighting = false;
 		bool mEnableCulling = false;
+		bool mEnableSSR = false;
 
 	public:
 		uint32_t mDrawCall;

@@ -13,6 +13,10 @@ namespace Engine
 	AnimationComponent::~AnimationComponent()
 	{ }
 
+	void AnimationComponent::Awake()
+	{
+	}
+
 	void AnimationComponent::Tick(float deltaTime)
 	{
 		if (!mIsEnable)
@@ -40,6 +44,14 @@ namespace Engine
 		{
 			mCurrentTickAnimationTime -= animationLength;
 		}
+	}
+
+	void AnimationComponent::OnDestroy()
+	{
+	}
+
+	void AnimationComponent::OnEnable()
+	{
 	}
 
 	bool AnimationComponent::GetCurrentTickBoneOffsetMat(const std::string& boneName, Matrix4x4& mat)

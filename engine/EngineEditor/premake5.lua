@@ -37,6 +37,8 @@ project "EngineEditor"
         "%{IncludeDir.jsoncpp}",
         "%{IncludeDir.yamlcpp}",
         "%{IncludeDir.spdlog}",
+        "%{IncludeDir.Lua}",
+        "%{IncludeDir.sol2}",
         g_WorkSpaceRootFolder .. "engine/"
     }
 

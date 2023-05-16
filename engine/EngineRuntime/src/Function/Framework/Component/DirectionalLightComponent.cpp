@@ -13,6 +13,10 @@ namespace Engine
 	DirectionalLightComponent::~DirectionalLightComponent()
 	{ }
 
+	void DirectionalLightComponent::Awake()
+	{
+	}
+
 	void DirectionalLightComponent::Tick(float deltaTime)
 	{
 		if (!mIsEnable)
@@ -74,6 +78,14 @@ namespace Engine
 		parameter.Direction = globalQuaternion * Vector3::UNIT_Z;
 
 		resource->UploadDirectionalLight(parameter);
+	}
+
+	void DirectionalLightComponent::OnDestroy()
+	{
+	}
+
+	void DirectionalLightComponent::OnEnable()
+	{
 	}
 
 	void DirectionalLightComponent::Serialize(SerializerDataFrame& stream) const

@@ -53,6 +53,8 @@ namespace Engine
 
 		void DeferredLightingPass();
 
+		void SSRPass();
+
 		void TAAPass();
 
 		void PostProcessPass();
@@ -175,6 +177,10 @@ namespace Engine
 		std::unique_ptr<Shader> mDeferredLightingShader = nullptr;
 		GraphicsPSODescriptor mDeferredLightingPSODescriptor;
 		std::unique_ptr<RenderTarget2D> mColorTexture = nullptr;
+
+	private:
+		std::unique_ptr<Shader> mSSRShader = nullptr;
+		GraphicsPSODescriptor mSSRPSODescriptor;
 
 	private:
 		// TAA

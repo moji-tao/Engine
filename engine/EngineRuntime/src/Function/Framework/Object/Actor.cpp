@@ -30,6 +30,10 @@ namespace Engine
 		}
 	}
 
+	void Actor::Awake()
+	{
+	}
+
 	void Actor::Tick(float deltaTime)
 	{
 		if (!mIsEnable)
@@ -47,6 +51,15 @@ namespace Engine
 			ASSERT(it != nullptr);
 			it->Tick(deltaTime);
 		}
+	}
+
+	void Actor::OnDestroy()
+	{
+
+	}
+
+	void Actor::OnEnable()
+	{
 	}
 
 	std::string Actor::GetActorName()
@@ -116,6 +129,21 @@ namespace Engine
 		}
 	}
 
+	void Actor::LuaAttachParent(Component* component)
+	{
+		ASSERT(mComponentsMap.find(component->GetType().mName) == mComponentsMap.end());
+
+		mComponentsMap.emplace(component->GetType().mName, component);
+		mComponents.push_back(component);
+
+		component->SetParent(this);
+
+		std::sort(mComponents.begin(), mComponents.end(), [](Component* left, Component* right)
+			{
+				return left->mOrder < right->mOrder;
+			});
+	}
+
 	Actor* Actor::GetParent()
 	{
 		return mParent;
@@ -149,16 +177,6 @@ namespace Engine
 	std::list<Actor*>& Actor::GetChildrens()
 	{
 		return mChildrens;
-	}
-
-	void Actor::SetEnable(bool enable)
-	{
-		mIsEnable = enable;
-	}
-
-	bool Actor::GetEnable()
-	{
-		return mIsEnable;
 	}
 
 	std::vector<Component*>& Actor::GetAllComponent()

@@ -95,6 +95,11 @@ namespace Engine
 
 		DeferredLightingPass();
 
+		if (RenderSystem::GetInstance()->mEnableSSR)
+		{
+			SSRPass();
+		}
+
 		if (RenderSystem::GetInstance()->mEnableTAA)
 		{
 			TAAPass();
@@ -298,6 +303,19 @@ namespace Engine
 			shaderInfo.mVertexShader = vsBlob;
 			shaderInfo.mPixelShader = psBlob;
 			mDeferredLightingShader = std::make_unique<Shader>(shaderInfo, mRHI);
+		}
+
+		{
+			ShaderInfo shaderInfo;
+			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SSRVS.cso");
+			std::shared_ptr<Blob> psBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SSRPS.cso");
+			if (vsBlob == nullptr || psBlob == nullptr)
+			{
+				LOG_FATAL("SSRShader文件读取出错");
+			}
+			shaderInfo.mVertexShader = vsBlob;
+			shaderInfo.mPixelShader = psBlob;
+			mSSRShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
 
 		{
@@ -511,6 +529,18 @@ namespace Engine
 			mDeferredLightingPSODescriptor.mShader = mDeferredLightingShader.get();
 
 			mRenderResource->TryCreatePSO(mDeferredLightingPSODescriptor);
+		}
+
+		{
+			mSSRPSODescriptor.mInputLayoutName = "BaseInputLayout";
+			mSSRPSODescriptor.mShader = mSSRShader.get();
+			mSSRPSODescriptor.mRasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+			mSSRPSODescriptor.mDepthStencilDesc.DepthEnable = false;
+			mSSRPSODescriptor.mDepthStencilFormat = DXGI_FORMAT_UNKNOWN;
+			mSSRPSODescriptor.mPrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			mSSRPSODescriptor.mRTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+			mRenderResource->TryCreatePSO(mSSRPSODescriptor);
 		}
 
 		{
@@ -937,6 +967,36 @@ namespace Engine
 			shader->SetParameter("SpotLightList", mRenderResource->mNullSRV->GetSRV());
 		}
 		shader->SetParameter("cbLightCommon", mRenderResource->mLightCommonDataBuffer);
+
+		shader->BindParameters();
+
+		DrawCallScreen(commandList);
+
+		mRHI->TransitionResource(mColorTexture->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+	}
+
+	void D3D12DeferredRenderPipeline::SSRPass()
+	{
+		auto commandList = mRHI->GetDevice()->GetCommandList();
+
+		// 将ColorBuffer复制到Cache中
+		mRHI->TransitionResource(mColorTexture->GetResource(), D3D12_RESOURCE_STATE_COPY_SOURCE);
+		mRHI->TransitionResource(mCacheColorTexture->GetResource(), D3D12_RESOURCE_STATE_COPY_DEST);
+		mRHI->CopyResource(mCacheColorTexture->GetResource(), mColorTexture->GetResource());
+		mRHI->TransitionResource(mCacheColorTexture->GetResource(), D3D12_RESOURCE_STATE_GENERIC_READ);
+		mRHI->TransitionResource(mColorTexture->GetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		commandList->ClearRenderTargetView(mColorTexture->GetRTV()->GetDescriptorHandle(), mColorTexture->GetClearColorPtr(), 0, nullptr);
+
+		commandList->OMSetRenderTargets(1, &mColorTexture->GetRTV()->GetDescriptorHandle(), true, nullptr);
+
+		ID3D12PipelineState* pipeline_state = mRenderResource->GetPSO(mSSRPSODescriptor);
+		ASSERT(pipeline_state != nullptr);
+		commandList->SetPipelineState(pipeline_state);
+
+		Shader* shader = mSSRPSODescriptor.mShader;
+
+		// mRHI->GetDevice()->GetNativeDevice()->
 
 		shader->BindParameters();
 

@@ -24,7 +24,8 @@ project "EngineRuntime"
         "jsoncpp",
         "spdlog",
         "jsoncpp",
-        "yamlcpp"
+        "yamlcpp",
+        "Lua",
     }
 
     includedirs
@@ -37,6 +38,8 @@ project "EngineRuntime"
         "%{IncludeDir.jsoncpp}",
         "%{IncludeDir.yamlcpp}",
         "%{IncludeDir.spdlog}",
+        "%{IncludeDir.Lua}",
+        "%{IncludeDir.sol2}",
         g_WorkSpaceRootFolder .. "engine/"
     }
 

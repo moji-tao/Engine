@@ -7,6 +7,7 @@
 #include "EngineRuntime/include/Function/Framework/Component/SkeletonMeshRendererComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/AnimationComponent.h"
 #include "EngineRuntime/include/Function/Framework/Component/AnimatorComponent.h"
+#include "EngineRuntime/include/Function/Framework/Component/ScriptComponent.h"
 
 namespace Engine
 {
@@ -15,7 +16,6 @@ namespace Engine
 	std::vector<std::string> Component::ALLInstanceComponentName;
 
 	Component::Component()
-		:mIsEnable(true)
 	{ }
 
 	Component::~Component()
@@ -24,6 +24,11 @@ namespace Engine
 	void Component::SetParent(Actor* parentObject)
 	{
 		mParentObject = parentObject;
+	}
+
+	void Component::LuaAttachParent(Actor* parentObject)
+	{
+		parentObject->LuaAttachParent(this);
 	}
 
 	ComponentClassRegister::ComponentClassRegister(const std::string& className)
@@ -51,4 +56,7 @@ namespace Engine
 
 	IMPLEMENT_RTTI(AnimatorComponent, Component);
 	REGISTER_COMPONENT(AnimatorComponent);
+
+	IMPLEMENT_RTTI(ScriptComponent, Component);
+	REGISTER_COMPONENT(ScriptComponent);
 }

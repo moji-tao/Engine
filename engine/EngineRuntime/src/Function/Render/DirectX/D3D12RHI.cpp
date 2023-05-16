@@ -532,7 +532,7 @@ namespace Engine
 		bool bCreateRTV = CreateFlags & (TexCreate_RTV | TexCreate_CubeRTV);
 		bool bCreateDSV = CreateFlags & (TexCreate_DSV | TexCreate_CubeDSV);
 		bool bCreateUAV = CreateFlags & TexCreate_UAV;
-
+		
 		if (bCreateRTV)
 		{
 			texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET; // | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
@@ -742,7 +742,7 @@ namespace Engine
 			}
 
 			{
-				D3D12_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
+				D3D12_DEPTH_STENCIL_VIEW_DESC DSVDesc = {}; 
 				DSVDesc.Flags = D3D12_DSV_FLAG_NONE;
 				DSVDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
 				DSVDesc.Texture2DArray.MipSlice = 0;
@@ -768,7 +768,7 @@ namespace Engine
 			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 			uavDesc.Texture2D.MipSlice = 0;
-
+			
 			if (TextureInfo.UAVFormat == DXGI_FORMAT_UNKNOWN)
 			{
 				uavDesc.Format = TextureInfo.Format;
@@ -777,7 +777,7 @@ namespace Engine
 			{
 				uavDesc.Format = TextureInfo.UAVFormat;
 			}
-
+			
 			TextureRef->AddUAV(std::make_unique<D3D12UnorderedAccessView>(GetDevice(), uavDesc, textureResource));
 		}
 	}

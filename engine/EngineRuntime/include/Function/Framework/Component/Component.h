@@ -27,7 +27,13 @@ namespace Engine
 	public:
 		void SetParent(Actor* parentObject);
 
-		virtual void Tick(float deltaTime) = 0;
+		virtual void Awake() override = 0;
+
+		virtual void Tick(float deltaTime) override = 0;
+
+		virtual void OnDestroy() override = 0;
+
+		virtual void OnEnable() override = 0;
 
 		virtual void Serialize(SerializerDataFrame& stream) const override = 0;
 
@@ -35,10 +41,12 @@ namespace Engine
 
 		virtual void CloneData(GameObject* node) override = 0;
 
+	public:
+		// Lua Only
+		void LuaAttachParent(Actor* parentObject);
+
 	protected:
 		Actor* mParentObject;
-
-		bool mIsEnable = true;
 
 	protected:
 		unsigned mOrder;

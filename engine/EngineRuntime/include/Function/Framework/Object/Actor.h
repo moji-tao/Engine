@@ -18,13 +18,22 @@ namespace Engine
 		virtual ~Actor() override;
 
 	public:
-		virtual void Tick(float deltaTime);
+		virtual void Awake() override;
+
+		virtual void Tick(float deltaTime) override;
+
+		virtual void OnDestroy() override;
+
+		virtual void OnEnable() override;
 
 		std::string GetActorName();
 
 		void SetActorName(const std::string& name);
 
 		void SetParent(Actor* newParent);
+
+		// User Not Use !!!
+		void LuaAttachParent(Component* component);
 
 		Actor* GetParent();
 
@@ -35,10 +44,6 @@ namespace Engine
 		Actor* GetChildren(uint64_t index);
 
 		std::list<Actor*>& GetChildrens();
-
-		void SetEnable(bool enable);
-
-		bool GetEnable();
 
 		std::vector<Component*>& GetAllComponent();
 
@@ -73,8 +78,6 @@ namespace Engine
 		void AddChildrenForTools(Actor* actor);
 
 	protected:
-		bool mIsEnable = true;
-
 		std::string mObjectName;
 
 		Actor* mParent = nullptr;

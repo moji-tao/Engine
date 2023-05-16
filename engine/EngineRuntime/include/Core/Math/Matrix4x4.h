@@ -124,7 +124,18 @@ namespace Engine
 
 		static const Matrix4x4 IDENTITY;
 
-	private:
-		float m_Value[4][4];
+	public:
+		union
+		{
+			float m_Value[4][4];
+			struct
+			{
+				float m00, m01, m02, m03;
+				float m10, m11, m12, m13;
+				float m20, m21, m22, m23;
+				float m30, m31, m32, m33;
+			};
+		};
+		
 	};
 }

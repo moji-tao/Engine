@@ -20,6 +20,10 @@ namespace Engine
 	SkeletonMeshRendererComponent::~SkeletonMeshRendererComponent()
 	{ }
 
+	void SkeletonMeshRendererComponent::Awake()
+	{
+	}
+
 	void SkeletonMeshRendererComponent::Tick(float deltaTime)
 	{
 		auto transform_component = mParentObject->GetComponent<TransformComponent>();
@@ -138,6 +142,14 @@ namespace Engine
 
 		constans.BoneSum = 0;
 		resource->UploadGameObjectRenderResource(mRefMesh, mRefMaterials, constans);
+	}
+
+	void SkeletonMeshRendererComponent::OnDestroy()
+	{
+	}
+
+	void SkeletonMeshRendererComponent::OnEnable()
+	{
 	}
 
 	GUID SkeletonMeshRendererComponent::GetRefSkeletonGUID()

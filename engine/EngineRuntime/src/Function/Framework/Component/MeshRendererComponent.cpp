@@ -14,6 +14,10 @@ namespace Engine
 	MeshRendererComponent::~MeshRendererComponent()
 	{ }
 
+	void MeshRendererComponent::Awake()
+	{
+	}
+
 	void MeshRendererComponent::Tick(float deltaTime)
 	{
 		auto transform_component = mParentObject->GetComponent<TransformComponent>();
@@ -29,6 +33,14 @@ namespace Engine
 		constans.BoneSum = 0;
 
 		resource->UploadGameObjectRenderResource(mRefMesh, mRefMaterials, constans);
+	}
+
+	void MeshRendererComponent::OnDestroy()
+	{
+	}
+
+	void MeshRendererComponent::OnEnable()
+	{
 	}
 
 	GUID MeshRendererComponent::GetRefMeshGUID()

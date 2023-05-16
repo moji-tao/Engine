@@ -2,6 +2,7 @@
 #include "EngineRuntime/include/Core/Base/macro.h"
 #include "EngineRuntime/include/Function/Framework/World/WorldManager.h"
 #include "EngineRuntime/include/Function/Render/RenderSystem.h"
+#include "EngineRuntime/include/Function/Framework/ScriptSystem.h"
 #include "EngineRuntime/include/Function/Window/WindowSystem.h"
 #include "EngineRuntime/include/Platform/FileSystem/FileSystem.h"
 #include "EngineRuntime/include/Resource/AssetManager/AssetManager.h"
@@ -62,6 +63,14 @@ namespace Engine
 
 		LOG_INFO("渲染系统初始化完成");
 
+		if (!ScriptSystem::GetInstance()->Initialize())
+		{
+			LOG_ERROR("脚本系统初始化失败");
+			return false;
+		}
+
+		LOG_INFO("脚本系统初始化完成");
+
 		if (!WorldManager::GetInstance()->Initialize())
 		{
 			LOG_ERROR("游戏场景初始化失败");
@@ -78,6 +87,7 @@ namespace Engine
 	void EngineRuntime::Finalize()
 	{
 		WorldManager::GetInstance()->Finalize();
+		ScriptSystem::GetInstance()->Finalize();
 		RenderSystem::GetInstance()->Finalize();
 		WindowSystem::GetInstance()->Finalize();
 		AssetManager::GetInstance()->Finalize();

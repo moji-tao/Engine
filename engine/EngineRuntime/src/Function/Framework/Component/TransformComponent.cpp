@@ -19,11 +19,23 @@ namespace Engine
 	TransformComponent::~TransformComponent()
 	{ }
 
+	void TransformComponent::Awake()
+	{
+	}
+
 	void TransformComponent::Tick(float deltaTime)
 	{
 		std::swap(mCurrentTick, mLastTick);
 
 		mTransform[mCurrentTick] = mTransform[mLastTick];
+	}
+
+	void TransformComponent::OnDestroy()
+	{
+	}
+
+	void TransformComponent::OnEnable()
+	{
 	}
 
 	void TransformComponent::Init(const Vector3& position, const Vector3& scale, const Quaternion& quaternion)

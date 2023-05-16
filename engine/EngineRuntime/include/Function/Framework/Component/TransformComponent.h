@@ -13,7 +13,13 @@ namespace Engine
 		virtual ~TransformComponent() override;
 
 	public:
+		virtual void Awake() override;
+
 		virtual void Tick(float deltaTime) override;
+
+		virtual void OnDestroy() override;
+
+		virtual void OnEnable() override;
 
 	public:
 		void Init(const Vector3& position, const Vector3& scale, const Quaternion& quaternion);

@@ -12,7 +12,13 @@ namespace Engine
 		virtual ~PointLightComponent() override;
 
 	public:
+		virtual void Awake() override;
+
 		virtual void Tick(float deltaTime) override;
+
+		virtual void OnDestroy() override;
+
+		virtual void OnEnable() override;
 
 	public:
 		virtual void Serialize(SerializerDataFrame& stream) const override;

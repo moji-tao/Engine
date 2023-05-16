@@ -12,7 +12,13 @@ namespace Engine
 		virtual ~SkeletonMeshRendererComponent() override;
 
 	public:
+		virtual void Awake() override;
+
 		virtual void Tick(float deltaTime) override;
+
+		virtual void OnDestroy() override;
+
+		virtual void OnEnable() override;
 
 	public:
 		GUID GetRefSkeletonGUID();
