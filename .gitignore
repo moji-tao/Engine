@@ -10,3 +10,4 @@ FodyWeavers.xsd
 /bin/*.exe
 /bin/*.pdb
 /*.sln
+/WorkSpace/Test/Logs/*
