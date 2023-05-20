@@ -135,16 +135,6 @@
 			"ShaderName": "Blur",
 			"EntryPoint": "VertCS",
 			"Version": "cs_5_1"
-		},
-		{
-			"ShaderName": "SSR",
-			"EntryPoint": "VS",
-			"Version": "vs_5_1"
-		},
-		{
-			"ShaderName": "SSR",
-			"EntryPoint": "PS",
-			"Version": "ps_5_1"
 		}
 	]
 }

@@ -95,10 +95,12 @@ namespace Engine
 
 		DeferredLightingPass();
 
+		/*
 		if (RenderSystem::GetInstance()->mEnableSSR)
 		{
 			SSRPass();
 		}
+		*/
 
 		if (RenderSystem::GetInstance()->mEnableTAA)
 		{
@@ -304,7 +306,7 @@ namespace Engine
 			shaderInfo.mPixelShader = psBlob;
 			mDeferredLightingShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
-
+		/*
 		{
 			ShaderInfo shaderInfo;
 			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/SSRVS.cso");
@@ -317,7 +319,7 @@ namespace Engine
 			shaderInfo.mPixelShader = psBlob;
 			mSSRShader = std::make_unique<Shader>(shaderInfo, mRHI);
 		}
-
+		*/
 		{
 			ShaderInfo shaderInfo;
 			std::shared_ptr<Blob> vsBlob = EngineFileSystem::GetInstance()->ReadFile("Shaders/TAAVS.cso");
@@ -531,6 +533,7 @@ namespace Engine
 			mRenderResource->TryCreatePSO(mDeferredLightingPSODescriptor);
 		}
 
+		/*
 		{
 			mSSRPSODescriptor.mInputLayoutName = "BaseInputLayout";
 			mSSRPSODescriptor.mShader = mSSRShader.get();
@@ -542,6 +545,7 @@ namespace Engine
 
 			mRenderResource->TryCreatePSO(mSSRPSODescriptor);
 		}
+		*/
 
 		{
 			mPostProcessPSODescriptor.mInputLayoutName = "BaseInputLayout";
